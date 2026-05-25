@@ -6,6 +6,11 @@
   <title>Forge Spin</title>
 
   <style>
+    :root {
+      --accent: #d6a84f;
+      --accent-soft: rgba(214,168,79,0.25);
+    }
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -14,13 +19,15 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      background: #111;
+      background:
+        linear-gradient(rgba(0,0,0,0.20), rgba(0,0,0,0.45)),
+        url("background.png") center center / cover no-repeat fixed;
     }
 
     .game {
       width: 550px;
-      background: rgba(27,27,27,0.94);
-      border: 2px solid #7a5a22;
+      background: rgba(15,15,15,0.90);
+      border: 2px solid var(--accent);
       border-radius: 18px;
       padding: 14px;
       text-align: center;
@@ -28,12 +35,11 @@
       backdrop-filter: blur(3px);
     }
 
-    .logo {
-      max-width: 260px;
-      max-height: 95px;
-      object-fit: contain;
-      margin: 0 auto 10px;
-      display: block;
+    .logoText {
+      color: var(--accent);
+      font-size: 34px;
+      font-weight: bold;
+      margin-bottom: 10px;
     }
 
     .slotFrame {
@@ -44,11 +50,7 @@
       overflow: hidden;
       padding: 8px;
       border-radius: 18px;
-      background:
-        linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.65)),
-        url("images/slot-background.png");
-      background-size: cover;
-      background-position: center;
+      background: #0f0f0f;
       border: 1px solid #333;
       box-shadow: inset 0 0 18px #000;
     }
@@ -98,12 +100,6 @@
       pointer-events: none;
     }
 
-    .blankCell {
-      background: rgba(0,0,0,0.28);
-      border-color: rgba(255,255,255,0.025);
-      box-shadow: inset 0 0 14px rgba(0,0,0,0.95);
-    }
-
     .teaserCell {
       opacity: 0.18;
       filter: grayscale(1) brightness(0.6);
@@ -126,11 +122,11 @@
     }
 
     .winningCell {
-      border: 2px solid #f0c35a;
+      border: 2px solid var(--accent);
       box-shadow:
         inset 0 0 10px rgba(0,0,0,0.8),
-        0 0 16px rgba(240,195,90,0.95),
-        0 0 28px rgba(240,195,90,0.55);
+        0 0 16px var(--accent),
+        0 0 28px var(--accent-soft);
     }
 
     @keyframes shake {
@@ -139,15 +135,91 @@
       100% { transform: translateY(6px); }
     }
 
+    .gemStatusRow {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.1fr;
+      gap: 8px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    .gemMessage {
+      min-height: 22px;
+      font-size: 13px;
+      font-weight: bold;
+      text-align: center;
+      opacity: 0.95;
+    }
+
+    .chaosGem {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto;
+      padding: 0;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chaosGem img {
+      width: 46px;
+      height: 46px;
+      object-fit: contain;
+      pointer-events: none;
+      transition: filter 0.2s ease, transform 0.2s ease;
+    }
+
+    .chaosGem:hover img {
+      transform: scale(1.08);
+    }
+
+    .gem-clear img {
+      filter: brightness(1.15) saturate(0.45)
+        drop-shadow(0 0 6px rgba(190,230,255,0.45));
+    }
+
+    .gem-ruby img {
+      filter: sepia(1) saturate(5) hue-rotate(310deg) brightness(1.1)
+        drop-shadow(0 0 10px #e31b4f);
+    }
+
+    .gem-emerald img {
+      filter: sepia(1) saturate(4) hue-rotate(85deg) brightness(1.1)
+        drop-shadow(0 0 10px #20c56b);
+    }
+
+    .gem-amethyst img {
+      filter: sepia(1) saturate(4) hue-rotate(235deg) brightness(1.15)
+        drop-shadow(0 0 10px #9b5de5);
+    }
+
+    .gem-sapphire img {
+      filter: sepia(1) saturate(4) hue-rotate(185deg) brightness(1.1)
+        drop-shadow(0 0 10px #2f6fff);
+    }
+
+    .gem-topaz img {
+      filter: sepia(1) saturate(4) hue-rotate(350deg) brightness(1.25)
+        drop-shadow(0 0 10px #f5b642);
+    }
+
+    .gem-skull {
+      font-size: 34px;
+      color: #d8d8d8;
+      text-shadow: 0 0 14px rgba(255,255,255,0.95);
+    }
+
     .tokenBar {
-      margin: 8px auto 8px;
+      margin: 0;
       padding: 8px 12px;
-      width: fit-content;
-      min-width: 220px;
       border-radius: 10px;
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.08);
-      color: #d6a84f;
+      color: var(--accent);
       font-size: 18px;
       font-weight: bold;
     }
@@ -158,7 +230,7 @@
       gap: 8px;
       align-items: center;
       margin-top: 8px;
-      background: #141414;
+      background: rgba(20,20,20,0.92);
       border: 1px solid #333;
       border-radius: 12px;
       padding: 8px;
@@ -184,7 +256,7 @@
     }
 
     .controlValue {
-      color: #d6a84f;
+      color: var(--accent);
       font-weight: bold;
       font-size: 16px;
       min-width: 48px;
@@ -199,7 +271,7 @@
       border-radius: 8px;
       border: 1px solid #7a5a22;
       background: #252525;
-      color: #d6a84f;
+      color: var(--accent);
       font-size: 16px;
       font-weight: bold;
       cursor: pointer;
@@ -212,9 +284,9 @@
       margin: 0;
       border: none;
       border-radius: 12px;
-      background: #d6a84f;
+      background: var(--accent);
       color: #111;
-      font-size: 20px;
+      font-size: 16px;
       font-weight: bold;
       cursor: pointer;
     }
@@ -224,17 +296,44 @@
       cursor: not-allowed;
     }
 
-    .totalBetLine {
-      margin-top: 8px;
-      font-size: 14px;
-      color: #ccc;
+    .specialSettings {
+      margin-top: 12px;
+      padding: 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      text-align: left;
     }
 
-    .result {
-      margin-top: 14px;
-      min-height: 70px;
-      font-size: 15px;
-      line-height: 1.45;
+    .specialTitle {
+      color: var(--accent);
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .themeControl {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .themeValue {
+      color: var(--accent);
+      min-width: 80px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .lastSpin {
+      margin-top: 8px;
+      color: #bbb;
+      font-size: 13px;
+      text-align: center;
+      line-height: 1.35;
+      min-height: 20px;
     }
 
     .winInfo {
@@ -256,7 +355,7 @@
 
     .winCard strong {
       display: block;
-      color: #d6a84f;
+      color: var(--accent);
       margin-bottom: 6px;
       font-size: 14px;
     }
@@ -276,7 +375,7 @@
     .winGap {
       margin-top: 8px;
       padding-top: 8px;
-      border-top: 1px solid rgba(214,168,79,0.25);
+      border-top: 1px solid var(--accent-soft);
     }
 
     .bottomStats {
@@ -298,18 +397,14 @@
     }
 
     .resetButton:hover {
-      color: #d6a84f;
-      border-color: #7a5a22;
+      color: var(--accent);
+      border-color: var(--accent);
     }
 
     @media (max-width: 600px) {
       .game {
         width: 94vw;
         padding: 10px;
-      }
-
-      .logo {
-        max-width: 220px;
       }
 
       .slotGrid {
@@ -334,6 +429,7 @@
         height: 208px;
       }
 
+      .gemStatusRow,
       .controlBar {
         grid-template-columns: 1fr;
       }
@@ -343,15 +439,23 @@
 
 <body>
   <div class="game">
-    <img src="images/logo.png" class="logo" alt="MagnettaForged Logo">
+    <div class="logoText">Forge Spin</div>
 
     <div class="slotFrame">
       <div class="activeWindow"></div>
       <div class="slotGrid" id="slotGrid"></div>
     </div>
 
-    <div class="tokenBar">
-      Forge Tokens: <span id="tokenBalance">0</span>
+    <div class="gemStatusRow">
+      <div class="gemMessage" id="gemMessage"></div>
+
+      <button class="chaosGem gem-clear" id="chaosGem" onclick="activateGem()" title="Chaos Gem">
+        <img src="gem.png" alt="Chaos Gem">
+      </button>
+
+      <div class="tokenBar">
+        Forge Tokens: <span id="tokenBalance">0</span>
+      </div>
     </div>
 
     <div class="controlBar">
@@ -369,14 +473,21 @@
         <button class="arrowButton" onclick="changeMultiplier(1)">›</button>
       </div>
 
-      <button class="spinButton" id="spinButton" onclick="spin()">SPIN</button>
+      <button class="spinButton" id="spinButton" onclick="spin()">SPIN — FREE</button>
     </div>
 
-    <div class="totalBetLine">
-      Total Bet: <span id="finalBetDisplay">0</span> Tokens
-    </div>
+    <div class="specialSettings">
+      <div class="specialTitle">Special Settings</div>
 
-    <div class="result" id="result">Choose a bet and press spin.</div>
+      <div class="themeControl">
+        <button class="arrowButton" onclick="changeTheme(-1)">‹</button>
+        <span>Theme</span>
+        <span class="themeValue" id="themeDisplay">Default</span>
+        <button class="arrowButton" onclick="changeTheme(1)">›</button>
+      </div>
+
+      <div class="lastSpin" id="lastSpin">No spin yet.</div>
+    </div>
 
     <div class="winInfo" id="winInfo"></div>
 
@@ -391,11 +502,35 @@
     const VISIBLE_ROWS = 5;
     const COLS = 5;
 
-    const baseBetOptions = [0, 10, 25, 50, 75, 100];
-    const multiplierOptions = [1, 10, 50, 100, 1000, 5000];
+    const baseBetOptions = [0, 10, 50, 75, 100];
+    const multiplierOptions = [1, 10, 50, 100, 1000, 2500, 5000, 10000];
+
+    const themes = {
+      Default: { accent: "#d6a84f", image: "background.png" },
+      Maya: { accent: "#8fdcff", image: "mayatheme.png" },
+      Reign: { accent: "#c46a35", image: "reigntheme.png" },
+      Kyra: { accent: "#9b5de5", image: "kyratheme.png" },
+      Nadia: { accent: "#d6a84f", image: "nadiatheme.png" },
+      Winky: { accent: "#39ff88", image: "winkytheme.png" }
+    };
+
+    let unlockedThemes = JSON.parse(localStorage.getItem("unlockedThemes")) || {
+      Default: true,
+      Maya: false,
+      Reign: false,
+      Kyra: false,
+      Nadia: false,
+      Winky: false
+    };
+
+    let activeTheme = localStorage.getItem("activeTheme") || "Default";
+    let themeIndex = 0;
 
     let baseBetIndex = 0;
     let multiplierIndex = 0;
+
+    let gemActive = false;
+    let currentGem = "clear";
 
     const symbolPool = [
       { name: "Axe", type: "emoji", value: "⚒️" },
@@ -419,11 +554,8 @@
       { name: "Nadia", type: "image", value: "nadia.png" },
       { name: "Nadia", type: "image", value: "nadia.png" },
 
-      { name: "Gem", type: "emoji", value: "💎" },
-      { name: "Gem", type: "emoji", value: "💎" },
-
-      { name: "Blank", type: "blank", value: "" },
-      { name: "Blank", type: "blank", value: "" }
+      { name: "Gem", type: "image", value: "gem.png" },
+      { name: "Gem", type: "image", value: "gem.png" }
     ];
 
     const paylines = [
@@ -444,15 +576,125 @@
 
     const tokenBalance = document.getElementById("tokenBalance");
     const spinCount = document.getElementById("spinCount");
-    const finalBetDisplay = document.getElementById("finalBetDisplay");
     const baseBetDisplay = document.getElementById("baseBetDisplay");
     const multiplierDisplay = document.getElementById("multiplierDisplay");
+    const themeDisplay = document.getElementById("themeDisplay");
     const slotGrid = document.getElementById("slotGrid");
-    const result = document.getElementById("result");
+    const lastSpin = document.getElementById("lastSpin");
     const spinButton = document.getElementById("spinButton");
 
     createGrid();
+    syncThemeIndex();
+    applyTheme(activeTheme);
     updateDisplay();
+
+    function getAvailableThemes() {
+      return Object.keys(themes).filter(theme => unlockedThemes[theme]);
+    }
+
+    function syncThemeIndex() {
+      const availableThemes = getAvailableThemes();
+
+      if (!availableThemes.includes(activeTheme)) {
+        activeTheme = "Default";
+      }
+
+      themeIndex = availableThemes.indexOf(activeTheme);
+    }
+
+    function changeTheme(direction) {
+      const availableThemes = getAvailableThemes();
+
+      themeIndex += direction;
+
+      if (themeIndex < 0) themeIndex = availableThemes.length - 1;
+      if (themeIndex >= availableThemes.length) themeIndex = 0;
+
+      activeTheme = availableThemes[themeIndex];
+      localStorage.setItem("activeTheme", activeTheme);
+
+      applyTheme(activeTheme);
+      updateDisplay();
+    }
+
+    function unlockTheme(themeName) {
+      if (!themes[themeName]) return;
+
+      if (!unlockedThemes[themeName]) {
+        unlockedThemes[themeName] = true;
+        localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+        lastSpin.innerHTML += `<br>${themeName} Theme unlocked.`;
+      }
+    }
+
+    function applyTheme(themeName) {
+      const theme = themes[themeName] || themes.Default;
+
+      document.documentElement.style.setProperty("--accent", theme.accent);
+      document.documentElement.style.setProperty("--accent-soft", theme.accent + "40");
+
+      document.body.style.background = `
+        linear-gradient(rgba(0,0,0,0.20), rgba(0,0,0,0.45)),
+        url("${theme.image}") center center / cover no-repeat fixed
+      `;
+
+      document.querySelector(".slotFrame").style.background = "#0f0f0f";
+    }
+
+    function setGemImage(gem) {
+      gem.innerHTML = '<img src="gem.png" alt="Chaos Gem">';
+    }
+
+    function activateGem() {
+      const gem = document.getElementById("chaosGem");
+      const message = document.getElementById("gemMessage");
+
+      if (gemActive) {
+        gemActive = false;
+        currentGem = "clear";
+
+        gem.className = "chaosGem gem-clear";
+        setGemImage(gem);
+
+        message.textContent = "";
+        message.style.color = "";
+
+        return;
+      }
+
+      gemActive = true;
+
+      const roll = Math.random() * 100;
+      let outcome;
+
+      if (roll < 19.2) {
+        outcome = { name: "ruby", className: "gem-ruby", color: "#e31b4f" };
+      } else if (roll < 38.4) {
+        outcome = { name: "emerald", className: "gem-emerald", color: "#20c56b" };
+      } else if (roll < 57.6) {
+        outcome = { name: "amethyst", className: "gem-amethyst", color: "#9b5de5" };
+      } else if (roll < 76.8) {
+        outcome = { name: "sapphire", className: "gem-sapphire", color: "#2f6fff" };
+      } else if (roll < 96) {
+        outcome = { name: "topaz", className: "gem-topaz", color: "#f5b642" };
+      } else {
+        outcome = { name: "skull", className: "gem-skull", color: "#d8d8d8" };
+      }
+
+      currentGem = outcome.name;
+      gem.className = `chaosGem ${outcome.className}`;
+
+      if (outcome.name === "skull") {
+        gem.textContent = "☠";
+        message.textContent = "Stay awhile and Listen";
+        unlockTheme("Winky");
+      } else {
+        setGemImage(gem);
+        message.textContent = "Gem Activated";
+      }
+
+      message.style.color = outcome.color;
+    }
 
     function randomSymbol() {
       return symbolPool[Math.floor(Math.random() * symbolPool.length)];
@@ -460,16 +702,12 @@
 
     function showSymbol(cell, symbol) {
       cell.innerHTML = "";
-      cell.classList.remove("blankCell");
 
       if (symbol.type === "image") {
         const img = document.createElement("img");
         img.src = symbol.value;
         img.alt = symbol.name;
         cell.appendChild(img);
-      } else if (symbol.type === "blank") {
-        cell.classList.add("blankCell");
-        cell.textContent = "";
       } else {
         cell.textContent = symbol.value;
       }
@@ -534,13 +772,18 @@
     function updateDisplay() {
       const baseBet = getBaseBet();
       const multiplier = getMultiplier();
+      const finalBet = getFinalBet();
 
       tokenBalance.textContent = tokens.toLocaleString();
       spinCount.textContent = totalSpins.toLocaleString();
-      finalBetDisplay.textContent = getFinalBet().toLocaleString();
 
       baseBetDisplay.textContent = baseBet === 0 ? "Free" : baseBet.toLocaleString();
       multiplierDisplay.textContent = multiplier + "x";
+      themeDisplay.textContent = activeTheme;
+
+      spinButton.textContent = finalBet === 0
+        ? "SPIN — FREE"
+        : `SPIN — ${finalBet.toLocaleString()}`;
 
       updateWinInfo();
     }
@@ -550,9 +793,7 @@
       const total = symbolPool.length;
 
       symbolPool.forEach(symbol => {
-        if (symbol.name !== "Blank") {
-          counts[symbol.name] = (counts[symbol.name] || 0) + 1;
-        }
+        counts[symbol.name] = (counts[symbol.name] || 0) + 1;
       });
 
       return Object.values(counts).map(count => count / total);
@@ -596,26 +837,64 @@
       return `${percent}% / 1 in ${oneIn}`;
     }
 
+    function paidMultiplierForMatch(matchCount, symbolName) {
+      const paytables = {
+        Axe: { 2: 0.75, 3: 4, 4: 18, 5: 75 },
+        Gem: { 2: 3, 3: 15, 4: 75, 5: 400 },
+        default: { 2: 1.5, 3: 7, 4: 35, 5: 150 }
+      };
+
+      const table = paytables[symbolName] || paytables.default;
+
+      if (matchCount >= 5) return table[5];
+      if (matchCount === 4) return table[4];
+      if (matchCount === 3) return table[3];
+      if (matchCount === 2) return table[2];
+
+      return 0;
+    }
+
+    function paidPayoutForMatch(matchCount, symbolName, lineBet) {
+      return Math.floor(lineBet * paidMultiplierForMatch(matchCount, symbolName));
+    }
+
+    function freePayoutForMatch(matchCount, symbolName) {
+      const paytables = {
+        Axe: { 2: 15, 3: 75, 4: 200, 5: 750 },
+        Gem: { 2: 100, 3: 400, 4: 1250, 5: 5000 },
+        default: { 2: 40, 3: 175, 4: 500, 5: 1500 }
+      };
+
+      const table = paytables[symbolName] || paytables.default;
+
+      if (matchCount >= 5) return table[5];
+      if (matchCount === 4) return table[4];
+      if (matchCount === 3) return table[3];
+      if (matchCount === 2) return table[2];
+
+      return 0;
+    }
+
     function updateWinInfo() {
       const winInfo = document.getElementById("winInfo");
       const finalBet = getFinalBet();
       const lineBet = getLineBet();
       const odds = calculateOdds();
 
-      const values = finalBet === 0
+      const payoutText = finalBet === 0
         ? {
-            two: 25,
-            three: 100,
-            four: 250,
-            five: 1000,
-            maxTotal: 5000
+            two: "Axe 15 | Char 40 | Gem 100",
+            three: "Axe 75 | Char 175 | Gem 400",
+            four: "Axe 200 | Char 500 | Gem 1,250",
+            five: "Axe 750 | Char 1,500 | Gem 5,000",
+            maxTotal: "25,000"
           }
         : {
-            two: lineBet * 1,
-            three: lineBet * 5,
-            four: lineBet * 25,
-            five: lineBet * 100,
-            maxTotal: lineBet * 100 * paylines.length
+            two: `Axe ${paidPayoutForMatch(2, "Axe", lineBet).toLocaleString()} | Char ${paidPayoutForMatch(2, "Maya", lineBet).toLocaleString()} | Gem ${paidPayoutForMatch(2, "Gem", lineBet).toLocaleString()}`,
+            three: `Axe ${paidPayoutForMatch(3, "Axe", lineBet).toLocaleString()} | Char ${paidPayoutForMatch(3, "Maya", lineBet).toLocaleString()} | Gem ${paidPayoutForMatch(3, "Gem", lineBet).toLocaleString()}`,
+            four: `Axe ${paidPayoutForMatch(4, "Axe", lineBet).toLocaleString()} | Char ${paidPayoutForMatch(4, "Maya", lineBet).toLocaleString()} | Gem ${paidPayoutForMatch(4, "Gem", lineBet).toLocaleString()}`,
+            five: `Axe ${paidPayoutForMatch(5, "Axe", lineBet).toLocaleString()} | Char ${paidPayoutForMatch(5, "Maya", lineBet).toLocaleString()} | Gem ${paidPayoutForMatch(5, "Gem", lineBet).toLocaleString()}`,
+            maxTotal: (paidPayoutForMatch(5, "Gem", lineBet) * paylines.length).toLocaleString()
           };
 
       winInfo.innerHTML = `
@@ -623,22 +902,22 @@
           <strong>Possible Wins & Odds</strong>
 
           <div class="winRow">
-            <span>2 in row: ${values.two.toLocaleString()}</span>
+            <span>2 in row: ${payoutText.two}</span>
             <span>${formatOdds(odds.twoInRow)}</span>
           </div>
 
           <div class="winRow">
-            <span>3 in row: ${values.three.toLocaleString()}</span>
+            <span>3 in row: ${payoutText.three}</span>
             <span>${formatOdds(odds.threeInRow)}</span>
           </div>
 
           <div class="winRow">
-            <span>4 in row: ${values.four.toLocaleString()}</span>
+            <span>4 in row: ${payoutText.four}</span>
             <span>${formatOdds(odds.fourInRow)}</span>
           </div>
 
           <div class="winRow">
-            <span>5 in row: ${values.five.toLocaleString()}</span>
+            <span>5 in row: ${payoutText.five}</span>
             <span>${formatOdds(odds.fiveInRow)}</span>
           </div>
 
@@ -648,27 +927,11 @@
           </div>
 
           <div class="winRow">
-            <span>Max possible win: ${values.maxTotal.toLocaleString()}</span>
+            <span>Max possible win: ${payoutText.maxTotal}</span>
             <span>${formatOdds(odds.approxMaxTotalWin)}</span>
           </div>
         </div>
       `;
-    }
-
-    function paidMultiplierForMatch(matchCount) {
-      if (matchCount >= 5) return 100;
-      if (matchCount === 4) return 25;
-      if (matchCount === 3) return 5;
-      if (matchCount === 2) return 1;
-      return 0;
-    }
-
-    function freePayoutForMatch(matchCount) {
-      if (matchCount >= 5) return 1000;
-      if (matchCount === 4) return 250;
-      if (matchCount === 3) return 100;
-      if (matchCount === 2) return 25;
-      return 0;
     }
 
     function buildFinalGrid() {
@@ -696,16 +959,13 @@
 
       paylines.forEach((line) => {
         const firstSymbol = grid[line.rows[0]][0];
-
-        if (firstSymbol.name === "Blank") return;
-
         let matchCount = 1;
 
         for (let col = 1; col < COLS; col++) {
           const row = line.rows[col];
           const symbol = grid[row][col];
 
-          if (symbol.name === firstSymbol.name && symbol.name !== "Blank") {
+          if (symbol.name === firstSymbol.name) {
             matchCount++;
           } else {
             break;
@@ -723,6 +983,22 @@
       });
 
       return wins;
+    }
+
+    function checkThemeUnlocks(wins) {
+      wins.forEach(win => {
+        if (win.matchCount >= 5) {
+          if (["Maya", "Reign", "Kyra", "Nadia"].includes(win.symbol)) {
+            unlockTheme(win.symbol);
+          }
+
+          if (win.symbol === "Gem") {
+            unlockTheme("Winky");
+          }
+        }
+      });
+
+      syncThemeIndex();
     }
 
     function highlightWins(wins) {
@@ -746,13 +1022,13 @@
       const lineBet = getLineBet();
 
       if (finalBet > tokens) {
-        result.textContent = "Not enough Forge Tokens for that spin.";
+        lastSpin.textContent = "Not enough Forge Tokens.";
         return;
       }
 
       setControlsDisabled(true);
       clearWinningHighlights();
-      result.textContent = "Spinning...";
+      lastSpin.textContent = "Spinning...";
 
       if (finalBet > 0) {
         tokens -= finalBet;
@@ -794,40 +1070,23 @@
       let message = "";
 
       highlightWins(wins);
+      checkThemeUnlocks(wins);
 
       if (finalBet === 0) {
-        if (wins.length === 0) {
-          payout = 0;
-          message = "Payout: 0 Forge Tokens<br>No line win.";
-        } else {
-          const details = [];
-
-          wins.forEach(win => {
-            const linePayout = freePayoutForMatch(win.matchCount);
-            payout += linePayout;
-            details.push(`${win.lineName}: ${win.matchCount}x ${win.symbol}`);
-          });
-
-          message = `
-            Payout: ${payout.toLocaleString()} Forge Tokens<br>
-            ${details.join("<br>")}
-          `;
-        }
-      } else {
-        const details = [];
-
         wins.forEach(win => {
-          const multiplier = paidMultiplierForMatch(win.matchCount);
-          const linePayout = lineBet * multiplier;
-          payout += linePayout;
-
-          details.push(`${win.lineName}: ${win.matchCount}x ${win.symbol}`);
+          payout += freePayoutForMatch(win.matchCount, win.symbol);
         });
+      } else {
+        wins.forEach(win => {
+          payout += paidPayoutForMatch(win.matchCount, win.symbol, lineBet);
+        });
+      }
 
-        message = `
-          Payout: ${payout.toLocaleString()} Forge Tokens<br>
-          ${details.length > 0 ? details.join("<br>") : "No line win"}
-        `;
+      if (wins.length === 0) {
+        message = "Payout: 0";
+      } else {
+        const details = wins.map(win => `${win.matchCount}x ${win.symbol}`).join(" | ");
+        message = `Payout: ${payout.toLocaleString()} | ${details}`;
       }
 
       tokens += payout;
@@ -835,9 +1094,10 @@
 
       localStorage.setItem("forgeTokens", tokens);
       localStorage.setItem("forgeTotalSpins", totalSpins);
+      localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
 
       updateDisplay();
-      result.innerHTML = message;
+      lastSpin.textContent = message;
       setControlsDisabled(false);
     }
 
@@ -851,7 +1111,7 @@
       clearWinningHighlights();
       updateDisplay();
 
-      result.textContent = "Game reset. Tokens and spins set to 0.";
+      lastSpin.textContent = "Game reset. Tokens and spins set to 0.";
     }
   </script>
 </body>

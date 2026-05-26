@@ -116,6 +116,14 @@
         0 0 28px var(--accent-soft);
     }
 
+    .wildCell {
+      border: 2px solid white;
+      box-shadow:
+        inset 0 0 10px rgba(0,0,0,0.8),
+        0 0 18px rgba(255,255,255,0.9),
+        0 0 32px var(--accent-soft);
+    }
+
     @keyframes shake {
       0% { transform: translateY(0); }
       50% { transform: translateY(-6px); }
@@ -406,14 +414,57 @@
       font-size: 13px;
       text-align: center;
       line-height: 1.35;
-      min-height: 20px;
+      min-height: 0;
+      display: none;
+    }
+
+      .statsPanel {
+        display: none;
+        margin-top: 10px;
+        padding: 10px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 10px;
+        font-size: 12px;
+        color: #ddd;
+      }
+
+    .statsPanel.visible {
+      display: block;
+    }
+
+    .statRow {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      padding: 3px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .statRow:last-child {
+      border-bottom: none;
+    }
+
+    .judgementGood {
+      color: #39ff88;
+      font-weight: bold;
+    }
+
+    .judgementSuspicious {
+      color: #f5b642;
+      font-weight: bold;
+    }
+
+    .judgementVoid {
+      color: #ff4444;
+      font-weight: bold;
     }
 
     .devTools {
-      display: none;
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid rgba(255,255,255,0.08);
+        display: none;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255,255,255,0.08);
     }
 
     .devTools.visible {
@@ -600,9 +651,16 @@
       }
     }
   </style>
-</head>
 
-<body>
+<!-- =========================
+     SECTION 2: HTML BODY
+     ========================= -->
+
+  </head>
+
+
+
+<body> 
   <div class="game">
     <div class="logoText">Forge Spin</div>
 
@@ -670,7 +728,16 @@
       </div>
 
       <div class="lastSpin" id="lastSpin">No spin yet.</div>
+      <div class="themeControl" style="margin-top:8px;">
+        <button class="arrowButton" onclick="toggleStats()">‹</button>
+        <span>Statistics</span>
+        <button class="arrowButton" onclick="toggleStats()">›</button>
+      </div>
 
+      <div class="statsPanel" id="statsPanel">
+        <div class="devSectionTitle">Winky’s Judgement</div>
+        <div id="statsContent"></div>
+</div>
       <div class="devTools" id="devTools">
         <div class="devSectionTitle">Theme Tools</div>
         <div class="devButtonGrid">
@@ -685,6 +752,8 @@
         <div class="devSectionTitle">Token Tools</div>
         <div class="devButtonGrid">
           <button class="devButton" onclick="addDevTokens()">+1,000,000 Tokens</button>
+          <button class="devButton" onclick="quickSpin(100)">Quick Spin x100</button>
+          <button class="devButton" onclick="quickSpin(500)">Quick Spin x500</button>
         </div>
       </div>
     </div>
@@ -699,17 +768,23 @@
       <input class="codeInput" id="codeInput" placeholder="Enter code" autocomplete="off">
       <button class="codeButton" onclick="applyCode()">Apply</button>
     </div>
+
     <div class="codeMessage" id="codeMessage"></div>
 
     <button class="resetButton" onclick="resetGame()">Reset Game</button>
   </div>
 
+
   <script>
+    // =========================
+    // CORE SETTINGS Section 3 ------------------------------------------
+    // =========================
+
     const VISIBLE_ROWS = 5;
     const COLS = 5;
 
     const baseBetOptions = [0, 10, 50, 75, 100];
-    const multiplierOptions = [1, 10, 50, 100, 1000, 2500, 5000, 10000];
+    const multiplierOptions = [1, 10, 50, 100, 1000, 2500, 5000, 10000, 25000, 50000];
     const lineCountOptions = [5, 10, 15];
 
     const lineColors = [
@@ -719,12 +794,30 @@
     ];
 
     const themes = {
-      Default: { accent: "#d6a84f", image: "background.png" },
-      Maya: { accent: "#8fdcff", image: "mayatheme.png" },
-      Reign: { accent: "#c46a35", image: "reigntheme.png" },
-      Kyra: { accent: "#9b5de5", image: "kyratheme.png" },
-      Nadia: { accent: "#d6a84f", image: "nadiatheme.png" },
-      Winky: { accent: "#39ff88", image: "winkytheme.png" }
+      Default: {
+        accent: "#d6a84f",
+        image: "background.png"
+      },
+      Maya: {
+        accent: "#8fdcff",
+        image: "mayatheme.png"
+      },
+      Reign: {
+        accent: "#c46a35",
+        image: "reigntheme.png"
+      },
+      Kyra: {
+        accent: "#9b5de5",
+        image: "kyratheme.png"
+      },
+      Nadia: {
+        accent: "#d6a84f",
+        image: "nadiatheme.png"
+      },
+      Winky: {
+        accent: "#39ff88",
+        image: "winkytheme.png"
+      }
     };
 
     let unlockedThemes = JSON.parse(localStorage.getItem("unlockedThemes")) || {
@@ -754,31 +847,66 @@
     let lineAutoHideTimer = null;
     let winPopupTimer = null;
 
-    const symbolPool = [
-      { name: "Axe", type: "emoji", value: "⚒️" },
-      { name: "Axe", type: "emoji", value: "⚒️" },
-      { name: "Axe", type: "emoji", value: "⚒️" },
-      { name: "Axe", type: "emoji", value: "⚒️" },
+    // =========================
+    // THEME-SENSITIVE SYMBOL IMAGES
+    // =========================
 
-      { name: "Maya", type: "image", value: "maya.png" },
-      { name: "Maya", type: "image", value: "maya.png" },
-      { name: "Maya", type: "image", value: "maya.png" },
+    function getThemeSymbolImage() {
+      if (activeTheme === "Kyra") return "scythe.png";
+      if (activeTheme === "Nadia") return "ankh.png";
+      if (activeTheme === "Winky") return "chaosaxe.png";
 
-      { name: "Reign", type: "image", value: "reign.png" },
-      { name: "Reign", type: "image", value: "reign.png" },
-      { name: "Reign", type: "image", value: "reign.png" },
+      return "axe.png";
+    }
 
-      { name: "Kyra", type: "image", value: "kyra.png" },
-      { name: "Kyra", type: "image", value: "kyra.png" },
-      { name: "Kyra", type: "image", value: "kyra.png" },
+    function getAnimalImage() {
+      if (activeTheme === "Maya") return "fox.png";
+      if (activeTheme === "Reign") return "bear.png";
+      if (activeTheme === "Kyra") return "wing.png";
+      if (activeTheme === "Nadia") return "purplemagic.png";
+      if (activeTheme === "Winky") return "chaosanimal.png";
 
-      { name: "Nadia", type: "image", value: "nadia.png" },
-      { name: "Nadia", type: "image", value: "nadia.png" },
-      { name: "Nadia", type: "image", value: "nadia.png" },
+      return "animal.png";
+    }
 
-      { name: "Gem", type: "image", value: "gem.png" },
-      { name: "Gem", type: "image", value: "gem.png" }
-    ];
+    function buildSymbolPool() {
+      return [
+        { name: "Axe", type: "image", value: getThemeSymbolImage() },
+        { name: "Axe", type: "image", value: getThemeSymbolImage() },
+        { name: "Axe", type: "image", value: getThemeSymbolImage() },
+
+        { name: "Animal", type: "image", value: getAnimalImage() },
+        { name: "Animal", type: "image", value: getAnimalImage() },
+        { name: "Animal", type: "image", value: getAnimalImage() },
+
+        { name: "Maya", type: "image", value: "maya.png" },
+        { name: "Maya", type: "image", value: "maya.png" },
+        { name: "Maya", type: "image", value: "maya.png" },
+
+        { name: "Reign", type: "image", value: "reign.png" },
+        { name: "Reign", type: "image", value: "reign.png" },
+        { name: "Reign", type: "image", value: "reign.png" },
+
+        { name: "Kyra", type: "image", value: "kyra.png" },
+        { name: "Kyra", type: "image", value: "kyra.png" },
+        { name: "Kyra", type: "image", value: "kyra.png" },
+
+        { name: "Nadia", type: "image", value: "nadia.png" },
+        { name: "Nadia", type: "image", value: "nadia.png" },
+        { name: "Nadia", type: "image", value: "nadia.png" },
+
+        { name: "Gem", type: "image", value: "gem.png" },
+        { name: "Gem", type: "image", value: "gem.png" },
+
+        { name: "Wild", type: "image", value: "wild.png" }
+      ];
+    }
+
+    let symbolPool = buildSymbolPool();
+
+    // =========================
+    // PAYLINES
+    // =========================
 
     const paylines = [
       { name: "Line 1", rows: [2, 2, 2, 2, 2] },
@@ -800,6 +928,10 @@
       { name: "Line 15", rows: [2, 3, 2, 3, 2] }
     ];
 
+    // =========================
+    // SAVED VALUES
+    // =========================
+
     let tokens = Number(localStorage.getItem("forgeTokens"));
     if (isNaN(tokens)) {
       tokens = 0;
@@ -807,6 +939,17 @@
     }
 
     let totalSpins = Number(localStorage.getItem("forgeTotalSpins")) || 0;
+    let lifetimeTokensEarned = Number(localStorage.getItem("lifetimeTokensEarned")) || 0;
+    let lifetimeTokensWagered = Number(localStorage.getItem("lifetimeTokensWagered")) || 0;
+    let biggestSingleWin = Number(localStorage.getItem("biggestSingleWin")) || 0;
+    let highestBalance = Number(localStorage.getItem("highestBalance")) || tokens;
+    let devToolsUsed = localStorage.getItem("devToolsUsed") === "true";
+    let promoTokensRedeemed = Number(localStorage.getItem("promoTokensRedeemed")) || 0;
+    let statsVisible = false;
+
+    // =========================
+    // DOM REFERENCES
+    // =========================
 
     const tokenBalance = document.getElementById("tokenBalance");
     const spinCount = document.getElementById("spinCount");
@@ -822,6 +965,16 @@
     const devTools = document.getElementById("devTools");
     const codeInput = document.getElementById("codeInput");
     const codeMessage = document.getElementById("codeMessage");
+    const statsPanel = document.getElementById("statsPanel");
+    const statsContent = document.getElementById("statsContent");
+    // =========================
+    // Init / Theme / Display / Grid Section 4 ------------------------------------------
+    // =========================
+
+
+      // =========================
+    // INITIALIZE GAME
+    // =========================
 
     createGrid();
     syncThemeIndex();
@@ -829,6 +982,10 @@
     updateDisplay();
     updateDevToolsVisibility();
     startLinePreview();
+
+    // =========================
+    // LINE COUNT / ACTIVE PAYLINES
+    // =========================
 
     function getLineCount() {
       return lineCountOptions[lineCountIndex];
@@ -847,6 +1004,10 @@
       updateDisplay();
       startLinePreview();
     }
+
+    // =========================
+    // LINE PREVIEW OVERLAY
+    // =========================
 
     function getGridMetrics() {
       const mobile = window.innerWidth <= 600;
@@ -956,6 +1117,10 @@
       lineOverlay.style.display = "none";
     }
 
+    // =========================
+    // THEME LOGIC
+    // =========================
+
     function getAvailableThemes() {
       return Object.keys(themes).filter(theme => unlockedThemes[theme]);
     }
@@ -981,8 +1146,11 @@
       activeTheme = availableThemes[themeIndex];
       localStorage.setItem("activeTheme", activeTheme);
 
+      symbolPool = buildSymbolPool();
       applyTheme(activeTheme);
+      createGrid();
       updateDisplay();
+      refreshReelGemGlow();
     }
 
     function unlockTheme(themeName) {
@@ -992,38 +1160,6 @@
         unlockedThemes[themeName] = true;
         localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
       }
-    }
-
-    function activateThemeDev(themeName) {
-      unlockTheme(themeName);
-      activeTheme = themeName;
-      localStorage.setItem("activeTheme", activeTheme);
-
-      syncThemeIndex();
-      applyTheme(activeTheme);
-      updateDisplay();
-
-      lastSpin.textContent = `${themeName} theme activated.`;
-    }
-
-    function unlockAllThemes() {
-      Object.keys(themes).forEach(theme => {
-        unlockedThemes[theme] = true;
-      });
-
-      localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
-      syncThemeIndex();
-      updateDisplay();
-
-      lastSpin.textContent = "All themes unlocked.";
-    }
-
-    function addDevTokens() {
-      tokens += 1000000;
-      localStorage.setItem("forgeTokens", tokens);
-      updateDisplay();
-
-      lastSpin.textContent = "+1,000,000 Forge Tokens added.";
     }
 
     function applyTheme(themeName) {
@@ -1039,6 +1175,10 @@
 
       document.querySelector(".slotFrame").style.background = "#0f0f0f";
     }
+
+    // =========================
+    // GEM LOGIC
+    // =========================
 
     function setGemImage(gem) {
       gem.innerHTML = '<img src="gem.png" alt="Chaos Gem">';
@@ -1121,6 +1261,10 @@
       refreshReelGemGlow();
     }
 
+    // =========================
+    // SYMBOL DISPLAY
+    // =========================
+
     function randomSymbol() {
       return symbolPool[Math.floor(Math.random() * symbolPool.length)];
     }
@@ -1169,17 +1313,25 @@
       return document.getElementById(`cell-${row}-${col}`);
     }
 
+    // =========================
+    // CONTROL DISPLAY
+    // =========================
+
     function changeBaseBet(direction) {
       baseBetIndex += direction;
+
       if (baseBetIndex < 0) baseBetIndex = baseBetOptions.length - 1;
       if (baseBetIndex >= baseBetOptions.length) baseBetIndex = 0;
+
       updateDisplay();
     }
 
     function changeMultiplier(direction) {
       multiplierIndex += direction;
+
       if (multiplierIndex < 0) multiplierIndex = multiplierOptions.length - 1;
       if (multiplierIndex >= multiplierOptions.length) multiplierIndex = 0;
+
       updateDisplay();
     }
 
@@ -1194,7 +1346,9 @@
     function getFinalBet() {
       const baseBet = getBaseBet();
       const multiplier = getMultiplier();
+
       if (baseBet === 0) return 0;
+
       return baseBet * multiplier;
     }
 
@@ -1228,6 +1382,15 @@
       updateDevToolsVisibility();
     }
 
+    // =========================
+    // ODDS / Payouts / Win Evaluation Section 5  ------------------------------------------
+    // =========================
+
+
+    // =========================
+    // ODDS DISPLAY
+    // =========================
+
     function getSymbolProbabilities() {
       const counts = {};
       const total = symbolPool.length;
@@ -1256,7 +1419,9 @@
       });
 
       const anyLineWin = twoInRow + threeInRow + fourInRow + fiveInRow;
-      const approxAnySpinWin = 1 - Math.pow(1 - anyLineWin, activeLines);
+
+      // Approximate only. Wilds and right-to-left wins make true odds higher.
+      const approxAnySpinWin = 1 - Math.pow(1 - anyLineWin, activeLines * 2);
 
       return {
         twoInRow,
@@ -1313,11 +1478,16 @@
       `;
     }
 
+    // =========================
+    // PAYOUT TABLES
+    // =========================
+
     function paidMultiplierForMatch(matchCount, symbolName) {
       const paytables = {
-        Axe: { 2: 1.5, 3: 8, 4: 36, 5: 150 },
-        Gem: { 2: 6, 3: 30, 4: 150, 5: 800 },
-        default: { 2: 3, 3: 14, 4: 70, 5: 300 }
+        Axe: { 2: 0.5, 3: 3, 4: 12, 5: 60 },
+        Animal: { 2: 0.5, 3: 3, 4: 12, 5: 60 },
+        Gem: { 2: 2, 3: 12, 4: 60, 5: 300 },
+        default: { 2: 1, 3: 6, 4: 25, 5: 120 }
       };
 
       const table = paytables[symbolName] || paytables.default;
@@ -1337,6 +1507,7 @@
     function freePayoutForMatch(matchCount, symbolName) {
       const paytables = {
         Axe: { 2: 15, 3: 75, 4: 200, 5: 750 },
+        Animal: { 2: 15, 3: 75, 4: 200, 5: 750 },
         Gem: { 2: 100, 3: 400, 4: 1250, 5: 5000 },
         default: { 2: 40, 3: 175, 4: 500, 5: 1500 }
       };
@@ -1350,6 +1521,10 @@
 
       return 0;
     }
+
+    // =========================
+    // GRID BUILDING
+    // =========================
 
     function buildFinalGrid() {
       const grid = [];
@@ -1365,9 +1540,129 @@
       return grid;
     }
 
+    // =========================
+    // WIN HELPERS
+    // =========================
+
+    function isWild(symbol) {
+      return symbol && symbol.name === "Wild";
+    }
+
+    function symbolsMatch(baseSymbol, testSymbol) {
+      if (!baseSymbol || !testSymbol) return false;
+      if (isWild(baseSymbol) || isWild(testSymbol)) return true;
+
+      return baseSymbol.name === testSymbol.name;
+    }
+
+    function getBestBaseSymbol(symbols) {
+      const nonWild = symbols.find(symbol => !isWild(symbol));
+
+      if (nonWild) return nonWild;
+
+      // If a line is all wilds, pay as Gem because it should feel premium.
+      return { name: "Gem", type: "image", value: "gem.png" };
+    }
+
+    function evaluateDirection(grid, line, direction) {
+      const columns = direction === "LTR" ? [0, 1, 2, 3, 4] : [4, 3, 2, 1, 0];
+
+      const firstRow = line.rows[columns[0]];
+      const firstSymbol = grid[firstRow][columns[0]];
+
+      let checkedSymbols = [firstSymbol];
+      let baseSymbol = isWild(firstSymbol) ? null : firstSymbol;
+      let matchCount = 1;
+      let cells = [{ row: firstRow, col: columns[0] }];
+
+      for (let i = 1; i < columns.length; i++) {
+        const col = columns[i];
+        const row = line.rows[col];
+        const symbol = grid[row][col];
+
+        if (!baseSymbol && !isWild(symbol)) {
+          baseSymbol = symbol;
+        }
+
+        const compareBase = baseSymbol || firstSymbol;
+
+        if (symbolsMatch(compareBase, symbol)) {
+          matchCount++;
+          checkedSymbols.push(symbol);
+          cells.push({ row, col });
+        } else {
+          break;
+        }
+      }
+
+      if (matchCount < 2) return null;
+
+      const payingSymbol = baseSymbol || getBestBaseSymbol(checkedSymbols);
+
+      return {
+        lineName: line.name,
+        direction,
+        symbol: payingSymbol.name,
+        matchCount,
+        cells
+      };
+    }
+
+    function evaluatePaylines(grid) {
+      const wins = [];
+      const activePaylines = getActivePaylines();
+
+      activePaylines.forEach((line) => {
+        const leftWin = evaluateDirection(grid, line, "LTR");
+        const rightWin = evaluateDirection(grid, line, "RTL");
+
+        // Prevent double-paying the same full 5-symbol line.
+        if (leftWin && rightWin && leftWin.matchCount === 5 && rightWin.matchCount === 5) {
+          wins.push(leftWin);
+          return;
+        }
+
+        if (leftWin) wins.push(leftWin);
+        if (rightWin) wins.push(rightWin);
+      });
+
+      return wins;
+    }
+
+    function checkThemeUnlocks(wins) {
+      wins.forEach(win => {
+        if (win.matchCount >= 5) {
+          if (["Maya", "Reign", "Kyra", "Nadia"].includes(win.symbol)) {
+            unlockTheme(win.symbol);
+          }
+
+          if (win.symbol === "Gem") {
+            unlockTheme("Winky");
+          }
+        }
+      });
+
+      syncThemeIndex();
+    }
+
     function clearWinningHighlights() {
       document.querySelectorAll(".cell").forEach(cell => {
         cell.classList.remove("winningCell");
+        cell.classList.remove("wildCell");
+      });
+    }
+
+    function highlightWins(wins) {
+      wins.forEach(win => {
+        win.cells.forEach(cellPosition => {
+          const cell = getCell(cellPosition.row, cellPosition.col);
+          cell.classList.add("winningCell");
+
+          const img = cell.querySelector("img");
+          if (img && img.alt === "Wild") {
+            cell.classList.add("wildCell");
+          }
+        });
       });
     }
 
@@ -1395,61 +1690,17 @@
       }, 2500);
     }
 
-    function evaluatePaylines(grid) {
-      const wins = [];
-      const activePaylines = getActivePaylines();
+    // =========================
+    // Spin / Dev Tools / Codes/ Close Section 6 ------------------------------------------
+    // =========================
 
-      activePaylines.forEach((line) => {
-        const firstSymbol = grid[line.rows[0]][0];
-        let matchCount = 1;
+    // =========================
+    // SECTION 6: SPIN / DEV TOOLS / CODES / STATS / CLOSE
+    // =========================
 
-        for (let col = 1; col < COLS; col++) {
-          const row = line.rows[col];
-          const symbol = grid[row][col];
-
-          if (symbol.name === firstSymbol.name) {
-            matchCount++;
-          } else {
-            break;
-          }
-        }
-
-        if (matchCount >= 2) {
-          wins.push({
-            lineName: line.name,
-            symbol: firstSymbol.name,
-            matchCount,
-            cells: line.rows.slice(0, matchCount).map((row, col) => ({ row, col }))
-          });
-        }
-      });
-
-      return wins;
-    }
-
-    function checkThemeUnlocks(wins) {
-      wins.forEach(win => {
-        if (win.matchCount >= 5) {
-          if (["Maya", "Reign", "Kyra", "Nadia"].includes(win.symbol)) {
-            unlockTheme(win.symbol);
-          }
-
-          if (win.symbol === "Gem") {
-            unlockTheme("Winky");
-          }
-        }
-      });
-
-      syncThemeIndex();
-    }
-
-    function highlightWins(wins) {
-      wins.forEach(win => {
-        win.cells.forEach(cellPosition => {
-          getCell(cellPosition.row, cellPosition.col).classList.add("winningCell");
-        });
-      });
-    }
+    // =========================
+    // SPIN CONTROL
+    // =========================
 
     function setControlsDisabled(disabled) {
       spinButton.disabled = disabled;
@@ -1464,7 +1715,7 @@
       const lineBet = getLineBet();
 
       if (finalBet > tokens) {
-        lastSpin.textContent = "Not enough Forge Tokens.";
+        codeMessage.textContent = "Not enough Forge Tokens.";
         return;
       }
 
@@ -1472,7 +1723,6 @@
       clearWinPopup();
       setControlsDisabled(true);
       clearWinningHighlights();
-      lastSpin.textContent = "Spinning...";
 
       if (finalBet > 0) {
         tokens -= finalBet;
@@ -1511,7 +1761,6 @@
     function finishSpin(finalGrid, finalBet, lineBet) {
       const wins = evaluatePaylines(finalGrid);
       let payout = 0;
-      let message = "";
 
       highlightWins(wins);
       checkThemeUnlocks(wins);
@@ -1526,24 +1775,233 @@
         });
       }
 
-      if (wins.length === 0) {
-        message = "No win.";
-      } else {
-        message = `${wins.length} winning line${wins.length > 1 ? "s" : ""}.`;
-      }
-
       tokens += payout;
       totalSpins += 1;
+
+      lifetimeTokensEarned += payout;
+      lifetimeTokensWagered += finalBet;
+
+      if (payout > biggestSingleWin) {
+        biggestSingleWin = payout;
+      }
 
       localStorage.setItem("forgeTokens", tokens);
       localStorage.setItem("forgeTotalSpins", totalSpins);
       localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
 
+      saveStats();
       updateDisplay();
-      lastSpin.textContent = message;
+      updateStatsPanel();
       showWinPopup(payout);
       setControlsDisabled(false);
     }
+
+    // =========================
+    // QUICK SPIN DEV TOOL
+    // =========================
+
+    function quickSpin(amount) {
+      markDevToolsUsed();
+
+      const finalBet = getFinalBet();
+      const lineBet = getLineBet();
+
+      let totalPayout = 0;
+      let completedSpins = 0;
+
+      for (let i = 0; i < amount; i++) {
+        if (finalBet > tokens) break;
+
+        if (finalBet > 0) {
+          tokens -= finalBet;
+        }
+
+        const grid = buildFinalGrid();
+        const wins = evaluatePaylines(grid);
+        let spinPayout = 0;
+
+        checkThemeUnlocks(wins);
+
+        if (finalBet === 0) {
+          wins.forEach(win => {
+            spinPayout += freePayoutForMatch(win.matchCount, win.symbol);
+          });
+        } else {
+          wins.forEach(win => {
+            spinPayout += paidPayoutForMatch(win.matchCount, win.symbol, lineBet);
+          });
+        }
+
+        tokens += spinPayout;
+        totalPayout += spinPayout;
+        totalSpins += 1;
+        completedSpins += 1;
+
+        lifetimeTokensEarned += spinPayout;
+        lifetimeTokensWagered += finalBet;
+
+        if (spinPayout > biggestSingleWin) {
+          biggestSingleWin = spinPayout;
+        }
+      }
+
+      localStorage.setItem("forgeTokens", tokens);
+      localStorage.setItem("forgeTotalSpins", totalSpins);
+      localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+
+      saveStats();
+      clearWinningHighlights();
+      clearWinPopup();
+      updateDisplay();
+      updateStatsPanel();
+
+      codeMessage.textContent = `Quick Spin complete: ${completedSpins} spins, +${totalPayout.toLocaleString()} payout.`;
+    }
+
+    // =========================
+    // STATISTICS / WINKY'S JUDGEMENT
+    // =========================
+
+    function saveStats() {
+      if (tokens > highestBalance) {
+        highestBalance = tokens;
+      }
+
+      localStorage.setItem("lifetimeTokensEarned", lifetimeTokensEarned);
+      localStorage.setItem("lifetimeTokensWagered", lifetimeTokensWagered);
+      localStorage.setItem("biggestSingleWin", biggestSingleWin);
+      localStorage.setItem("highestBalance", highestBalance);
+      localStorage.setItem("devToolsUsed", devToolsUsed ? "true" : "false");
+      localStorage.setItem("promoTokensRedeemed", promoTokensRedeemed);
+    }
+
+    function markDevToolsUsed() {
+      devToolsUsed = true;
+      saveStats();
+      updateStatsPanel();
+    }
+
+    function toggleStats() {
+      statsVisible = !statsVisible;
+
+      if (statsVisible) {
+        statsPanel.classList.add("visible");
+      } else {
+        statsPanel.classList.remove("visible");
+      }
+
+      updateStatsPanel();
+    }
+
+    function getReturnRate() {
+      if (lifetimeTokensWagered <= 0) return 0;
+
+      return (lifetimeTokensEarned / lifetimeTokensWagered) * 100;
+    }
+
+    function getWinkyJudgement() {
+      const returnRate = getReturnRate();
+
+      if (devToolsUsed) {
+        return {
+          text: "Void — Winky saw the dev tools",
+          className: "judgementVoid"
+        };
+      }
+
+      if (tokens >= 8000000000 && totalSpins < 100) {
+        return {
+          text: "Void — impossible snack behavior",
+          className: "judgementVoid"
+        };
+      }
+
+      if (totalSpins >= 1000 && returnRate > 250) {
+        return {
+          text: "Suspicious — Winky is watching",
+          className: "judgementSuspicious"
+        };
+      }
+
+      if (totalSpins >= 5000 && returnRate > 180) {
+        return {
+          text: "Suspicious — unusually blessed",
+          className: "judgementSuspicious"
+        };
+      }
+
+      return {
+        text: "Acceptable mortal",
+        className: "judgementGood"
+      };
+    }
+
+    function updateStatsPanel() {
+      if (!statsContent) return;
+
+      const returnRate = getReturnRate();
+      const averageEarned = totalSpins > 0
+        ? Math.floor(lifetimeTokensEarned / totalSpins)
+        : 0;
+
+      const judgement = getWinkyJudgement();
+
+      statsContent.innerHTML = `
+        <div class="statRow">
+          <span>Lifetime Tokens Earned</span>
+          <span>${lifetimeTokensEarned.toLocaleString()}</span>
+        </div>
+
+        <div class="statRow">
+          <span>Lifetime Tokens Wagered</span>
+          <span>${lifetimeTokensWagered.toLocaleString()}</span>
+        </div>
+
+        <div class="statRow">
+          <span>Lifetime Spins</span>
+          <span>${totalSpins.toLocaleString()}</span>
+        </div>
+
+        <div class="statRow">
+          <span>Average Earned / Spin</span>
+          <span>${averageEarned.toLocaleString()}</span>
+        </div>
+
+        <div class="statRow">
+          <span>Return Rate</span>
+          <span>${returnRate.toFixed(2)}%</span>
+        </div>
+
+        <div class="statRow">
+          <span>Highest Balance</span>
+          <span>${highestBalance.toLocaleString()}</span>
+        </div>
+
+        <div class="statRow">
+          <span>Biggest Win</span>
+          <span>${biggestSingleWin.toLocaleString()}</span>
+        </div>
+
+        <div class="statRow">
+          <span>Promo Tokens</span>
+          <span>${promoTokensRedeemed.toLocaleString()}</span>
+        </div>
+
+        <div class="statRow">
+          <span>Dev Tools Used</span>
+          <span>${devToolsUsed ? "Yes" : "No"}</span>
+        </div>
+
+        <div class="statRow">
+          <span>Winky’s Judgement</span>
+          <span class="${judgement.className}">${judgement.text}</span>
+        </div>
+      `;
+    }
+
+    // =========================
+    // DEV THEME / TOKEN TOOLS
+    // =========================
 
     function updateDevToolsVisibility() {
       if (devToolsUnlocked) {
@@ -1552,6 +2010,53 @@
         devTools.classList.remove("visible");
       }
     }
+
+    function activateThemeDev(themeName) {
+      markDevToolsUsed();
+
+      unlockTheme(themeName);
+      activeTheme = themeName;
+      localStorage.setItem("activeTheme", activeTheme);
+
+      syncThemeIndex();
+      symbolPool = buildSymbolPool();
+      applyTheme(activeTheme);
+      createGrid();
+      updateDisplay();
+      refreshReelGemGlow();
+
+      codeMessage.textContent = `${themeName} theme activated.`;
+    }
+
+    function unlockAllThemes() {
+      markDevToolsUsed();
+
+      Object.keys(themes).forEach(theme => {
+        unlockedThemes[theme] = true;
+      });
+
+      localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+      syncThemeIndex();
+      updateDisplay();
+
+      codeMessage.textContent = "All themes unlocked.";
+    }
+
+    function addDevTokens() {
+      markDevToolsUsed();
+
+      tokens += 100000000;
+      localStorage.setItem("forgeTokens", tokens);
+      updateDisplay();
+      saveStats();
+      updateStatsPanel();
+
+      codeMessage.textContent = "+100,000,000 Forge Tokens added.";
+    }
+
+    // =========================
+    // CODES
+    // =========================
 
     function applyCode() {
       const code = codeInput.value.trim().toUpperCase();
@@ -1564,37 +2069,55 @@
       const codeRewards = {
         EMAIL1000: () => {
           tokens += 1000;
+          promoTokensRedeemed += 1000;
+
           localStorage.setItem("forgeTokens", tokens);
           codeMessage.textContent = "+1,000 Forge Tokens.";
+
+          saveStats();
         },
+
         EVENT5000: () => {
           tokens += 5000;
+          promoTokensRedeemed += 5000;
+
           localStorage.setItem("forgeTokens", tokens);
           codeMessage.textContent = "+5,000 Forge Tokens.";
+
+          saveStats();
         },
+
         MAYAFOX: () => {
           unlockTheme("Maya");
           codeMessage.textContent = "Maya theme unlocked.";
         },
+
         REIGNBEAR: () => {
           unlockTheme("Reign");
           codeMessage.textContent = "Reign theme unlocked.";
         },
+
         KYRASCYTHE: () => {
           unlockTheme("Kyra");
           codeMessage.textContent = "Kyra theme unlocked.";
         },
+
         NADIASPELL: () => {
           unlockTheme("Nadia");
           codeMessage.textContent = "Nadia theme unlocked.";
         },
+
         WINKYCHAOS: () => {
           unlockTheme("Winky");
           codeMessage.textContent = "Winky theme unlocked.";
         },
+
         FORGEDEV: () => {
           devToolsUnlocked = true;
           localStorage.setItem("devToolsUnlocked", "true");
+
+          markDevToolsUsed();
+
           codeMessage.textContent = "Dev tools unlocked.";
         }
       };
@@ -1602,9 +2125,11 @@
       if (codeRewards[code]) {
         codeRewards[code]();
         codeInput.value = "";
+
         syncThemeIndex();
         updateDisplay();
         updateDevToolsVisibility();
+        updateStatsPanel();
       } else {
         codeMessage.textContent = "Invalid code.";
       }
@@ -1616,21 +2141,66 @@
       }
     });
 
+    // =========================
+    // RESET
+    // =========================
+
     function resetGame() {
       tokens = 0;
       totalSpins = 0;
 
+      lifetimeTokensEarned = 0;
+      lifetimeTokensWagered = 0;
+      biggestSingleWin = 0;
+      highestBalance = 0;
+      promoTokensRedeemed = 0;
+      devToolsUsed = false;
+
+      unlockedThemes = {
+        Default: true,
+        Maya: false,
+        Reign: false,
+        Kyra: false,
+        Nadia: false,
+        Winky: false
+      };
+
+      activeTheme = "Default";
+      themeIndex = 0;
+      symbolPool = buildSymbolPool();
+
+      devToolsUnlocked = false;
+      statsVisible = false;
+
       localStorage.setItem("forgeTokens", tokens);
       localStorage.setItem("forgeTotalSpins", totalSpins);
+      localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+      localStorage.setItem("activeTheme", activeTheme);
+      localStorage.setItem("devToolsUnlocked", "false");
+
+      saveStats();
 
       clearWinningHighlights();
       clearWinPopup();
+
+      if (statsPanel) {
+        statsPanel.classList.remove("visible");
+      }
+
+      applyTheme(activeTheme);
+      createGrid();
       updateDisplay();
+      updateDevToolsVisibility();
+      updateStatsPanel();
 
       startLinePreview();
 
-      lastSpin.textContent = "Game reset. Tokens and spins set to 0.";
+      codeMessage.textContent = "Game reset. Tokens, stats, and theme progress reset.";
     }
+
+    // =========================
+    // RESIZE HANDLER
+    // =========================
 
     window.addEventListener("resize", () => {
       if (lineOverlayVisible) {

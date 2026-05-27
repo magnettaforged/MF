@@ -1,3 +1,7 @@
+<!-- =========================
+     SECTION 1: HEAD + CSS
+     ========================= -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,6 +13,27 @@
     :root {
       --accent: #d6a84f;
       --accent-soft: rgba(214,168,79,0.25);
+
+      --page-bg: url("background.png");
+      --game-bg: none;
+
+      --ui-bg: rgba(0,0,0,0.54);
+      --ui-bg-soft: rgba(0,0,0,0.42);
+      --ui-border: 1px solid rgba(255,255,255,0.12);
+      --ui-radius: 10px;
+      --ui-shadow: inset 0 0 8px rgba(0,0,0,0.58);
+
+      --button-bg: rgba(0,0,0,0.58);
+      --button-border: 1px solid #7a5a22;
+      --button-radius: 8px;
+
+      --slot-bg: rgba(0,0,0,0);
+      --cell-bg: rgba(0,0,0,0.1);
+    }
+
+    html {
+      min-height: 100%;
+      background: #050505;
     }
 
     body {
@@ -17,22 +42,37 @@
       color: white;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
       min-height: 100vh;
-      background:
-        linear-gradient(rgba(0,0,0,0.20), rgba(0,0,0,0.45)),
-        url("background.png") center center / cover no-repeat fixed;
+      padding-top: 12px;
+      background-color: #050505;
+      background-image:
+        linear-gradient(rgba(0,0,0,0.18), rgba(0,0,0,0.42)),
+        var(--page-bg);
+      background-position: center top;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: scroll;
+      overflow-x: hidden;
     }
 
     .game {
-      width: 500px;
-      background: rgba(15,15,15,0.84);
+      width: 570px;
+      margin-left: auto;
+      margin-right: auto;
+      background-color: rgba(0,0,0,0.10);
+      background-image:
+        linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0)),
+        var(--game-bg);
+      background-position: center top;
+      background-size: cover;
+      background-repeat: no-repeat;
       border: 2px solid var(--accent);
       border-radius: 18px;
       padding: 12px;
       text-align: center;
-      box-shadow: 0 0 25px rgba(0,0,0,0.8);
-      backdrop-filter: blur(3px);
+      box-shadow: 0 0 25px rgba(0,0,0,0.82);
+      backdrop-filter: none;
     }
 
     .logoText {
@@ -40,6 +80,38 @@
       font-size: 32px;
       font-weight: bold;
       margin-bottom: 8px;
+      text-shadow: 0 0 10px rgba(0,0,0,0.85);
+    }
+
+    .uiPanel,
+    .specialSettings,
+    .winCard,
+    .statsPanel {
+      background: var(--ui-bg);
+      border: var(--ui-border);
+      border-radius: var(--ui-radius);
+      box-shadow: var(--ui-shadow);
+    }
+
+    .uiCell,
+    .readout,
+    .tokenReadout {
+      background: var(--ui-bg);
+      border: var(--ui-border);
+      border-radius: 8px;
+      box-shadow: var(--ui-shadow);
+    }
+
+    .uiButton,
+    .arrowButton,
+    .codeButton,
+    .devButton,
+    .resetButton {
+      background: var(--button-bg);
+      border: var(--button-border);
+      border-radius: var(--button-radius);
+      color: var(--accent);
+      cursor: pointer;
     }
 
     .slotFrame {
@@ -50,9 +122,9 @@
       overflow: hidden;
       padding: 8px;
       border-radius: 18px;
-      background: #0f0f0f;
-      border: 1px solid #333;
-      box-shadow: inset 0 0 18px #000;
+      background: var(--slot-bg);
+      border: var(--ui-border);
+      box-shadow: inset 0 0 18px rgba(0,0,0,0.78);
     }
 
     .slotGrid {
@@ -70,9 +142,9 @@
       width: 80px;
       height: 80px;
       border-radius: 12px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-      box-shadow: inset 0 0 8px rgba(0,0,0,0.7);
+      background: var(--cell-bg);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: inset 0 0 8px rgba(0,0,0,0.68);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -194,7 +266,7 @@
 
     .controlPanel {
       margin-top: 8px;
-      padding: 6px 4px;
+      padding: 6px;
       background: transparent;
       border: none;
       border-radius: 0;
@@ -228,7 +300,8 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      min-height: 28px;
+      min-height: 34px;
+      padding: 4px 6px;
       color: #ddd;
     }
 
@@ -249,19 +322,26 @@
 
     .tokenReadout {
       display: flex;
+      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      justify-content: flex-end;
-      gap: 6px;
-      min-height: 32px;
+      min-height: 34px;
+      padding: 4px 6px;
+      line-height: 1.1;
       color: var(--accent);
-      font-size: 17px;
       font-weight: bold;
     }
 
     .tokenReadout span:first-child {
       color: #aaa;
-      font-size: 13px;
+      font-size: 11px;
       font-weight: normal;
+    }
+
+    #tokenBalance {
+      font-family: monospace;
+      font-size: 14px;
+      letter-spacing: 0.4px;
     }
 
     .arrowButton {
@@ -269,13 +349,8 @@
       height: 24px;
       padding: 0;
       margin: 0;
-      border-radius: 7px;
-      border: 1px solid #7a5a22;
-      background: rgba(37,37,37,0.72);
-      color: var(--accent);
       font-size: 15px;
       font-weight: bold;
-      cursor: pointer;
     }
 
     .spinButton {
@@ -290,6 +365,7 @@
       font-size: 17px;
       font-weight: bold;
       cursor: pointer;
+      box-shadow: 0 0 10px var(--accent-soft);
     }
 
     button:disabled {
@@ -380,9 +456,6 @@
     .specialSettings {
       margin-top: 12px;
       padding: 10px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px;
       text-align: left;
     }
 
@@ -418,16 +491,13 @@
       display: none;
     }
 
-      .statsPanel {
-        display: none;
-        margin-top: 10px;
-        padding: 10px;
-        background: rgba(255,255,255,0.03);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 10px;
-        font-size: 12px;
-        color: #ddd;
-      }
+    .statsPanel {
+      display: none;
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 12px;
+      color: #ddd;
+    }
 
     .statsPanel.visible {
       display: block;
@@ -461,10 +531,10 @@
     }
 
     .devTools {
-        display: none;
-        margin-top: 10px;
-        padding-top: 10px;
-        border-top: 1px solid rgba(255,255,255,0.08);
+      display: none;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,0.08);
     }
 
     .devTools.visible {
@@ -486,16 +556,15 @@
     }
 
     .devButton {
-      background: #202020;
-      border: 1px solid rgba(255,255,255,0.12);
       color: #ddd;
-      border-radius: 8px;
       padding: 7px 5px;
       font-size: 11px;
-      cursor: pointer;
     }
 
-    .devButton:hover {
+    .devButton:hover,
+    .arrowButton:hover,
+    .codeButton:hover,
+    .resetButton:hover {
       color: var(--accent);
       border-color: var(--accent);
     }
@@ -510,9 +579,6 @@
     }
 
     .winCard {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 10px;
       padding: 10px;
       line-height: 1.5;
     }
@@ -557,9 +623,9 @@
     }
 
     .codeInput {
-      background: #151515;
+      background: var(--button-bg);
       color: #ddd;
-      border: 1px solid #333;
+      border: var(--ui-border);
       border-radius: 8px;
       padding: 8px;
       font-size: 13px;
@@ -571,13 +637,8 @@
     }
 
     .codeButton {
-      background: #252525;
-      color: var(--accent);
-      border: 1px solid #7a5a22;
-      border-radius: 8px;
       padding: 8px 12px;
       font-size: 13px;
-      cursor: pointer;
     }
 
     .codeMessage {
@@ -590,18 +651,9 @@
     .resetButton {
       margin-top: 10px;
       width: 100%;
-      background: #222;
-      color: #777;
-      border: 1px solid #333;
+      color: #999;
       font-size: 12px;
       padding: 8px;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-
-    .resetButton:hover {
-      color: var(--accent);
-      border-color: var(--accent);
     }
 
     @media (max-width: 600px) {
@@ -631,14 +683,21 @@
       .controlBottomRow,
       .gemRow {
         grid-template-columns: 1fr;
+        gap: 5px;
       }
 
+      .readout,
       .tokenReadout {
-        justify-content: center;
+        min-height: 30px;
+        padding: 3px 5px;
+      }
+
+      #tokenBalance {
+        font-size: 12px;
       }
 
       .spinButton {
-        height: 46px;
+        height: 38px;
       }
 
       .winPopup {
@@ -656,11 +715,9 @@
      SECTION 2: HTML BODY
      ========================= -->
 
-  </head>
+</head>
 
-
-
-<body> 
+<body>
   <div class="game">
     <div class="logoText">Forge Spin</div>
 
@@ -681,7 +738,7 @@
 
         <div class="tokenReadout">
           <span>Forge Tokens</span>
-          <span id="tokenBalance">0</span>
+          <span id="tokenBalance">000,000,000,000</span>
         </div>
       </div>
 
@@ -727,7 +784,6 @@
         <button class="arrowButton" onclick="changeTheme(1)">›</button>
       </div>
 
-      <div class="lastSpin" id="lastSpin">No spin yet.</div>
       <div class="themeControl" style="margin-top:8px;">
         <button class="arrowButton" onclick="toggleStats()">‹</button>
         <span>Statistics</span>
@@ -737,9 +793,13 @@
       <div class="statsPanel" id="statsPanel">
         <div class="devSectionTitle">Winky’s Judgement</div>
         <div id="statsContent"></div>
-</div>
+      </div>
+
+      <div class="lastSpin" id="lastSpin">No spin yet.</div>
+
       <div class="devTools" id="devTools">
         <div class="devSectionTitle">Theme Tools</div>
+
         <div class="devButtonGrid">
           <button class="devButton" onclick="unlockAllThemes()">Unlock All</button>
           <button class="devButton" onclick="activateThemeDev('Maya')">Activate Maya</button>
@@ -750,8 +810,9 @@
         </div>
 
         <div class="devSectionTitle">Token Tools</div>
+
         <div class="devButtonGrid">
-          <button class="devButton" onclick="addDevTokens()">+1,000,000 Tokens</button>
+          <button class="devButton" onclick="addDevTokens()">+100,000,000</button>
           <button class="devButton" onclick="quickSpin(100)">Quick Spin x100</button>
           <button class="devButton" onclick="quickSpin(500)">Quick Spin x500</button>
         </div>
@@ -774,51 +835,106 @@
     <button class="resetButton" onclick="resetGame()">Reset Game</button>
   </div>
 
-
   <script>
+
+
     // =========================
-    // CORE SETTINGS Section 3 ------------------------------------------
+    // SECTION 3: SETTINGS / SYMBOLS / STATE
+    // =========================
+
+    // =========================
+    // CORE SETTINGS
     // =========================
 
     const VISIBLE_ROWS = 5;
     const COLS = 5;
 
     const baseBetOptions = [0, 25, 50, 75, 100];
-    const multiplierOptions = [1, 10, 50, 100, 1000, 2500, 5000, 10000, 25000, 50000];
+    const multiplierOptions = [1, 2, 10, 50, 100, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000, 2500000, 5000000, 10000000, 25000000, 50000000];
     const lineCountOptions = [5, 10, 15];
 
-    const lineColors = [
+    const defaultLineColors = [
       "#f0c35a", "#55d6ff", "#ff4fd8", "#60ff7a", "#ff7a32",
       "#ffffff", "#a855ff", "#00ffd5", "#ff4444", "#99ff33",
       "#ffd166", "#4cc9f0", "#f72585", "#80ffdb", "#f8961e"
     ];
 
+    let lineColors = [...defaultLineColors];
+
+    // =========================
+    // THEME SETTINGS
+    // pageImage = outer website/page background
+    // gameImage = background inside the slot machine body
+    // Default uses transparent game body
+    // =========================
+
     const themes = {
       Default: {
         accent: "#d6a84f",
-        image: "background.png"
+        pageImage: 'url("background.png")',
+        gameImage: "none",
+        lineColors: defaultLineColors
       },
+
       Maya: {
-        accent: "#8fdcff",
-        image: "mayatheme.png"
+        accent: "#D13A2F",
+        pageImage: 'url("background.png")',
+        gameImage: 'url("mayatheme.png")',
+        lineColors: [
+          "#8fdcff", "#ffffff", "#4cc9f0", "#bdefff", "#55d6ff",
+          "#d6a84f", "#80ffdb", "#99e6ff", "#c9f7ff", "#78cfff",
+          "#a8e6ff", "#e6fbff", "#66d9ff", "#f0c35a", "#ffffff"
+        ]
       },
+
       Reign: {
-        accent: "#c46a35",
-        image: "reigntheme.png"
+        accent: "#8A4A2A",
+        pageImage: 'url("background.png")',
+        gameImage: 'url("reigntheme.png")',
+        lineColors: [
+          "#c46a35", "#ff9b4f", "#f0c35a", "#ffffff", "#9b4a22",
+          "#ff6b35", "#d97941", "#ffaa66", "#ffd166", "#b4532a",
+          "#f8961e", "#e76f51", "#f4a261", "#ffb703", "#ffffff"
+        ]
       },
+
       Kyra: {
-        accent: "#9b5de5",
-        image: "kyratheme.png"
+        accent: "#36A3FF",
+        pageImage: 'url("background.png")',
+        gameImage: 'url("kyratheme.png")',
+        lineColors: [
+          "#9b5de5", "#f72585", "#4cc9f0", "#ffffff", "#7209b7",
+          "#b5179e", "#560bad", "#a855ff", "#00ffd5", "#c77dff",
+          "#e0aaff", "#3a0ca3", "#ff4fd8", "#80ffdb", "#ffffff"
+        ]
       },
+
       Nadia: {
-        accent: "#d6a84f",
-        image: "nadiatheme.png"
+        accent: "#9B5DE5",
+        pageImage: 'url("background.png")',
+        gameImage: 'url("nadiatheme.png")',
+        lineColors: [
+          "#d6a84f", "#9b5de5", "#f0c35a", "#ffffff", "#c77dff",
+          "#7b2cbf", "#ffd166", "#e0aaff", "#b8860b", "#ffcc66",
+          "#a855ff", "#f5d76e", "#7209b7", "#ffe29a", "#ffffff"
+        ]
       },
+
       Winky: {
         accent: "#39ff88",
-        image: "winkytheme.png"
+        pageImage: 'url("background.png")',
+        gameImage: 'url("winkytheme.png")',
+        lineColors: [
+          "#39ff88", "#ffffff", "#ff4fd8", "#f5b642", "#00ffd5",
+          "#99ff33", "#ff4444", "#a855ff", "#55d6ff", "#f0c35a",
+          "#80ffdb", "#ff7a32", "#c77dff", "#eaff00", "#ffffff"
+        ]
       }
     };
+
+    // =========================
+    // SAVED THEME / DEV STATE
+    // =========================
 
     let unlockedThemes = JSON.parse(localStorage.getItem("unlockedThemes")) || {
       Default: true,
@@ -833,6 +949,10 @@
 
     let activeTheme = localStorage.getItem("activeTheme") || "Default";
     let themeIndex = 0;
+
+    // =========================
+    // CONTROL STATE
+    // =========================
 
     let baseBetIndex = 0;
     let multiplierIndex = 0;
@@ -870,36 +990,30 @@
     }
 
     function buildSymbolPool() {
-      return [
-        { name: "Axe", type: "image", value: getThemeSymbolImage() },
-        { name: "Axe", type: "image", value: getThemeSymbolImage() },
-        { name: "Axe", type: "image", value: getThemeSymbolImage() },
-
-        { name: "Animal", type: "image", value: getAnimalImage() },
-        { name: "Animal", type: "image", value: getAnimalImage() },
-        { name: "Animal", type: "image", value: getAnimalImage() },
-
-        { name: "Maya", type: "image", value: "maya.png" },
-        { name: "Maya", type: "image", value: "maya.png" },
-        { name: "Maya", type: "image", value: "maya.png" },
-
-        { name: "Reign", type: "image", value: "reign.png" },
-        { name: "Reign", type: "image", value: "reign.png" },
-        { name: "Reign", type: "image", value: "reign.png" },
-
-        { name: "Kyra", type: "image", value: "kyra.png" },
-        { name: "Kyra", type: "image", value: "kyra.png" },
-        { name: "Kyra", type: "image", value: "kyra.png" },
-
-        { name: "Nadia", type: "image", value: "nadia.png" },
-        { name: "Nadia", type: "image", value: "nadia.png" },
-        { name: "Nadia", type: "image", value: "nadia.png" },
-
-        { name: "Gem", type: "image", value: "gem.png" },
-        { name: "Gem", type: "image", value: "gem.png" },
-
-        { name: "Wild", type: "image", value: "wild.png" }
+      const symbolConfig = [
+        ["Axe", 3, () => getThemeSymbolImage()],
+        ["Animal", 3, () => getAnimalImage()],
+        ["Maya", 3, () => "maya.png"],
+        ["Reign", 3, () => "reign.png"],
+        ["Kyra", 3, () => "kyra.png"],
+        ["Nadia", 3, () => "nadia.png"],
+        ["Gem", 2, () => "gem.png"],
+        ["Wild", 1, () => "wild.png"]
       ];
+
+      const pool = [];
+
+      symbolConfig.forEach(([name, count, getImage]) => {
+        for (let i = 0; i < count; i++) {
+          pool.push({
+            name,
+            type: "image",
+            value: getImage()
+          });
+        }
+      });
+
+      return pool;
     }
 
     let symbolPool = buildSymbolPool();
@@ -929,7 +1043,7 @@
     ];
 
     // =========================
-    // SAVED VALUES
+    // SAVED VALUES / STATS
     // =========================
 
     let tokens = Number(localStorage.getItem("forgeTokens"));
@@ -939,6 +1053,7 @@
     }
 
     let totalSpins = Number(localStorage.getItem("forgeTotalSpins")) || 0;
+
     let lifetimeTokensEarned = Number(localStorage.getItem("lifetimeTokensEarned")) || 0;
     let lifetimeTokensWagered = Number(localStorage.getItem("lifetimeTokensWagered")) || 0;
     let biggestSingleWin = Number(localStorage.getItem("biggestSingleWin")) || 0;
@@ -967,12 +1082,12 @@
     const codeMessage = document.getElementById("codeMessage");
     const statsPanel = document.getElementById("statsPanel");
     const statsContent = document.getElementById("statsContent");
+
     // =========================
-    // Init / Theme / Display / Grid Section 4 ------------------------------------------
+    // SECTION 4: INIT / THEME / DISPLAY / GRID
     // =========================
 
-
-      // =========================
+    // =========================
     // INITIALIZE GAME
     // =========================
 
@@ -981,6 +1096,7 @@
     applyTheme(activeTheme);
     updateDisplay();
     updateDevToolsVisibility();
+    updateStatsPanel();
     startLinePreview();
 
     // =========================
@@ -1165,15 +1281,12 @@
     function applyTheme(themeName) {
       const theme = themes[themeName] || themes.Default;
 
+      lineColors = theme.lineColors || defaultLineColors;
+
       document.documentElement.style.setProperty("--accent", theme.accent);
       document.documentElement.style.setProperty("--accent-soft", theme.accent + "40");
-
-      document.body.style.background = `
-        linear-gradient(rgba(0,0,0,0.20), rgba(0,0,0,0.45)),
-        url("${theme.image}") center center / cover no-repeat fixed
-      `;
-
-      document.querySelector(".slotFrame").style.background = "#0f0f0f";
+      document.documentElement.style.setProperty("--page-bg", theme.pageImage || 'url("background.png")');
+      document.documentElement.style.setProperty("--game-bg", theme.gameImage || "none");
     }
 
     // =========================
@@ -1353,20 +1466,31 @@
     }
 
     function getLineBet() {
-      const finalBet = getFinalBet();
-      const activeLines = getActivePaylines().length;
+      const baseBet = getBaseBet();
+      const multiplier = getMultiplier();
 
-      if (finalBet === 0) return 0;
+      if (baseBet === 0) return 0;
 
-    return Math.max(1, Math.floor(finalBet / activeLines));    
+      return baseBet * multiplier;
     }
 
+    function getFinalBet() {
+      const lineBet = getLineBet();
+      const activeLines = getActivePaylines().length;
+
+      return lineBet * activeLines;
+    }
+
+    function formatTokenBank(amount) {
+      const raw = String(Math.floor(amount)).padStart(18, "0");
+      return raw.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
     function updateDisplay() {
       const baseBet = getBaseBet();
       const multiplier = getMultiplier();
       const finalBet = getFinalBet();
 
-      tokenBalance.textContent = tokens.toLocaleString();
+      tokenBalance.textContent = formatTokenBank(tokens);
       spinCount.textContent = totalSpins.toLocaleString();
 
       baseBetDisplay.textContent = baseBet === 0 ? "Free" : baseBet.toLocaleString();
@@ -1380,12 +1504,12 @@
 
       updateWinInfo();
       updateDevToolsVisibility();
+      updateStatsPanel();
     }
 
     // =========================
-    // ODDS / Payouts / Win Evaluation Section 5  ------------------------------------------
+    // SECTION 5: ODDS / PAYOUTS / WIN EVALUATION
     // =========================
-
 
     // =========================
     // ODDS DISPLAY
@@ -1420,7 +1544,8 @@
 
       const anyLineWin = twoInRow + threeInRow + fourInRow + fiveInRow;
 
-      // Approximate only. Wilds and right-to-left wins make true odds higher.
+      // Approximate only.
+      // True odds are higher because of Wilds and right-to-left wins.
       const approxAnySpinWin = 1 - Math.pow(1 - anyLineWin, activeLines * 2);
 
       return {
@@ -1482,15 +1607,40 @@
     // PAYOUT TABLES
     // =========================
 
-    function paidMultiplierForMatch(matchCount, symbolName) {
-      const paytables = {
+    const payoutTables = {
+      free: {
+        Axe: { 2: 15, 3: 75, 4: 200, 5: 750 },
+        Animal: { 2: 15, 3: 75, 4: 200, 5: 750 },
+        Gem: { 2: 100, 3: 400, 4: 1250, 5: 5000 },
+        default: { 2: 40, 3: 175, 4: 500, 5: 1500 }
+      },
+
+      paid: {
         Axe: { 2: 0.5, 3: 3, 4: 12, 5: 60 },
         Animal: { 2: 0.5, 3: 3, 4: 12, 5: 60 },
         Gem: { 2: 2, 3: 12, 4: 60, 5: 300 },
         default: { 2: 1, 3: 6, 4: 25, 5: 120 }
-      };
+      }
+    };
 
-      const table = paytables[symbolName] || paytables.default;
+    function getPayoutTable(mode, symbolName) {
+      const tableSet = payoutTables[mode];
+      return tableSet[symbolName] || tableSet.default;
+    }
+
+    function freePayoutForMatch(matchCount, symbolName) {
+      const table = getPayoutTable("free", symbolName);
+
+      if (matchCount >= 5) return table[5];
+      if (matchCount === 4) return table[4];
+      if (matchCount === 3) return table[3];
+      if (matchCount === 2) return table[2];
+
+      return 0;
+    }
+
+    function paidMultiplierForMatch(matchCount, symbolName) {
+      const table = getPayoutTable("paid", symbolName);
 
       if (matchCount >= 5) return table[5];
       if (matchCount === 4) return table[4];
@@ -1502,24 +1652,6 @@
 
     function paidPayoutForMatch(matchCount, symbolName, lineBet) {
       return Math.floor(lineBet * paidMultiplierForMatch(matchCount, symbolName));
-    }
-
-    function freePayoutForMatch(matchCount, symbolName) {
-      const paytables = {
-        Axe: { 2: 15, 3: 75, 4: 200, 5: 750 },
-        Animal: { 2: 15, 3: 75, 4: 200, 5: 750 },
-        Gem: { 2: 100, 3: 400, 4: 1250, 5: 5000 },
-        default: { 2: 40, 3: 175, 4: 500, 5: 1500 }
-      };
-
-      const table = paytables[symbolName] || paytables.default;
-
-      if (matchCount >= 5) return table[5];
-      if (matchCount === 4) return table[4];
-      if (matchCount === 3) return table[3];
-      if (matchCount === 2) return table[2];
-
-      return 0;
     }
 
     // =========================
@@ -1560,20 +1692,23 @@
 
       if (nonWild) return nonWild;
 
-      // If a line is all wilds, pay as Gem because it should feel premium.
+      // If a line is all Wilds, pay as Gem.
       return { name: "Gem", type: "image", value: "gem.png" };
     }
 
     function evaluateDirection(grid, line, direction) {
-      const columns = direction === "LTR" ? [0, 1, 2, 3, 4] : [4, 3, 2, 1, 0];
+      const columns = direction === "LTR"
+        ? [0, 1, 2, 3, 4]
+        : [4, 3, 2, 1, 0];
 
-      const firstRow = line.rows[columns[0]];
-      const firstSymbol = grid[firstRow][columns[0]];
+      const firstCol = columns[0];
+      const firstRow = line.rows[firstCol];
+      const firstSymbol = grid[firstRow][firstCol];
 
       let checkedSymbols = [firstSymbol];
       let baseSymbol = isWild(firstSymbol) ? null : firstSymbol;
       let matchCount = 1;
-      let cells = [{ row: firstRow, col: columns[0] }];
+      let cells = [{ row: firstRow, col: firstCol }];
 
       for (let i = 1; i < columns.length; i++) {
         const col = columns[i];
@@ -1612,7 +1747,7 @@
       const wins = [];
       const activePaylines = getActivePaylines();
 
-      activePaylines.forEach((line) => {
+      activePaylines.forEach(line => {
         const leftWin = evaluateDirection(grid, line, "LTR");
         const rightWin = evaluateDirection(grid, line, "RTL");
 
@@ -1659,6 +1794,7 @@
           cell.classList.add("winningCell");
 
           const img = cell.querySelector("img");
+
           if (img && img.alt === "Wild") {
             cell.classList.add("wildCell");
           }
@@ -1691,10 +1827,6 @@
     }
 
     // =========================
-    // Spin / Dev Tools / Codes/ Close Section 6 ------------------------------------------
-    // =========================
-
-    // =========================
     // SECTION 6: SPIN / DEV TOOLS / CODES / STATS / CLOSE
     // =========================
 
@@ -1710,6 +1842,22 @@
       });
     }
 
+    function calculateSpinPayout(wins, finalBet, lineBet) {
+      let payout = 0;
+
+      if (finalBet === 0) {
+        wins.forEach(win => {
+          payout += freePayoutForMatch(win.matchCount, win.symbol);
+        });
+      } else {
+        wins.forEach(win => {
+          payout += paidPayoutForMatch(win.matchCount, win.symbol, lineBet);
+        });
+      }
+
+      return payout;
+    }
+
     function spin() {
       const finalBet = getFinalBet();
       const lineBet = getLineBet();
@@ -1721,8 +1869,8 @@
 
       hideLineOverlay();
       clearWinPopup();
-      setControlsDisabled(true);
       clearWinningHighlights();
+      setControlsDisabled(true);
 
       if (finalBet > 0) {
         tokens -= finalBet;
@@ -1760,20 +1908,10 @@
 
     function finishSpin(finalGrid, finalBet, lineBet) {
       const wins = evaluatePaylines(finalGrid);
-      let payout = 0;
+      const payout = calculateSpinPayout(wins, finalBet, lineBet);
 
       highlightWins(wins);
       checkThemeUnlocks(wins);
-
-      if (finalBet === 0) {
-        wins.forEach(win => {
-          payout += freePayoutForMatch(win.matchCount, win.symbol);
-        });
-      } else {
-        wins.forEach(win => {
-          payout += paidPayoutForMatch(win.matchCount, win.symbol, lineBet);
-        });
-      }
 
       tokens += payout;
       totalSpins += 1;
@@ -1807,6 +1945,7 @@
       const lineBet = getLineBet();
 
       let totalPayout = 0;
+      let totalWagered = 0;
       let completedSpins = 0;
 
       for (let i = 0; i < amount; i++) {
@@ -1814,23 +1953,14 @@
 
         if (finalBet > 0) {
           tokens -= finalBet;
+          totalWagered += finalBet;
         }
 
         const grid = buildFinalGrid();
         const wins = evaluatePaylines(grid);
-        let spinPayout = 0;
+        const spinPayout = calculateSpinPayout(wins, finalBet, lineBet);
 
         checkThemeUnlocks(wins);
-
-        if (finalBet === 0) {
-          wins.forEach(win => {
-            spinPayout += freePayoutForMatch(win.matchCount, win.symbol);
-          });
-        } else {
-          wins.forEach(win => {
-            spinPayout += paidPayoutForMatch(win.matchCount, win.symbol, lineBet);
-          });
-        }
 
         tokens += spinPayout;
         totalPayout += spinPayout;
@@ -1855,7 +1985,11 @@
       updateDisplay();
       updateStatsPanel();
 
-      codeMessage.textContent = `Quick Spin complete: ${completedSpins} spins, +${totalPayout.toLocaleString()} payout.`;
+      const net = totalPayout - totalWagered;
+      const sign = net >= 0 ? "+" : "-";
+
+      codeMessage.textContent =
+        `Quick Spin: ${completedSpins} spins | Payout ${totalPayout.toLocaleString()} | Net ${sign}${Math.abs(net).toLocaleString()}`;
     }
 
     // =========================
@@ -1899,6 +2033,10 @@
       return (lifetimeTokensEarned / lifetimeTokensWagered) * 100;
     }
 
+    function getNetGain() {
+      return lifetimeTokensEarned - lifetimeTokensWagered;
+    }
+
     function getWinkyJudgement() {
       const returnRate = getReturnRate();
 
@@ -1940,11 +2078,14 @@
       if (!statsContent) return;
 
       const returnRate = getReturnRate();
+      const netGain = getNetGain();
+
       const averageEarned = totalSpins > 0
         ? Math.floor(lifetimeTokensEarned / totalSpins)
         : 0;
 
       const judgement = getWinkyJudgement();
+      const netSign = netGain >= 0 ? "+" : "-";
 
       statsContent.innerHTML = `
         <div class="statRow">
@@ -1955,6 +2096,11 @@
         <div class="statRow">
           <span>Lifetime Tokens Wagered</span>
           <span>${lifetimeTokensWagered.toLocaleString()}</span>
+        </div>
+
+        <div class="statRow">
+          <span>Lifetime Net Gain</span>
+          <span>${netSign}${Math.abs(netGain).toLocaleString()}</span>
         </div>
 
         <div class="statRow">
@@ -2000,7 +2146,7 @@
     }
 
     // =========================
-    // DEV THEME / TOKEN TOOLS
+    // DEV TOOLS
     // =========================
 
     function updateDevToolsVisibility() {
@@ -2036,8 +2182,10 @@
       });
 
       localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+
       syncThemeIndex();
       updateDisplay();
+      updateStatsPanel();
 
       codeMessage.textContent = "All themes unlocked.";
     }
@@ -2045,13 +2193,15 @@
     function addDevTokens() {
       markDevToolsUsed();
 
-      tokens += 100000000;
+      tokens += 100000000000;
+
       localStorage.setItem("forgeTokens", tokens);
-      updateDisplay();
+
       saveStats();
+      updateDisplay();
       updateStatsPanel();
 
-      codeMessage.textContent = "+100,000,000 Forge Tokens added.";
+      codeMessage.textContent = "+100,000,000,000 Forge Tokens added.";
     }
 
     // =========================
@@ -2072,9 +2222,9 @@
           promoTokensRedeemed += 1000;
 
           localStorage.setItem("forgeTokens", tokens);
-          codeMessage.textContent = "+1,000 Forge Tokens.";
 
           saveStats();
+          codeMessage.textContent = "+1,000 Forge Tokens.";
         },
 
         EVENT5000: () => {
@@ -2082,33 +2232,38 @@
           promoTokensRedeemed += 5000;
 
           localStorage.setItem("forgeTokens", tokens);
-          codeMessage.textContent = "+5,000 Forge Tokens.";
 
           saveStats();
+          codeMessage.textContent = "+5,000 Forge Tokens.";
         },
 
         MAYAFOX: () => {
           unlockTheme("Maya");
+          localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
           codeMessage.textContent = "Maya theme unlocked.";
         },
 
         REIGNBEAR: () => {
           unlockTheme("Reign");
+          localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
           codeMessage.textContent = "Reign theme unlocked.";
         },
 
         KYRASCYTHE: () => {
           unlockTheme("Kyra");
+          localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
           codeMessage.textContent = "Kyra theme unlocked.";
         },
 
         NADIASPELL: () => {
           unlockTheme("Nadia");
+          localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
           codeMessage.textContent = "Nadia theme unlocked.";
         },
 
         WINKYCHAOS: () => {
           unlockTheme("Winky");
+          localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
           codeMessage.textContent = "Winky theme unlocked.";
         },
 
@@ -2192,7 +2347,6 @@
       updateDisplay();
       updateDevToolsVisibility();
       updateStatsPanel();
-
       startLinePreview();
 
       codeMessage.textContent = "Game reset. Tokens, stats, and theme progress reset.";
@@ -2210,3 +2364,4 @@
   </script>
 </body>
 </html>
+

@@ -11,29 +11,24 @@
 
   <style>
     :root {
-      --accent: #D6A84F;
+      --accent: #d6a84f;
       --accent-soft: rgba(214,168,79,0.25);
 
       --page-bg: url("background.png");
       --game-bg: none;
 
-      --text-main: #ffffff;
-      --text-muted: #d8d0bd;
-      --text-accent: var(--accent);
-      --button-text: var(--accent);
-
-      --ui-bg: rgba(0,0,0,0);
-      --ui-bg-soft: rgba(0,0,0,0);
-      --ui-border: 1px solid var(--accent);
+      --ui-bg: rgba(0,0,0,0.54);
+      --ui-bg-soft: rgba(0,0,0,0.42);
+      --ui-border: 1px solid rgba(255,255,255,0.12);
       --ui-radius: 10px;
-      --ui-shadow: none;
+      --ui-shadow: inset 0 0 8px rgba(0,0,0,0.58);
 
-      --button-bg: rgba(0,0,0,0);
-      --button-border: 1px solid var(--accent);
+      --button-bg: rgba(0,0,0,0.58);
+      --button-border: 1px solid #7a5a22;
       --button-radius: 8px;
 
       --slot-bg: rgba(0,0,0,0);
-      --cell-bg: rgba(0,0,0,0);
+      --cell-bg: rgba(0,0,0,0.1);
     }
 
     html {
@@ -44,7 +39,7 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      color: var(--text-main);
+      color: white;
       display: flex;
       justify-content: center;
       align-items: flex-start;
@@ -61,16 +56,11 @@
       overflow-x: hidden;
     }
 
-    .pageWrap {
+    .game {
       width: 570px;
-      max-width: 94vw;
       margin-left: auto;
       margin-right: auto;
-    }
-
-    .game {
-      width: 100%;
-      background-color: rgba(15,15,15,0);
+      background-color: rgba(0,0,0,0.10);
       background-image:
         linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0)),
         var(--game-bg);
@@ -81,39 +71,22 @@
       border-radius: 18px;
       padding: 12px;
       text-align: center;
-      box-shadow: none;
+      box-shadow: 0 0 25px rgba(0,0,0,0.82);
       backdrop-filter: none;
-      box-sizing: border-box;
-    }
-
-    .infoWindow {
-      margin-top: 12px;
-      background: rgba(0,0,0,0);
-      border: 2px solid var(--accent);
-      border-radius: 18px;
-      padding: 12px;
-      box-shadow: none;
-      box-sizing: border-box;
     }
 
     .logoText {
-      display: block;
-      color: var(--text-accent);
-      font-size: 36px;
+      color: var(--accent);
+      font-size: 32px;
       font-weight: bold;
       margin-bottom: 8px;
-      text-decoration: none;
       text-shadow: 0 0 10px rgba(0,0,0,0.85);
-    }
-
-    .logoText:hover {
-      color: var(--text-accent);
-      text-decoration: none;
     }
 
     .uiPanel,
     .specialSettings,
-    .winCard {
+    .winCard,
+    .statsPanel {
       background: var(--ui-bg);
       border: var(--ui-border);
       border-radius: var(--ui-radius);
@@ -131,14 +104,13 @@
 
     .uiButton,
     .arrowButton,
-    .infoButton,
     .codeButton,
     .devButton,
     .resetButton {
       background: var(--button-bg);
       border: var(--button-border);
       border-radius: var(--button-radius);
-      color: var(--button-text);
+      color: var(--accent);
       cursor: pointer;
     }
 
@@ -151,8 +123,8 @@
       padding: 8px;
       border-radius: 18px;
       background: var(--slot-bg);
-      border: 1px solid var(--accent);
-      box-shadow: none;
+      border: var(--ui-border);
+      box-shadow: inset 0 0 18px rgba(0,0,0,0.78);
     }
 
     .slotGrid {
@@ -171,8 +143,8 @@
       height: 80px;
       border-radius: 12px;
       background: var(--cell-bg);
-      border: 1px solid var(--accent);
-      box-shadow: none;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: inset 0 0 8px rgba(0,0,0,0.68);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -209,35 +181,19 @@
     }
 
     .winningCell {
-      border: 3px solid var(--accent);
+      border: 2px solid var(--accent);
       box-shadow:
-        inset 0 0 10px rgba(255,255,255,0.28),
-        0 0 10px var(--accent),
-        0 0 20px var(--accent),
-        0 0 30px var(--accent-soft);
-      animation: winPulse 0.9s ease-in-out infinite alternate;
-      z-index: 3;
+        inset 0 0 10px rgba(0,0,0,0.8),
+        0 0 16px var(--accent),
+        0 0 28px var(--accent-soft);
     }
 
     .wildCell {
-      border: 3px solid #ffffff;
+      border: 2px solid white;
       box-shadow:
-        inset 0 0 10px rgba(255,255,255,0.35),
-        0 0 12px rgba(255,255,255,0.85),
-        0 0 24px var(--accent),
-        0 0 36px var(--accent-soft);
-      animation: winPulse 0.75s ease-in-out infinite alternate;
-      z-index: 3;
-    }
-
-    @keyframes winPulse {
-      from {
-        filter: brightness(1);
-      }
-
-      to {
-        filter: brightness(1.28);
-      }
+        inset 0 0 10px rgba(0,0,0,0.8),
+        0 0 18px rgba(255,255,255,0.9),
+        0 0 32px var(--accent-soft);
     }
 
     @keyframes shake {
@@ -253,7 +209,7 @@
       width: 100%;
       height: 100%;
       pointer-events: none;
-      z-index: 6;
+      z-index: 4;
       display: block;
       opacity: 0.95;
     }
@@ -265,20 +221,16 @@
 
     .lineOverlay polyline {
       fill: none;
-      stroke-width: 2.5;
+      stroke-width: 4;
       stroke-linecap: round;
       stroke-linejoin: round;
-      filter:
-        drop-shadow(0 0 2px black)
-        drop-shadow(0 0 3px currentColor);
-      opacity: 0.65;
+      filter: drop-shadow(0 0 5px currentColor);
+      opacity: 0.85;
     }
 
     .lineOverlay polygon {
-      filter:
-        drop-shadow(0 0 2px black)
-        drop-shadow(0 0 3px currentColor);
-      opacity: 0.75;
+      filter: drop-shadow(0 0 4px currentColor);
+      opacity: 0.95;
     }
 
     .lineOverlay .lineLabel {
@@ -287,44 +239,27 @@
       filter: drop-shadow(0 0 3px black);
     }
 
-    .winPopup,
-    .unlockPopup {
+    .winPopup {
       position: absolute;
       left: 50%;
+      bottom: 18px;
       transform: translateX(-50%);
-      z-index: 8;
-      padding: 8px 18px;
+      z-index: 6;
+      padding: 7px 16px;
       border-radius: 999px;
-      background: rgba(0,0,0,0.76);
+      background: rgba(0,0,0,0.72);
       border: 1px solid var(--accent);
-      color: var(--text-accent);
+      color: var(--accent);
+      font-size: 24px;
       font-weight: bold;
       text-shadow: 0 0 10px var(--accent);
       box-shadow: 0 0 16px var(--accent-soft);
       pointer-events: none;
       opacity: 0;
       transition: opacity 0.35s ease, transform 0.35s ease;
-      white-space: normal;
-      text-align: center;
-      line-height: 1.2;
     }
 
-    .winPopup {
-      bottom: 18px;
-      font-size: 24px;
-      width: auto;
-      max-width: 82%;
-    }
-
-    .unlockPopup {
-      top: 44%;
-      font-size: 20px;
-      width: 82%;
-      max-width: 360px;
-    }
-
-    .winPopup.show,
-    .unlockPopup.show {
+    .winPopup.show {
       opacity: 1;
       transform: translateX(-50%) translateY(-4px);
     }
@@ -367,18 +302,18 @@
       gap: 6px;
       min-height: 34px;
       padding: 4px 6px;
-      color: var(--text-main);
+      color: #ddd;
     }
 
     .readoutLabel {
-      color: var(--text-muted);
+      color: #aaa;
       font-size: 13px;
       min-width: 34px;
       text-align: right;
     }
 
     .readoutValue {
-      color: var(--text-accent);
+      color: var(--accent);
       font-size: 16px;
       font-weight: bold;
       min-width: 48px;
@@ -393,12 +328,12 @@
       min-height: 34px;
       padding: 4px 6px;
       line-height: 1.1;
-      color: var(--text-accent);
+      color: var(--accent);
       font-weight: bold;
     }
 
     .tokenReadout span:first-child {
-      color: var(--text-muted);
+      color: #aaa;
       font-size: 11px;
       font-weight: normal;
     }
@@ -410,8 +345,8 @@
     }
 
     .arrowButton {
-      width: 24px;
-      height: 26px;
+      width: 22px;
+      height: 24px;
       padding: 0;
       margin: 0;
       font-size: 15px;
@@ -431,20 +366,6 @@
       font-weight: bold;
       cursor: pointer;
       box-shadow: 0 0 10px var(--accent-soft);
-    }
-
-    .infoButton {
-      min-height: 34px;
-      padding: 7px 10px;
-      font-size: 13px;
-      font-weight: bold;
-      text-align: center;
-    }
-
-    .infoButton.active {
-      background: var(--accent);
-      color: #111;
-      border-color: var(--accent);
     }
 
     button:disabled {
@@ -484,7 +405,6 @@
       font-weight: bold;
       text-align: center;
       opacity: 0.95;
-      color: var(--text-accent);
     }
 
     .gem-clear img {
@@ -539,62 +459,31 @@
       text-align: left;
     }
 
-    .specialTitle,
-    .panelTitle,
-    .devSectionTitle,
-    .statGroupTitle,
-    .winCard strong {
-      color: var(--text-accent);
-      font-weight: bold;
-      text-align: center;
-    }
-
     .specialTitle {
+      color: var(--accent);
+      font-weight: bold;
       font-size: 14px;
       margin-bottom: 8px;
+      text-align: center;
     }
 
     .themeControl {
-      display: grid;
-      grid-template-columns: auto 28px 150px 28px;
+      display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      margin-top: 8px;
-    }
-
-    .themeLabel {
-      color: var(--text-muted);
-      font-size: 13px;
     }
 
     .themeValue {
-      color: var(--text-accent);
-      width: 150px;
+      color: var(--accent);
+      min-width: 80px;
       text-align: center;
       font-weight: bold;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .infoButtonRow {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .soundButtonRow {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 8px;
-      margin-top: 8px;
     }
 
     .lastSpin {
       margin-top: 8px;
-      color: var(--text-muted);
+      color: #bbb;
       font-size: 13px;
       text-align: center;
       line-height: 1.35;
@@ -602,36 +491,27 @@
       display: none;
     }
 
-    .statGroup {
+    .statsPanel {
+      display: none;
       margin-top: 10px;
-      padding-top: 8px;
-      border-top: 1px solid var(--accent);
-    }
-
-    .statGroup:first-child {
-      margin-top: 0;
-      padding-top: 0;
-      border-top: none;
-    }
-
-    .statGroupTitle {
-      margin-bottom: 5px;
+      padding: 10px;
       font-size: 12px;
+      color: #ddd;
     }
 
-    .statRow,
-    .breakdownRow,
-    .unlockRow {
+    .statsPanel.visible {
+      display: block;
+    }
+
+    .statRow {
       display: grid;
       grid-template-columns: 1fr auto;
       gap: 10px;
       padding: 3px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
     }
 
-    .statRow:last-child,
-    .breakdownRow:last-child,
-    .unlockRow:last-child {
+    .statRow:last-child {
       border-bottom: none;
     }
 
@@ -652,27 +532,20 @@
 
     .devTools {
       display: none;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,0.08);
     }
 
     .devTools.visible {
-      display: none;
-    }
-
-    .devUnlockPanel {
-      display: none;
-      margin-top: 10px;
-      padding: 10px;
-      background: var(--ui-bg-soft);
-      border: var(--ui-border);
-      border-radius: var(--ui-radius);
-    }
-
-    .devUnlockPanel.visible {
       display: block;
     }
 
     .devSectionTitle {
+      color: var(--accent);
       font-size: 12px;
+      font-weight: bold;
+      text-align: center;
       margin: 8px 0 6px;
     }
 
@@ -683,27 +556,26 @@
     }
 
     .devButton {
-      color: var(--button-text);
+      color: #ddd;
       padding: 7px 5px;
       font-size: 11px;
     }
 
     .devButton:hover,
     .arrowButton:hover,
-    .infoButton:hover,
     .codeButton:hover,
     .resetButton:hover {
-      color: var(--text-accent);
+      color: var(--accent);
       border-color: var(--accent);
     }
 
     .winInfo {
-      margin: 0;
-      border: none;
-      padding: 0;
+      margin-top: 12px;
+      border-top: 1px solid #333;
+      padding-top: 10px;
       text-align: left;
       font-size: 13px;
-      color: var(--text-main);
+      color: #ddd;
     }
 
     .winCard {
@@ -713,15 +585,17 @@
 
     .winCard strong {
       display: block;
+      color: var(--accent);
       margin-bottom: 6px;
       font-size: 14px;
+      text-align: center;
     }
 
     .winRow {
       display: grid;
       grid-template-columns: 1fr auto;
       gap: 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
       padding: 3px 0;
     }
 
@@ -732,14 +606,13 @@
     .winGap {
       margin-top: 8px;
       padding-top: 8px;
-      border-top: 1px solid var(--accent);
+      border-top: 1px solid var(--accent-soft);
     }
 
     .bottomStats {
       margin-top: 12px;
-      color: var(--text-muted);
+      color: #777;
       font-size: 13px;
-      text-align: center;
     }
 
     .codeArea {
@@ -751,7 +624,7 @@
 
     .codeInput {
       background: var(--button-bg);
-      color: var(--text-main);
+      color: #ddd;
       border: var(--ui-border);
       border-radius: 8px;
       padding: 8px;
@@ -770,42 +643,23 @@
 
     .codeMessage {
       margin-top: 6px;
-      color: var(--text-muted);
+      color: #888;
       font-size: 12px;
       min-height: 16px;
-      text-align: center;
     }
 
     .resetButton {
       margin-top: 10px;
       width: 100%;
-      color: var(--button-text);
+      color: #999;
       font-size: 12px;
       padding: 8px;
     }
 
     @media (max-width: 600px) {
-      body {
-        padding-top: 0;
-      }
-
-      .pageWrap {
+      .game {
         width: 94vw;
-        margin-left: auto;
-        margin-right: auto;
-      }
-
-      .game,
-      .infoWindow {
         padding: 10px;
-      }
-
-      .logoText {
-        font-size: 34px;
-      }
-
-      .slotFrame {
-        height: 310px;
       }
 
       .slotGrid {
@@ -821,19 +675,15 @@
         font-size: 30px;
       }
 
+      .slotFrame {
+        height: 310px;
+      }
+
       .controlTopRow,
       .controlBottomRow,
       .gemRow {
         grid-template-columns: 1fr;
         gap: 5px;
-      }
-
-      .themeControl {
-        grid-template-columns: auto 28px 130px 28px;
-      }
-
-      .themeValue {
-        width: 130px;
       }
 
       .readout,
@@ -844,7 +694,6 @@
 
       #tokenBalance {
         font-size: 12px;
-        letter-spacing: 0;
       }
 
       .spinButton {
@@ -856,25 +705,11 @@
         bottom: 16px;
       }
 
-      .unlockPopup {
-        font-size: 16px;
-        width: 82%;
-        max-width: 320px;
-      }
-
       .devButtonGrid {
         grid-template-columns: repeat(2, 1fr);
       }
-
-      .statRow,
-      .breakdownRow,
-      .unlockRow {
-        font-size: 12px;
-        gap: 6px;
-      }
     }
   </style>
-
 
 <!-- =========================
      SECTION 2: HTML BODY
@@ -883,131 +718,108 @@
 </head>
 
 <body>
-  <div class="pageWrap">
+  <div class="game">
+    <div class="logoText">Forge Spin</div>
 
-    <div class="game">
-      <a class="logoText" href="https://magnettaforged.com" target="_blank" rel="noopener">
-        Forge Spin
-      </a>
+    <div class="slotFrame">
+      <div class="lineOverlay" id="lineOverlay"></div>
+      <div class="slotGrid" id="slotGrid"></div>
+      <div class="winPopup" id="winPopup"></div>
+    </div>
 
-      <div class="slotFrame">
-        <div class="lineOverlay" id="lineOverlay"></div>
-        <div class="slotGrid" id="slotGrid"></div>
-        <div class="winPopup" id="winPopup"></div>
-        <div class="unlockPopup" id="unlockPopup"></div>
-      </div>
-
-      <div class="controlPanel">
-        <div class="controlTopRow">
-          <div class="readout">
-            <span class="readoutLabel">Lines</span>
-            <button class="arrowButton" onclick="changeLineCount(-1)">‹</button>
-            <span class="readoutValue" id="lineCountDisplay">15</span>
-            <button class="arrowButton" onclick="changeLineCount(1)">›</button>
-          </div>
-
-          <div class="tokenReadout">
-            <span>Forge Tokens</span>
-            <span id="tokenBalance">000,000,000,000,000,000</span>
-          </div>
+    <div class="controlPanel">
+      <div class="controlTopRow">
+        <div class="readout">
+          <span class="readoutLabel">Lines</span>
+          <button class="arrowButton" onclick="changeLineCount(-1)">‹</button>
+          <span class="readoutValue" id="lineCountDisplay">15</span>
+          <button class="arrowButton" onclick="changeLineCount(1)">›</button>
         </div>
 
-        <div class="controlBottomRow">
-          <div class="readout">
-            <span class="readoutLabel">Bet</span>
-            <button class="arrowButton" onclick="changeBaseBet(-1)">‹</button>
-            <span class="readoutValue" id="baseBetDisplay">Free</span>
-            <button class="arrowButton" onclick="changeBaseBet(1)">›</button>
-          </div>
-
-          <div class="readout">
-            <span class="readoutLabel">Multi</span>
-            <button class="arrowButton" onclick="changeMultiplier(-1)">‹</button>
-            <span class="readoutValue" id="multiplierDisplay">1x</span>
-            <button class="arrowButton" onclick="changeMultiplier(1)">›</button>
-          </div>
-
-          <button class="spinButton" id="spinButton" onclick="spin()">FREE</button>
-        </div>
-
-        <div class="gemRow">
-          <div></div>
-
-          <div>
-            <button class="chaosGem gem-clear" id="chaosGem" onclick="activateGem()" title="Chaos Gem">
-              <img src="gem.png" alt="Chaos Gem">
-            </button>
-            <div class="gemMessage" id="gemMessage"></div>
-          </div>
-
-          <div></div>
+        <div class="tokenReadout">
+          <span>Forge Tokens</span>
+          <span id="tokenBalance">000,000,000,000</span>
         </div>
       </div>
 
-      <div class="specialSettings">
-        <div class="specialTitle">Special Settings</div>
-
-        <div class="themeControl">
-          <span class="themeLabel">Theme</span>
-          <button class="arrowButton" onclick="changeTheme(-1)">‹</button>
-          <span class="themeValue" id="themeDisplay">Default</span>
-          <button class="arrowButton" onclick="changeTheme(1)">›</button>
+      <div class="controlBottomRow">
+        <div class="readout">
+          <span class="readoutLabel">Bet</span>
+          <button class="arrowButton" onclick="changeBaseBet(-1)">‹</button>
+          <span class="readoutValue" id="baseBetDisplay">Free</span>
+          <button class="arrowButton" onclick="changeBaseBet(1)">›</button>
         </div>
 
-        <div class="infoButtonRow">
-          <button class="infoButton" id="statsButton" onclick="setInfoMode('stats')">
-            Statistics
-          </button>
-
-          <button class="infoButton" id="breakdownButton" onclick="setInfoMode('breakdown')">
-            Win Breakdown
-          </button>
+        <div class="readout">
+          <span class="readoutLabel">Multi</span>
+          <button class="arrowButton" onclick="changeMultiplier(-1)">‹</button>
+          <span class="readoutValue" id="multiplierDisplay">1x</span>
+          <button class="arrowButton" onclick="changeMultiplier(1)">›</button>
         </div>
 
-        <div class="soundButtonRow">
-          <button class="infoButton" id="soundButton" onclick="toggleSound()">
-            Sound: On
+        <button class="spinButton" id="spinButton" onclick="spin()">FREE</button>
+      </div>
+
+      <div class="gemRow">
+        <div></div>
+
+        <div>
+          <button class="chaosGem gem-clear" id="chaosGem" onclick="activateGem()" title="Chaos Gem">
+            <img src="gem.png" alt="Chaos Gem">
           </button>
+          <div class="gemMessage" id="gemMessage"></div>
         </div>
 
-        <div class="lastSpin" id="lastSpin">No spin yet.</div>
+        <div></div>
+      </div>
+    </div>
 
-        <div class="devTools" id="devTools">
-          <div class="devSectionTitle">Theme Tools</div>
+    <div class="specialSettings">
+      <div class="specialTitle">Special Settings</div>
 
-          <div class="devButtonGrid">
-            <button class="devButton" onclick="unlockAllThemes()">Unlock All</button>
-            <button class="devButton" onclick="activateThemeDev('Maya')">Activate Maya</button>
-            <button class="devButton" onclick="activateThemeDev('Reign')">Activate Reign</button>
-            <button class="devButton" onclick="activateThemeDev('Kyra')">Activate Kyra</button>
-            <button class="devButton" onclick="activateThemeDev('Nadia')">Activate Nadia</button>
-            <button class="devButton" onclick="activateThemeDev('Winky')">Activate Winky</button>
-          </div>
+      <div class="themeControl">
+        <button class="arrowButton" onclick="changeTheme(-1)">‹</button>
+        <span>Theme</span>
+        <span class="themeValue" id="themeDisplay">Default</span>
+        <button class="arrowButton" onclick="changeTheme(1)">›</button>
+      </div>
 
-          <div class="devSectionTitle">Token Tools</div>
+      <div class="themeControl" style="margin-top:8px;">
+        <button class="arrowButton" onclick="toggleStats()">‹</button>
+        <span>Statistics</span>
+        <button class="arrowButton" onclick="toggleStats()">›</button>
+      </div>
 
-          <div class="devButtonGrid">
-            <button class="devButton" onclick="addDevTokens()">+100,000,000</button>
-            <button class="devButton" onclick="quickSpin(100)">Quick Spin x100</button>
-            <button class="devButton" onclick="quickSpin(500)">Quick Spin x500</button>
-          </div>
+      <div class="statsPanel" id="statsPanel">
+        <div class="devSectionTitle">Winky’s Judgement</div>
+        <div id="statsContent"></div>
+      </div>
 
-          <div class="devSectionTitle">Unlock Tracker</div>
+      <div class="lastSpin" id="lastSpin">No spin yet.</div>
 
-          <button class="devButton" onclick="toggleDevUnlocks()" style="width:100%;">
-            Show / Hide Unlocks
-          </button>
+      <div class="devTools" id="devTools">
+        <div class="devSectionTitle">Theme Tools</div>
 
-          <div class="devUnlockPanel" id="devUnlockPanel">
-            <div id="unlockContent"></div>
-          </div>
+        <div class="devButtonGrid">
+          <button class="devButton" onclick="unlockAllThemes()">Unlock All</button>
+          <button class="devButton" onclick="activateThemeDev('Maya')">Activate Maya</button>
+          <button class="devButton" onclick="activateThemeDev('Reign')">Activate Reign</button>
+          <button class="devButton" onclick="activateThemeDev('Kyra')">Activate Kyra</button>
+          <button class="devButton" onclick="activateThemeDev('Nadia')">Activate Nadia</button>
+          <button class="devButton" onclick="activateThemeDev('Winky')">Activate Winky</button>
+        </div>
+
+        <div class="devSectionTitle">Token Tools</div>
+
+        <div class="devButtonGrid">
+          <button class="devButton" onclick="addDevTokens()">+100,000,000</button>
+          <button class="devButton" onclick="quickSpin(100)">Quick Spin x100</button>
+          <button class="devButton" onclick="quickSpin(500)">Quick Spin x500</button>
         </div>
       </div>
     </div>
 
-    <div class="infoWindow">
-      <div class="winInfo" id="winInfo"></div>
-    </div>
+    <div class="winInfo" id="winInfo"></div>
 
     <div class="bottomStats">
       Total Spins: <span id="spinCount">0</span>
@@ -1021,11 +833,11 @@
     <div class="codeMessage" id="codeMessage"></div>
 
     <button class="resetButton" onclick="resetGame()">Reset Game</button>
-
   </div>
 
-
   <script>
+
+
     // =========================
     // SECTION 3: SETTINGS / SYMBOLS / STATE
     // =========================
@@ -1038,11 +850,8 @@
     const COLS = 5;
 
     const baseBetOptions = [0, 25, 50, 75, 100];
-    const multiplierOptions = [1, 10, 50, 100, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 1000000, 10000000, 50000000];
+    const multiplierOptions = [1, 2, 10, 50, 100, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000, 2500000, 5000000, 10000000, 25000000, 50000000];
     const lineCountOptions = [5, 10, 15];
-
-    const characterSymbols = ["Maya", "Reign", "Kyra", "Nadia"];
-    const variantGemKeys = ["ruby", "emerald", "sapphire", "amethyst", "topaz", "skull"];
 
     const defaultLineColors = [
       "#f0c35a", "#55d6ff", "#ff4fd8", "#60ff7a", "#ff7a32",
@@ -1053,197 +862,75 @@
     let lineColors = [...defaultLineColors];
 
     // =========================
-    // AUDIO SETTINGS
-    // =========================
-
-    let soundEnabled = localStorage.getItem("soundEnabled") !== "false";
-
-    const soundFiles = {
-      click: "button-click.mp3",
-      spin: "spin-start.mp3",
-      stop: "reel-stop.mp3",
-      smallWin: "small-win.mp3",
-      bigWin: "big-win.mp3",
-      bonus: "bonus-spin.mp3",
-      unlock: "theme-unlock.mp3",
-      winky: "winky-intervention.mp3"
-    };
-
-    const sounds = {};
-
-    Object.keys(soundFiles).forEach(soundKey => {
-      sounds[soundKey] = new Audio(soundFiles[soundKey]);
-      sounds[soundKey].preload = "auto";
-      sounds[soundKey].volume = 0.55;
-    });
-
-    // =========================
     // THEME SETTINGS
-    // pageImage = outer page background
-    // gameImage = image inside the game body
-    // Default gameImage stays transparent
+    // pageImage = outer website/page background
+    // gameImage = background inside the slot machine body
+    // Default uses transparent game body
     // =========================
 
     const themes = {
       Default: {
-        label: "Default",
-        accent: "#D6A84F",
-        textMain: "#ffffff",
-        textMuted: "#d8d0bd",
-        textAccent: "#D6A84F",
-        buttonText: "#D6A84F",
+        accent: "#d6a84f",
         pageImage: 'url("background.png")',
         gameImage: "none",
-        lineColors: defaultLineColors,
-        unlockType: "base"
+        lineColors: defaultLineColors
       },
 
       Maya: {
-        label: "Maya",
         accent: "#D13A2F",
-        textMain: "#ffffff",
-        textMuted: "#ffd0c8",
-        textAccent: "#FF4438",
-        buttonText: "#FF4438",
         pageImage: 'url("background.png")',
         gameImage: 'url("mayatheme.png")',
         lineColors: [
-          "#D13A2F", "#ffffff", "#ff7a4f", "#f0c35a", "#ff4444",
-          "#ff9b66", "#d6a84f", "#ffb199", "#c62828", "#ffd166",
-          "#ff6b35", "#e76f51", "#f4a261", "#ffcc66", "#ffffff"
-        ],
-        unlockType: "base"
+          "#8fdcff", "#ffffff", "#4cc9f0", "#bdefff", "#55d6ff",
+          "#d6a84f", "#80ffdb", "#99e6ff", "#c9f7ff", "#78cfff",
+          "#a8e6ff", "#e6fbff", "#66d9ff", "#f0c35a", "#ffffff"
+        ]
       },
 
       Reign: {
-        label: "Reign",
-        accent: "#9A4F2C",
-        textMain: "#ffffff",
-        textMuted: "#d8c2b3",
-        textAccent: "#B86A3C",
-        buttonText: "#B86A3C",
+        accent: "#8A4A2A",
         pageImage: 'url("background.png")',
         gameImage: 'url("reigntheme.png")',
         lineColors: [
-          "#9A4F2C", "#c46a35", "#f0c35a", "#ffffff", "#5a2c1a",
-          "#ff6b35", "#d97941", "#ffaa66", "#ffd166", "#7a3b20",
-          "#f8961e", "#e76f51", "#f4a261", "#b4532a", "#ffffff"
-        ],
-        unlockType: "base"
+          "#c46a35", "#ff9b4f", "#f0c35a", "#ffffff", "#9b4a22",
+          "#ff6b35", "#d97941", "#ffaa66", "#ffd166", "#b4532a",
+          "#f8961e", "#e76f51", "#f4a261", "#ffb703", "#ffffff"
+        ]
       },
 
       Kyra: {
-        label: "Kyra",
         accent: "#36A3FF",
-        textMain: "#ffffff",
-        textMuted: "#d7eaff",
-        textAccent: "#36A3FF",
-        buttonText: "#36A3FF",
         pageImage: 'url("background.png")',
         gameImage: 'url("kyratheme.png")',
         lineColors: [
-          "#36A3FF", "#4cc9f0", "#00ffd5", "#ffffff", "#2f8cff",
-          "#55d6ff", "#80ffdb", "#0096ff", "#a8e6ff", "#3a86ff",
-          "#00b4d8", "#caf0f8", "#48cae4", "#90e0ef", "#ffffff"
-        ],
-        unlockType: "base"
+          "#9b5de5", "#f72585", "#4cc9f0", "#ffffff", "#7209b7",
+          "#b5179e", "#560bad", "#a855ff", "#00ffd5", "#c77dff",
+          "#e0aaff", "#3a0ca3", "#ff4fd8", "#80ffdb", "#ffffff"
+        ]
       },
 
       Nadia: {
-        label: "Nadia",
         accent: "#9B5DE5",
-        textMain: "#ffffff",
-        textMuted: "#ead8ff",
-        textAccent: "#B66CFF",
-        buttonText: "#B66CFF",
         pageImage: 'url("background.png")',
         gameImage: 'url("nadiatheme.png")',
         lineColors: [
-          "#9B5DE5", "#d6a84f", "#f0c35a", "#ffffff", "#c77dff",
+          "#d6a84f", "#9b5de5", "#f0c35a", "#ffffff", "#c77dff",
           "#7b2cbf", "#ffd166", "#e0aaff", "#b8860b", "#ffcc66",
           "#a855ff", "#f5d76e", "#7209b7", "#ffe29a", "#ffffff"
-        ],
-        unlockType: "base"
+        ]
       },
 
       Winky: {
-        label: "Winky",
-        accent: "#39FF88",
-        textMain: "#ffffff",
-        textMuted: "#d6ffe5",
-        textAccent: "#39FF88",
-        buttonText: "#39FF88",
+        accent: "#39ff88",
         pageImage: 'url("background.png")',
         gameImage: 'url("winkytheme.png")',
         lineColors: [
           "#39ff88", "#ffffff", "#ff4fd8", "#f5b642", "#00ffd5",
           "#99ff33", "#ff4444", "#a855ff", "#55d6ff", "#f0c35a",
           "#80ffdb", "#ff7a32", "#c77dff", "#eaff00", "#ffffff"
-        ],
-        unlockType: "special"
+        ]
       }
     };
-
-    // =========================
-    // AUTO-GENERATED GEM VARIANT THEMES
-    // File naming:
-    // mayaruby.png, mayaemerald.png, etc.
-    // kyraruby.png, reignskull.png, nadiaamethyst.png, etc.
-    // =========================
-
-    const gemVariantAccents = {
-      ruby: "#D13A2F",
-      emerald: "#20C56B",
-      sapphire: "#36A3FF",
-      amethyst: "#9B5DE5",
-      topaz: "#F5B642",
-      skull: "#D8D8D8"
-    };
-
-    const gemVariantTextMuted = {
-      ruby: "#ffd0c8",
-      emerald: "#d6ffe5",
-      sapphire: "#d7eaff",
-      amethyst: "#ead8ff",
-      topaz: "#fff0c7",
-      skull: "#eeeeee"
-    };
-
-    const gemVariantLineColors = {
-      ruby: ["#D13A2F", "#ff4444", "#ffffff", "#ff7a4f", "#f0c35a", "#c62828", "#ff9b66", "#ffd166", "#e76f51", "#ff6b35", "#f4a261", "#ffb199", "#d6a84f", "#ffcc66", "#ffffff"],
-      emerald: ["#20C56B", "#39ff88", "#ffffff", "#80ffdb", "#99ff33", "#00ffd5", "#60ff7a", "#2ecc71", "#a7ff83", "#1dd1a1", "#55efc4", "#b8ffcc", "#16a085", "#d6a84f", "#ffffff"],
-      sapphire: ["#36A3FF", "#2f8cff", "#ffffff", "#4cc9f0", "#00b4d8", "#80ffdb", "#55d6ff", "#0096ff", "#90e0ef", "#caf0f8", "#3a86ff", "#48cae4", "#00ffd5", "#f0c35a", "#ffffff"],
-      amethyst: ["#9B5DE5", "#a855ff", "#ffffff", "#c77dff", "#f72585", "#7209b7", "#e0aaff", "#ff4fd8", "#b5179e", "#560bad", "#80ffdb", "#d6a84f", "#3a0ca3", "#f0c35a", "#ffffff"],
-      topaz: ["#F5B642", "#ffd166", "#ffffff", "#f0c35a", "#ffb703", "#ffcc66", "#f8961e", "#d6a84f", "#ffe29a", "#f4a261", "#ff9b4f", "#b8860b", "#ffaa66", "#9b5de5", "#ffffff"],
-      skull: ["#D8D8D8", "#ffffff", "#8a8a8a", "#ff4444", "#39ff88", "#bdbdbd", "#f5b642", "#a855ff", "#777777", "#00ffd5", "#cfcfcf", "#ff4fd8", "#999999", "#f0c35a", "#ffffff"]
-    };
-
-    function addVariantThemes() {
-      characterSymbols.forEach(characterName => {
-        variantGemKeys.forEach(gemKey => {
-          const themeKey = `${characterName}${capitalize(gemKey)}`;
-          const fileName = `${characterName.toLowerCase()}${gemKey}.png`;
-          const accent = gemVariantAccents[gemKey] || themes[characterName].accent;
-
-          themes[themeKey] = {
-            label: `${characterName} ${capitalize(gemKey)}`,
-            accent,
-            textMain: "#ffffff",
-            textMuted: gemVariantTextMuted[gemKey] || themes[characterName].textMuted,
-            textAccent: accent,
-            buttonText: accent,
-            pageImage: 'url("background.png")',
-            gameImage: `url("${fileName}")`,
-            lineColors: gemVariantLineColors[gemKey] || themes[characterName].lineColors,
-            unlockType: "variant",
-            baseCharacter: characterName,
-            gemKey
-          };
-        });
-      });
-    }
-
-    addVariantThemes();
 
     // =========================
     // SAVED THEME / DEV STATE
@@ -1257,14 +944,6 @@
       Nadia: false,
       Winky: false
     };
-
-    Object.keys(themes).forEach(themeKey => {
-      if (typeof unlockedThemes[themeKey] !== "boolean") {
-        unlockedThemes[themeKey] = themeKey === "Default";
-      }
-    });
-
-    localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
 
     let devToolsUnlocked = localStorage.getItem("devToolsUnlocked") === "true";
 
@@ -1287,35 +966,25 @@
     let linePreviewTimer = null;
     let lineAutoHideTimer = null;
     let winPopupTimer = null;
-    let unlockPopupTimer = null;
-
-    let activePanel = null;
-    let lastWinBreakdown = [];
-
-    // Bonus spins = earned free spins
-    let bonusSpinQueue = 0;
-    let bonusSpinLineBet = 0;
-    let bonusSpinFinalBet = 0;
-    let bonusSpinSource = "";
 
     // =========================
-    // SYMBOL IMAGES
+    // THEME-SENSITIVE SYMBOL IMAGES
     // =========================
 
     function getThemeSymbolImage() {
-      if (activeTheme.includes("Kyra")) return "scythe.png";
-      if (activeTheme.includes("Nadia")) return "ankh.png";
-      if (activeTheme.includes("Winky")) return "chaosaxe.png";
+      if (activeTheme === "Kyra") return "scythe.png";
+      if (activeTheme === "Nadia") return "ankh.png";
+      if (activeTheme === "Winky") return "chaosaxe.png";
 
       return "axe.png";
     }
 
     function getAnimalImage() {
-      if (activeTheme.includes("Maya")) return "fox.png";
-      if (activeTheme.includes("Reign")) return "bear.png";
-      if (activeTheme.includes("Kyra")) return "wing.png";
-      if (activeTheme.includes("Nadia")) return "purplemagic.png";
-      if (activeTheme.includes("Winky")) return "chaosanimal.png";
+      if (activeTheme === "Maya") return "fox.png";
+      if (activeTheme === "Reign") return "bear.png";
+      if (activeTheme === "Kyra") return "wing.png";
+      if (activeTheme === "Nadia") return "purplemagic.png";
+      if (activeTheme === "Winky") return "chaosanimal.png";
 
       return "animal.png";
     }
@@ -1391,17 +1060,7 @@
     let highestBalance = Number(localStorage.getItem("highestBalance")) || tokens;
     let devToolsUsed = localStorage.getItem("devToolsUsed") === "true";
     let promoTokensRedeemed = Number(localStorage.getItem("promoTokensRedeemed")) || 0;
-
-    let lifetimeFreeGames = Number(localStorage.getItem("lifetimeFreeGames")) || 0;
-    let lifetimeFreeWinnings = Number(localStorage.getItem("lifetimeFreeWinnings")) || 0;
-
-    let lifetimePaidGames = Number(localStorage.getItem("lifetimePaidGames")) || 0;
-    let lifetimePaidWagered = Number(localStorage.getItem("lifetimePaidWagered")) || 0;
-    let lifetimePaidWinnings = Number(localStorage.getItem("lifetimePaidWinnings")) || 0;
-
-    let lifetimeBonusSpinsEarned = Number(localStorage.getItem("lifetimeBonusSpinsEarned")) || 0;
-    let lifetimeBonusSpinsPlayed = Number(localStorage.getItem("lifetimeBonusSpinsPlayed")) || 0;
-    let lifetimeBonusSpinWinnings = Number(localStorage.getItem("lifetimeBonusSpinWinnings")) || 0;
+    let statsVisible = false;
 
     // =========================
     // DOM REFERENCES
@@ -1416,27 +1075,16 @@
     const slotGrid = document.getElementById("slotGrid");
     const lineOverlay = document.getElementById("lineOverlay");
     const winPopup = document.getElementById("winPopup");
-    const unlockPopup = document.getElementById("unlockPopup");
     const lastSpin = document.getElementById("lastSpin");
     const spinButton = document.getElementById("spinButton");
     const devTools = document.getElementById("devTools");
     const codeInput = document.getElementById("codeInput");
     const codeMessage = document.getElementById("codeMessage");
-
-    const unlockContent = document.getElementById("unlockContent");
-
-    // =========================
-    // SMALL HELPERS
-    // =========================
-
-    function capitalize(text) {
-      if (!text) return "";
-      return text.charAt(0).toUpperCase() + text.slice(1);
-    }
-
+    const statsPanel = document.getElementById("statsPanel");
+    const statsContent = document.getElementById("statsContent");
 
     // =========================
-    // SECTION 4: INIT / THEME / DISPLAY / GRID / AUDIO
+    // SECTION 4: INIT / THEME / DISPLAY / GRID
     // =========================
 
     // =========================
@@ -1448,37 +1096,8 @@
     applyTheme(activeTheme);
     updateDisplay();
     updateDevToolsVisibility();
-    updateSoundButton();
+    updateStatsPanel();
     startLinePreview();
-
-    // =========================
-    // AUDIO
-    // =========================
-
-    function playSound(soundName) {
-      if (!soundEnabled) return;
-
-      const sound = sounds[soundName];
-      if (!sound) return;
-
-      sound.currentTime = 0;
-      sound.play().catch(() => {});
-    }
-
-    function toggleSound() {
-      soundEnabled = !soundEnabled;
-      localStorage.setItem("soundEnabled", soundEnabled ? "true" : "false");
-      updateSoundButton();
-      playSound("click");
-    }
-
-    function updateSoundButton() {
-      const soundButton = document.getElementById("soundButton");
-      if (!soundButton) return;
-
-      soundButton.textContent = soundEnabled ? "Sound: On" : "Sound: Off";
-      soundButton.classList.toggle("active", soundEnabled);
-    }
 
     // =========================
     // LINE COUNT / ACTIVE PAYLINES
@@ -1493,8 +1112,6 @@
     }
 
     function changeLineCount(direction) {
-      playSound("click");
-
       lineCountIndex += direction;
 
       if (lineCountIndex < 0) lineCountIndex = lineCountOptions.length - 1;
@@ -1505,7 +1122,7 @@
     }
 
     // =========================
-    // LINE PREVIEW / WINNING LINE OVERLAY
+    // LINE PREVIEW OVERLAY
     // =========================
 
     function getGridMetrics() {
@@ -1584,39 +1201,6 @@
       linePreviewIndex++;
     }
 
-    function drawWinningLines(wins) {
-      if (!wins.length) {
-        hideLineOverlay();
-        return;
-      }
-
-      stopLinePreview();
-
-      const m = getGridMetrics();
-
-      const lineSvgs = wins.map((win, index) => {
-        const color = lineColors[index % lineColors.length];
-        const line = paylines.find(payline => payline.name === win.lineName);
-
-        if (!line) return "";
-
-        const points = getLinePoints(line);
-        const pointString = points.map(p => `${p.x},${p.y}`).join(" ");
-
-        return `
-          <polyline points="${pointString}" stroke="${color}" />
-        `;
-      }).join("");
-
-      lineOverlayVisible = true;
-      lineOverlay.style.display = "block";
-      lineOverlay.innerHTML = `
-        <svg viewBox="0 0 ${m.viewW} ${m.viewH}" preserveAspectRatio="none">
-          ${lineSvgs}
-        </svg>
-      `;
-    }
-
     function startLinePreview() {
       stopLinePreview();
 
@@ -1647,7 +1231,6 @@
       stopLinePreview();
       lineOverlayVisible = false;
       lineOverlay.style.display = "none";
-      lineOverlay.innerHTML = "";
     }
 
     // =========================
@@ -1663,15 +1246,12 @@
 
       if (!availableThemes.includes(activeTheme)) {
         activeTheme = "Default";
-        localStorage.setItem("activeTheme", activeTheme);
       }
 
       themeIndex = availableThemes.indexOf(activeTheme);
     }
 
     function changeTheme(direction) {
-      playSound("click");
-
       const availableThemes = getAvailableThemes();
 
       themeIndex += direction;
@@ -1690,15 +1270,12 @@
     }
 
     function unlockTheme(themeName) {
-      if (!themes[themeName]) return false;
+      if (!themes[themeName]) return;
 
       if (!unlockedThemes[themeName]) {
         unlockedThemes[themeName] = true;
         localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
-        return true;
       }
-
-      return false;
     }
 
     function applyTheme(themeName) {
@@ -1710,74 +1287,6 @@
       document.documentElement.style.setProperty("--accent-soft", theme.accent + "40");
       document.documentElement.style.setProperty("--page-bg", theme.pageImage || 'url("background.png")');
       document.documentElement.style.setProperty("--game-bg", theme.gameImage || "none");
-
-      document.documentElement.style.setProperty("--text-main", theme.textMain || "#ffffff");
-      document.documentElement.style.setProperty("--text-muted", theme.textMuted || "#c9c9c9");
-      document.documentElement.style.setProperty("--text-accent", theme.textAccent || theme.accent);
-      document.documentElement.style.setProperty("--button-text", theme.buttonText || theme.accent);
-    }
-
-    function applyUnlockedTheme(themeName) {
-      if (!themes[themeName]) return;
-
-      activeTheme = themeName;
-      localStorage.setItem("activeTheme", activeTheme);
-
-      syncThemeIndex();
-      symbolPool = buildSymbolPool();
-      applyTheme(activeTheme);
-
-      // Do NOT rebuild the reels here.
-      // This preserves the winning board when a theme auto-unlocks.
-      updateDisplay();
-      refreshReelGemGlow();
-    }
-
-    function getUnlockGemKey() {
-      if (!gemActive || currentGem === "clear") return "diamond";
-      return currentGem;
-    }
-
-    function handleCharacterThemeUnlock(characterName) {
-      const baseUnlocked = unlockTheme(characterName);
-      const gemKey = getUnlockGemKey();
-
-      let themeToApply = characterName;
-      let unlockMessage = `${characterName} Unlocked`;
-
-      if (gemKey !== "diamond") {
-        const variantTheme = `${characterName}${capitalize(gemKey)}`;
-        const variantUnlocked = unlockTheme(variantTheme);
-
-        themeToApply = variantTheme;
-        unlockMessage = `${themes[variantTheme]?.label || variantTheme} Unlocked`;
-
-        if (!variantUnlocked && !baseUnlocked) {
-          unlockMessage = `${themes[variantTheme]?.label || variantTheme} Applied`;
-        }
-      } else if (!baseUnlocked) {
-        unlockMessage = `${characterName} Applied`;
-      }
-
-      applyUnlockedTheme(themeToApply);
-      showUnlockPopup(unlockMessage);
-      playSound("unlock");
-    }
-
-    function showUnlockPopup(message) {
-      if (!unlockPopup) return;
-
-      if (unlockPopupTimer) {
-        clearTimeout(unlockPopupTimer);
-        unlockPopupTimer = null;
-      }
-
-      unlockPopup.textContent = message;
-      unlockPopup.classList.add("show");
-
-      unlockPopupTimer = setTimeout(() => {
-        unlockPopup.classList.remove("show");
-      }, 2800);
     }
 
     // =========================
@@ -1813,8 +1322,6 @@
     }
 
     function activateGem() {
-      playSound("click");
-
       const gem = document.getElementById("chaosGem");
       const message = document.getElementById("gemMessage");
 
@@ -1858,11 +1365,9 @@
         gem.textContent = "☠";
         message.textContent = "Stay awhile and Listen";
         unlockTheme("Winky");
-        updateUnlockPanel();
-        playSound("winky");
       } else {
         setGemImage(gem);
-        message.textContent = `${capitalize(outcome.name)} Gem Active`;
+        message.textContent = "Gem Activated";
       }
 
       message.style.color = outcome.color;
@@ -1926,8 +1431,6 @@
     // =========================
 
     function changeBaseBet(direction) {
-      playSound("click");
-
       baseBetIndex += direction;
 
       if (baseBetIndex < 0) baseBetIndex = baseBetOptions.length - 1;
@@ -1937,8 +1440,6 @@
     }
 
     function changeMultiplier(direction) {
-      playSound("click");
-
       multiplierIndex += direction;
 
       if (multiplierIndex < 0) multiplierIndex = multiplierOptions.length - 1;
@@ -1953,6 +1454,15 @@
 
     function getMultiplier() {
       return multiplierOptions[multiplierIndex];
+    }
+
+    function getFinalBet() {
+      const baseBet = getBaseBet();
+      const multiplier = getMultiplier();
+
+      if (baseBet === 0) return 0;
+
+      return baseBet * multiplier;
     }
 
     function getLineBet() {
@@ -1974,8 +1484,7 @@
     function formatTokenBank(amount) {
       const raw = String(Math.floor(amount)).padStart(18, "0");
       return raw.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
-
+}
     function updateDisplay() {
       const baseBet = getBaseBet();
       const multiplier = getMultiplier();
@@ -1987,62 +1496,16 @@
       baseBetDisplay.textContent = baseBet === 0 ? "Free" : baseBet.toLocaleString();
       multiplierDisplay.textContent = multiplier + "x";
       lineCountDisplay.textContent = getLineCount();
-      themeDisplay.textContent = themes[activeTheme]?.label || activeTheme;
+      themeDisplay.textContent = activeTheme;
 
       spinButton.textContent = finalBet === 0
         ? "FREE"
         : finalBet.toLocaleString();
 
-      updateInfoButtons();
       updateWinInfo();
       updateDevToolsVisibility();
-      updateUnlockPanel();
-      updateSoundButton();
+      updateStatsPanel();
     }
-
-    // =========================
-    // INFO FRAME MODE
-    // =========================
-
-    function setInfoMode(mode) {
-      playSound("click");
-
-      activePanel = activePanel === mode ? null : mode;
-
-      updateInfoButtons();
-      updateWinInfo();
-    }
-
-    function updateInfoButtons() {
-      const statsButton = document.getElementById("statsButton");
-      const breakdownButton = document.getElementById("breakdownButton");
-
-      if (statsButton) {
-        statsButton.classList.toggle("active", activePanel === "stats");
-      }
-
-      if (breakdownButton) {
-        breakdownButton.classList.toggle("active", activePanel === "breakdown");
-      }
-    }
-
-    function updateAllPanels() {
-      updateWinInfo();
-      updateUnlockPanel();
-      updateSoundButton();
-    }
-
-    function toggleDevUnlocks() {
-      playSound("click");
-
-      const devUnlockPanel = document.getElementById("devUnlockPanel");
-
-      if (!devUnlockPanel) return;
-
-      devUnlockPanel.classList.toggle("visible");
-      updateUnlockPanel();
-    }
-
 
     // =========================
     // SECTION 5: ODDS / PAYOUTS / WIN EVALUATION
@@ -2081,7 +1544,8 @@
 
       const anyLineWin = twoInRow + threeInRow + fourInRow + fiveInRow;
 
-      // Approximate only. True odds are higher because of Wilds and right-to-left wins.
+      // Approximate only.
+      // True odds are higher because of Wilds and right-to-left wins.
       const approxAnySpinWin = 1 - Math.pow(1 - anyLineWin, activeLines * 2);
 
       return {
@@ -2102,6 +1566,43 @@
       return `${percent}% / 1 in ${oneIn}`;
     }
 
+    function updateWinInfo() {
+      const winInfo = document.getElementById("winInfo");
+      const activeLines = getActivePaylines().length;
+      const odds = calculateOdds();
+
+      winInfo.innerHTML = `
+        <div class="winCard">
+          <strong>Possibilities & Odds — ${activeLines} Lines</strong>
+
+          <div class="winRow">
+            <span>2 in row</span>
+            <span>${formatOdds(odds.twoInRow)}</span>
+          </div>
+
+          <div class="winRow">
+            <span>3 in row</span>
+            <span>${formatOdds(odds.threeInRow)}</span>
+          </div>
+
+          <div class="winRow">
+            <span>4 in row</span>
+            <span>${formatOdds(odds.fourInRow)}</span>
+          </div>
+
+          <div class="winRow">
+            <span>5 in row</span>
+            <span>${formatOdds(odds.fiveInRow)}</span>
+          </div>
+
+          <div class="winRow winGap">
+            <span>Hit Chance</span>
+            <span>${formatOdds(odds.approxAnySpinWin)}</span>
+          </div>
+        </div>
+      `;
+    }
+
     // =========================
     // PAYOUT TABLES
     // =========================
@@ -2111,16 +1612,14 @@
         Axe: { 2: 15, 3: 75, 4: 200, 5: 750 },
         Animal: { 2: 15, 3: 75, 4: 200, 5: 750 },
         Gem: { 2: 100, 3: 400, 4: 1250, 5: 5000 },
-        Wild: { 2: 100, 3: 400, 4: 1250, 5: 5000 },
         default: { 2: 40, 3: 175, 4: 500, 5: 1500 }
       },
 
       paid: {
-        Axe: { 2: 0.75, 3: 4, 4: 15, 5: 75 },
-        Animal: { 2: 0.75, 3: 4, 4: 15, 5: 75 },
-        Gem: { 2: 3, 3: 15, 4: 75, 5: 350 },
-        Wild: { 2: 3, 3: 15, 4: 75, 5: 350 },
-        default: { 2: 1.5, 3: 8, 4: 35, 5: 150 }
+        Axe: { 2: 0.5, 3: 3, 4: 12, 5: 60 },
+        Animal: { 2: 0.5, 3: 3, 4: 12, 5: 60 },
+        Gem: { 2: 2, 3: 12, 4: 60, 5: 300 },
+        default: { 2: 1, 3: 6, 4: 25, 5: 120 }
       }
     };
 
@@ -2153,14 +1652,6 @@
 
     function paidPayoutForMatch(matchCount, symbolName, lineBet) {
       return Math.floor(lineBet * paidMultiplierForMatch(matchCount, symbolName));
-    }
-
-    function payoutForWin(win, finalBet, lineBet) {
-      if (finalBet === 0) {
-        return freePayoutForMatch(win.matchCount, win.symbol);
-      }
-
-      return paidPayoutForMatch(win.matchCount, win.symbol, lineBet);
     }
 
     // =========================
@@ -2201,26 +1692,8 @@
 
       if (nonWild) return nonWild;
 
-      // Pure Wild line stays Wild so it can pay premium and trigger Bonus Spins.
-      return { name: "Wild", type: "image", value: "wild.png" };
-    }
-
-    function countLeadingWilds(symbols) {
-      let count = 0;
-
-      for (let i = 0; i < symbols.length; i++) {
-        if (isWild(symbols[i])) {
-          count++;
-        } else {
-          break;
-        }
-      }
-
-      return count;
-    }
-
-    function isPureWildChain(symbols) {
-      return symbols.length >= 2 && symbols.every(symbol => isWild(symbol));
+      // If a line is all Wilds, pay as Gem.
+      return { name: "Gem", type: "image", value: "gem.png" };
     }
 
     function evaluateDirection(grid, line, direction) {
@@ -2260,17 +1733,13 @@
       if (matchCount < 2) return null;
 
       const payingSymbol = baseSymbol || getBestBaseSymbol(checkedSymbols);
-      const pureWild = isPureWildChain(checkedSymbols);
-      const leadingWildCount = countLeadingWilds(checkedSymbols);
 
       return {
         lineName: line.name,
         direction,
         symbol: payingSymbol.name,
         matchCount,
-        wildCount: leadingWildCount,
-        cells,
-        pureWild
+        cells
       };
     }
 
@@ -2295,45 +1764,18 @@
       return wins;
     }
 
-    function countBonusSpinsFromWins(wins) {
-      let earned = 0;
-
-      wins.forEach(win => {
-        if (win.wildCount >= 2) {
-          earned += win.wildCount;
-        }
-      });
-
-      return earned;
-    }
-
     function checkThemeUnlocks(wins) {
-      let unlockedSomething = false;
-
       wins.forEach(win => {
-        if (win.matchCount < 5) return;
+        if (win.matchCount >= 5) {
+          if (["Maya", "Reign", "Kyra", "Nadia"].includes(win.symbol)) {
+            unlockTheme(win.symbol);
+          }
 
-        if (characterSymbols.includes(win.symbol)) {
-          handleCharacterThemeUnlock(win.symbol);
-          unlockedSomething = true;
-        }
-
-        if (win.symbol === "Gem" || win.symbol === "Wild") {
-          const wasUnlocked = unlockTheme("Winky");
-
-          if (wasUnlocked) {
-            applyUnlockedTheme("Winky");
-            showUnlockPopup("Winky Unlocked");
-            playSound("unlock");
-            unlockedSomething = true;
+          if (win.symbol === "Gem") {
+            unlockTheme("Winky");
           }
         }
       });
-
-      if (unlockedSomething) {
-        localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
-        updateUnlockPanel();
-      }
 
       syncThemeIndex();
     }
@@ -2357,27 +1799,6 @@
             cell.classList.add("wildCell");
           }
         });
-      });
-    }
-
-    function buildWinBreakdown(wins, finalBet, lineBet) {
-      if (!wins.length) return [];
-
-      return wins.map(win => {
-        const payout = payoutForWin(win, finalBet, lineBet);
-
-        const wildText = win.wildCount >= 2
-          ? ` — Wild x${win.wildCount}`
-          : "";
-
-        const bonusText = finalBet > 0 && win.wildCount >= 2
-          ? ` + ${win.wildCount} Bonus Spins`
-          : "";
-
-        return {
-          text: `${win.lineName} ${win.direction}: ${win.matchCount}x ${win.symbol}${wildText}${bonusText}`,
-          payout
-        };
       });
     }
 
@@ -2405,21 +1826,9 @@
       }, 2500);
     }
 
-
     // =========================
     // SECTION 6: SPIN / DEV TOOLS / CODES / STATS / CLOSE
     // =========================
-
-    // =========================
-    // BONUS SPIN SESSION STATE
-    // =========================
-
-    let bonusSessionTotal = 0;
-    let bonusSessionPlayed = 0;
-    let bonusSessionWon = 0;
-    let devUnlockInfoVisible = false;
-
-    const BONUS_SPIN_DELAY = 1500;
 
     // =========================
     // SPIN CONTROL
@@ -2431,18 +1840,20 @@
       document.querySelectorAll(".arrowButton").forEach(button => {
         button.disabled = disabled;
       });
-
-      document.querySelectorAll(".infoButton").forEach(button => {
-        button.disabled = disabled;
-      });
     }
 
     function calculateSpinPayout(wins, finalBet, lineBet) {
       let payout = 0;
 
-      wins.forEach(win => {
-        payout += payoutForWin(win, finalBet, lineBet);
-      });
+      if (finalBet === 0) {
+        wins.forEach(win => {
+          payout += freePayoutForMatch(win.matchCount, win.symbol);
+        });
+      } else {
+        wins.forEach(win => {
+          payout += paidPayoutForMatch(win.matchCount, win.symbol, lineBet);
+        });
+      }
 
       return payout;
     }
@@ -2453,29 +1864,18 @@
 
       if (finalBet > tokens) {
         codeMessage.textContent = "Not enough Forge Tokens.";
-        playSound("click");
         return;
       }
 
-      if (finalBet > 0) {
-        tokens -= finalBet;
-        localStorage.setItem("forgeTokens", tokens);
-        updateDisplay();
-      }
-
-      animateSpin(finalBet, lineBet, "normal");
-    }
-
-    function animateSpin(finalBet, lineBet, spinType = "normal") {
-      playSound("spin");
       hideLineOverlay();
       clearWinPopup();
       clearWinningHighlights();
       setControlsDisabled(true);
 
-      if (spinType === "bonus") {
-        const currentBonusNumber = bonusSessionPlayed + 1;
-        showUnlockPopup(`Bonus Spin ${currentBonusNumber} / ${bonusSessionTotal}`);
+      if (finalBet > 0) {
+        tokens -= finalBet;
+        localStorage.setItem("forgeTokens", tokens);
+        updateDisplay();
       }
 
       const finalGrid = buildFinalGrid();
@@ -2492,7 +1892,6 @@
 
         setTimeout(() => {
           clearInterval(intervals[col]);
-          playSound("stop");
 
           for (let row = 0; row < VISIBLE_ROWS; row++) {
             const cell = getCell(row, col);
@@ -2501,64 +1900,24 @@
           }
 
           if (col === COLS - 1) {
-            finishSpin(finalGrid, finalBet, lineBet, spinType);
+            finishSpin(finalGrid, finalBet, lineBet);
           }
         }, 900 + col * 350);
       }
     }
 
-    function finishSpin(finalGrid, finalBet, lineBet, spinType = "normal") {
+    function finishSpin(finalGrid, finalBet, lineBet) {
       const wins = evaluatePaylines(finalGrid);
       const payout = calculateSpinPayout(wins, finalBet, lineBet);
 
-      const earnedBonusSpins = spinType === "normal" && finalBet > 0
-        ? countBonusSpinsFromWins(wins)
-        : 0;
-
       highlightWins(wins);
-      drawWinningLines(wins);
       checkThemeUnlocks(wins);
-
-      lastWinBreakdown = buildWinBreakdown(wins, finalBet, lineBet);
 
       tokens += payout;
       totalSpins += 1;
+
       lifetimeTokensEarned += payout;
-
-      if (spinType === "normal") {
-        lifetimeTokensWagered += finalBet;
-
-        if (finalBet === 0) {
-          lifetimeFreeGames += 1;
-          lifetimeFreeWinnings += payout;
-        } else {
-          lifetimePaidGames += 1;
-          lifetimePaidWagered += finalBet;
-          lifetimePaidWinnings += payout;
-        }
-      }
-
-      if (spinType === "bonus") {
-        lifetimeBonusSpinsPlayed += 1;
-        lifetimeBonusSpinWinnings += payout;
-        bonusSessionPlayed += 1;
-        bonusSessionWon += payout;
-      }
-
-      if (earnedBonusSpins > 0) {
-        bonusSpinQueue += earnedBonusSpins;
-        bonusSpinLineBet = lineBet;
-        bonusSpinFinalBet = finalBet;
-        bonusSpinSource = `${earnedBonusSpins} Bonus Spins`;
-
-        bonusSessionTotal = earnedBonusSpins;
-        bonusSessionPlayed = 0;
-        bonusSessionWon = 0;
-
-        lifetimeBonusSpinsEarned += earnedBonusSpins;
-        showUnlockPopup(`${earnedBonusSpins} Bonus Spins Earned`);
-        playSound("bonus");
-      }
+      lifetimeTokensWagered += finalBet;
 
       if (payout > biggestSingleWin) {
         biggestSingleWin = payout;
@@ -2570,39 +1929,9 @@
 
       saveStats();
       updateDisplay();
+      updateStatsPanel();
       showWinPopup(payout);
-
-      if (payout > 0) {
-        if (payout >= finalBet * 20 && finalBet > 0) {
-          playSound("bigWin");
-        } else {
-          playSound("smallWin");
-        }
-      }
-
-      if (bonusSpinQueue > 0) {
-        setTimeout(runBonusSpin, BONUS_SPIN_DELAY);
-      } else {
-        if (spinType === "bonus" && bonusSessionTotal > 0) {
-          showUnlockPopup(`${bonusSessionTotal} Bonus Spins Complete — ${bonusSessionWon.toLocaleString()} Tokens Won`);
-          bonusSessionTotal = 0;
-          bonusSessionPlayed = 0;
-          bonusSessionWon = 0;
-        }
-
-        setControlsDisabled(false);
-      }
-    }
-
-    function runBonusSpin() {
-      if (bonusSpinQueue <= 0) {
-        setControlsDisabled(false);
-        return;
-      }
-
-      bonusSpinQueue -= 1;
-
-      animateSpin(bonusSpinFinalBet, bonusSpinLineBet, "bonus");
+      setControlsDisabled(false);
     }
 
     // =========================
@@ -2611,7 +1940,6 @@
 
     function quickSpin(amount) {
       markDevToolsUsed();
-      playSound("click");
 
       const finalBet = getFinalBet();
       const lineBet = getLineBet();
@@ -2619,8 +1947,6 @@
       let totalPayout = 0;
       let totalWagered = 0;
       let completedSpins = 0;
-      let earnedBonusTotal = 0;
-      let playedBonusTotal = 0;
 
       for (let i = 0; i < amount; i++) {
         if (finalBet > tokens) break;
@@ -2633,7 +1959,6 @@
         const grid = buildFinalGrid();
         const wins = evaluatePaylines(grid);
         const spinPayout = calculateSpinPayout(wins, finalBet, lineBet);
-        const earnedBonusSpins = finalBet > 0 ? countBonusSpinsFromWins(wins) : 0;
 
         checkThemeUnlocks(wins);
 
@@ -2644,41 +1969,6 @@
 
         lifetimeTokensEarned += spinPayout;
         lifetimeTokensWagered += finalBet;
-
-        if (finalBet === 0) {
-          lifetimeFreeGames += 1;
-          lifetimeFreeWinnings += spinPayout;
-        } else {
-          lifetimePaidGames += 1;
-          lifetimePaidWagered += finalBet;
-          lifetimePaidWinnings += spinPayout;
-        }
-
-        if (earnedBonusSpins > 0) {
-          lifetimeBonusSpinsEarned += earnedBonusSpins;
-          earnedBonusTotal += earnedBonusSpins;
-
-          for (let b = 0; b < earnedBonusSpins; b++) {
-            const bonusGrid = buildFinalGrid();
-            const bonusWins = evaluatePaylines(bonusGrid);
-            const bonusPayout = calculateSpinPayout(bonusWins, finalBet, lineBet);
-
-            checkThemeUnlocks(bonusWins);
-
-            tokens += bonusPayout;
-            totalPayout += bonusPayout;
-            totalSpins += 1;
-
-            lifetimeTokensEarned += bonusPayout;
-            lifetimeBonusSpinsPlayed += 1;
-            lifetimeBonusSpinWinnings += bonusPayout;
-            playedBonusTotal += 1;
-
-            if (bonusPayout > biggestSingleWin) {
-              biggestSingleWin = bonusPayout;
-            }
-          }
-        }
 
         if (spinPayout > biggestSingleWin) {
           biggestSingleWin = spinPayout;
@@ -2692,18 +1982,18 @@
       saveStats();
       clearWinningHighlights();
       clearWinPopup();
-      hideLineOverlay();
       updateDisplay();
+      updateStatsPanel();
 
       const net = totalPayout - totalWagered;
       const sign = net >= 0 ? "+" : "-";
 
       codeMessage.textContent =
-        `Quick Spin: ${completedSpins} spins | Bonus ${playedBonusTotal}/${earnedBonusTotal} | Net ${sign}${Math.abs(net).toLocaleString()}`;
+        `Quick Spin: ${completedSpins} spins | Payout ${totalPayout.toLocaleString()} | Net ${sign}${Math.abs(net).toLocaleString()}`;
     }
 
     // =========================
-    // STATS / INFO FRAME
+    // STATISTICS / WINKY'S JUDGEMENT
     // =========================
 
     function saveStats() {
@@ -2717,32 +2007,29 @@
       localStorage.setItem("highestBalance", highestBalance);
       localStorage.setItem("devToolsUsed", devToolsUsed ? "true" : "false");
       localStorage.setItem("promoTokensRedeemed", promoTokensRedeemed);
-
-      localStorage.setItem("lifetimeFreeGames", lifetimeFreeGames);
-      localStorage.setItem("lifetimeFreeWinnings", lifetimeFreeWinnings);
-
-      localStorage.setItem("lifetimePaidGames", lifetimePaidGames);
-      localStorage.setItem("lifetimePaidWagered", lifetimePaidWagered);
-      localStorage.setItem("lifetimePaidWinnings", lifetimePaidWinnings);
-
-      localStorage.setItem("lifetimeBonusSpinsEarned", lifetimeBonusSpinsEarned);
-      localStorage.setItem("lifetimeBonusSpinsPlayed", lifetimeBonusSpinsPlayed);
-      localStorage.setItem("lifetimeBonusSpinWinnings", lifetimeBonusSpinWinnings);
     }
 
     function markDevToolsUsed() {
       devToolsUsed = true;
       saveStats();
-      updateDisplay();
+      updateStatsPanel();
     }
 
-    function getPaidReturnRate() {
-      if (lifetimePaidWagered <= 0) return 0;
-      return (lifetimePaidWinnings / lifetimePaidWagered) * 100;
+    function toggleStats() {
+      statsVisible = !statsVisible;
+
+      if (statsVisible) {
+        statsPanel.classList.add("visible");
+      } else {
+        statsPanel.classList.remove("visible");
+      }
+
+      updateStatsPanel();
     }
 
-    function getOverallReturnRate() {
+    function getReturnRate() {
       if (lifetimeTokensWagered <= 0) return 0;
+
       return (lifetimeTokensEarned / lifetimeTokensWagered) * 100;
     }
 
@@ -2750,337 +2037,112 @@
       return lifetimeTokensEarned - lifetimeTokensWagered;
     }
 
-    function getUnlockCount() {
-      return Object.keys(themes).filter(themeKey => unlockedThemes[themeKey]).length;
-    }
-
-    function getTotalUnlockCount() {
-      return Object.keys(themes).length;
-    }
-
     function getWinkyJudgement() {
-      const paidReturn = getPaidReturnRate();
+      const returnRate = getReturnRate();
 
       if (devToolsUsed) {
         return {
-          text: "Void — Timeline Corrupted",
+          text: "Void — Winky saw the dev tools",
           className: "judgementVoid"
         };
       }
 
       if (tokens >= 8000000000 && totalSpins < 100) {
         return {
-          text: "Void — Impossible Snack Behavior",
+          text: "Void — impossible snack behavior",
           className: "judgementVoid"
         };
       }
 
-      if (lifetimePaidGames >= 1000 && paidReturn > 250) {
+      if (totalSpins >= 1000 && returnRate > 250) {
         return {
-          text: "Suspicious Snack",
+          text: "Suspicious — Winky is watching",
           className: "judgementSuspicious"
         };
       }
 
-      if (lifetimePaidGames >= 5000 && paidReturn > 180) {
+      if (totalSpins >= 5000 && returnRate > 180) {
         return {
-          text: "Unusually Blessed",
+          text: "Suspicious — unusually blessed",
           className: "judgementSuspicious"
         };
       }
 
       return {
-        text: "Acceptable Mortal",
+        text: "Acceptable mortal",
         className: "judgementGood"
       };
     }
 
-    function renderOddsInfo() {
-      const activeLines = getActivePaylines().length;
-      const odds = calculateOdds();
+    function updateStatsPanel() {
+      if (!statsContent) return;
 
-      return `
-        <div class="winCard">
-          <strong>Possibilities & Odds — ${activeLines} Lines</strong>
-
-          <div class="winRow">
-            <span>2 in row</span>
-            <span>${formatOdds(odds.twoInRow)}</span>
-          </div>
-
-          <div class="winRow">
-            <span>3 in row</span>
-            <span>${formatOdds(odds.threeInRow)}</span>
-          </div>
-
-          <div class="winRow">
-            <span>4 in row</span>
-            <span>${formatOdds(odds.fourInRow)}</span>
-          </div>
-
-          <div class="winRow">
-            <span>5 in row</span>
-            <span>${formatOdds(odds.fiveInRow)}</span>
-          </div>
-
-          <div class="winRow winGap">
-            <span>Hit Chance</span>
-            <span>${formatOdds(odds.approxAnySpinWin)}</span>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderStatsInfo() {
-      const paidReturn = getPaidReturnRate();
-      const overallReturn = getOverallReturnRate();
+      const returnRate = getReturnRate();
       const netGain = getNetGain();
+
+      const averageEarned = totalSpins > 0
+        ? Math.floor(lifetimeTokensEarned / totalSpins)
+        : 0;
+
       const judgement = getWinkyJudgement();
       const netSign = netGain >= 0 ? "+" : "-";
 
-      return `
-        <div class="winCard">
-          <strong>Statistics</strong>
+      statsContent.innerHTML = `
+        <div class="statRow">
+          <span>Lifetime Tokens Earned</span>
+          <span>${lifetimeTokensEarned.toLocaleString()}</span>
+        </div>
 
-          <div class="statGroup">
-            <div class="statGroupTitle">Judgement</div>
-            <div class="statRow">
-              <span>Winky’s Judgement</span>
-              <span class="${judgement.className}">${judgement.text}</span>
-            </div>
-            <div class="statRow">
-              <span>Unlocks Found</span>
-              <span>${getUnlockCount()} / ${getTotalUnlockCount()}</span>
-            </div>
-          </div>
+        <div class="statRow">
+          <span>Lifetime Tokens Wagered</span>
+          <span>${lifetimeTokensWagered.toLocaleString()}</span>
+        </div>
 
-          <div class="statGroup">
-            <div class="statGroupTitle">Free Play</div>
-            <div class="statRow">
-              <span>Free Games</span>
-              <span>${lifetimeFreeGames.toLocaleString()}</span>
-            </div>
-            <div class="statRow">
-              <span>Free Winnings</span>
-              <span>${lifetimeFreeWinnings.toLocaleString()}</span>
-            </div>
-          </div>
+        <div class="statRow">
+          <span>Lifetime Net Gain</span>
+          <span>${netSign}${Math.abs(netGain).toLocaleString()}</span>
+        </div>
 
-          <div class="statGroup">
-            <div class="statGroupTitle">Paid Play</div>
-            <div class="statRow">
-              <span>Paid Games</span>
-              <span>${lifetimePaidGames.toLocaleString()}</span>
-            </div>
-            <div class="statRow">
-              <span>Paid Wagered</span>
-              <span>${lifetimePaidWagered.toLocaleString()}</span>
-            </div>
-            <div class="statRow">
-              <span>Paid Winnings</span>
-              <span>${lifetimePaidWinnings.toLocaleString()}</span>
-            </div>
-            <div class="statRow">
-              <span>Paid Return</span>
-              <span>${paidReturn.toFixed(2)}%</span>
-            </div>
-          </div>
+        <div class="statRow">
+          <span>Lifetime Spins</span>
+          <span>${totalSpins.toLocaleString()}</span>
+        </div>
 
-          <div class="statGroup">
-            <div class="statGroupTitle">Bonus Spins</div>
-            <div class="statRow">
-              <span>Bonus Spins Earned</span>
-              <span>${lifetimeBonusSpinsEarned.toLocaleString()}</span>
-            </div>
-            <div class="statRow">
-              <span>Bonus Spins Played</span>
-              <span>${lifetimeBonusSpinsPlayed.toLocaleString()}</span>
-            </div>
-            <div class="statRow">
-              <span>Bonus Spin Winnings</span>
-              <span>${lifetimeBonusSpinWinnings.toLocaleString()}</span>
-            </div>
-          </div>
+        <div class="statRow">
+          <span>Average Earned / Spin</span>
+          <span>${averageEarned.toLocaleString()}</span>
+        </div>
 
-          <div class="statGroup">
-            <div class="statGroupTitle">Overall</div>
-            <div class="statRow">
-              <span>Total Spins</span>
-              <span>${totalSpins.toLocaleString()}</span>
-            </div>
-            <div class="statRow">
-              <span>Total Tokens Earned</span>
-              <span>${lifetimeTokensEarned.toLocaleString()}</span>
-            </div>
-            <div class="statRow">
-              <span>Total Wagered</span>
-              <span>${lifetimeTokensWagered.toLocaleString()}</span>
-            </div>
-            <div class="statRow">
-              <span>Net Gain</span>
-              <span>${netSign}${Math.abs(netGain).toLocaleString()}</span>
-            </div>
-            <div class="statRow">
-              <span>Overall Return</span>
-              <span>${overallReturn.toFixed(2)}%</span>
-            </div>
-            <div class="statRow">
-              <span>Highest Balance</span>
-              <span>${highestBalance.toLocaleString()}</span>
-            </div>
-            <div class="statRow">
-              <span>Biggest Win</span>
-              <span>${biggestSingleWin.toLocaleString()}</span>
-            </div>
-          </div>
+        <div class="statRow">
+          <span>Return Rate</span>
+          <span>${returnRate.toFixed(2)}%</span>
+        </div>
+
+        <div class="statRow">
+          <span>Highest Balance</span>
+          <span>${highestBalance.toLocaleString()}</span>
+        </div>
+
+        <div class="statRow">
+          <span>Biggest Win</span>
+          <span>${biggestSingleWin.toLocaleString()}</span>
+        </div>
+
+        <div class="statRow">
+          <span>Promo Tokens</span>
+          <span>${promoTokensRedeemed.toLocaleString()}</span>
+        </div>
+
+        <div class="statRow">
+          <span>Dev Tools Used</span>
+          <span>${devToolsUsed ? "Yes" : "No"}</span>
+        </div>
+
+        <div class="statRow">
+          <span>Winky’s Judgement</span>
+          <span class="${judgement.className}">${judgement.text}</span>
         </div>
       `;
-    }
-
-    function renderBreakdownInfo() {
-      if (!lastWinBreakdown.length) {
-        return `
-          <div class="winCard">
-            <strong>Last Win Breakdown</strong>
-            <div class="breakdownRow">
-              <span>No wins recorded yet.</span>
-              <span></span>
-            </div>
-          </div>
-        `;
-      }
-
-      return `
-        <div class="winCard">
-          <strong>Last Win Breakdown</strong>
-          ${lastWinBreakdown.map(item => `
-            <div class="breakdownRow">
-              <span>${item.text}</span>
-              <span>${item.payout > 0 ? "+" + item.payout.toLocaleString() : ""}</span>
-            </div>
-          `).join("")}
-        </div>
-      `;
-    }
-
-    function renderDevToolsInfo() {
-      if (!devToolsUnlocked) {
-        return renderOddsInfo();
-      }
-
-      return `
-        <div class="winCard">
-          <strong>Dev Tools</strong>
-
-          <div class="statGroup">
-            <div class="statGroupTitle">Theme Tools</div>
-            <div class="devButtonGrid">
-              <button class="devButton" onclick="unlockAllThemes()">Unlock All</button>
-              <button class="devButton" onclick="activateThemeDev('Maya')">Activate Maya</button>
-              <button class="devButton" onclick="activateThemeDev('Reign')">Activate Reign</button>
-              <button class="devButton" onclick="activateThemeDev('Kyra')">Activate Kyra</button>
-              <button class="devButton" onclick="activateThemeDev('Nadia')">Activate Nadia</button>
-              <button class="devButton" onclick="activateThemeDev('Winky')">Activate Winky</button>
-            </div>
-          </div>
-
-          <div class="statGroup">
-            <div class="statGroupTitle">Token Tools</div>
-            <div class="devButtonGrid">
-              <button class="devButton" onclick="addDevTokens()">+100,000,000</button>
-              <button class="devButton" onclick="quickSpin(100)">Quick Spin x100</button>
-              <button class="devButton" onclick="quickSpin(500)">Quick Spin x500</button>
-            </div>
-          </div>
-
-          <div class="statGroup">
-            <div class="statGroupTitle">Unlock Tracker</div>
-            <button class="devButton" onclick="toggleDevUnlocks()" style="width:100%;">
-              Show / Hide Unlocks
-            </button>
-            <div id="devUnlockInfo">
-              ${devUnlockInfoVisible ? renderUnlockRows() : ""}
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderUnlockRows() {
-      const baseThemes = Object.keys(themes).filter(key => themes[key].unlockType === "base");
-      const variantThemes = Object.keys(themes).filter(key => themes[key].unlockType === "variant");
-      const specialThemes = Object.keys(themes).filter(key => themes[key].unlockType === "special");
-
-      const baseFound = baseThemes.filter(key => unlockedThemes[key]).length;
-      const variantFound = variantThemes.filter(key => unlockedThemes[key]).length;
-      const specialFound = specialThemes.filter(key => unlockedThemes[key]).length;
-
-      let rows = `
-        <div class="unlockRow">
-          <span>Total Unlocks</span>
-          <span>${getUnlockCount()} / ${getTotalUnlockCount()}</span>
-        </div>
-        <div class="unlockRow">
-          <span>Base Themes</span>
-          <span>${baseFound} / ${baseThemes.length}</span>
-        </div>
-        <div class="unlockRow">
-          <span>Gem Variants</span>
-          <span>${variantFound} / ${variantThemes.length}</span>
-        </div>
-        <div class="unlockRow">
-          <span>Special Themes</span>
-          <span>${specialFound} / ${specialThemes.length}</span>
-        </div>
-      `;
-
-      Object.keys(themes).forEach(themeKey => {
-        if (themeKey === "Default") return;
-
-        const label = themes[themeKey].label || themeKey;
-        const found = unlockedThemes[themeKey];
-
-        rows += `
-          <div class="unlockRow">
-            <span>${label}</span>
-            <span>${found ? "Found" : "Locked"}</span>
-          </div>
-        `;
-      });
-
-      return rows;
-    }
-
-    function updateWinInfo() {
-      const winInfo = document.getElementById("winInfo");
-      if (!winInfo) return;
-
-      if (activePanel === "stats") {
-        winInfo.innerHTML = renderStatsInfo();
-        return;
-      }
-
-      if (activePanel === "breakdown") {
-        winInfo.innerHTML = renderBreakdownInfo();
-        return;
-      }
-
-      if (activePanel === "dev") {
-        winInfo.innerHTML = renderDevToolsInfo();
-        return;
-      }
-
-      winInfo.innerHTML = renderOddsInfo();
-    }
-
-    function updateUnlockPanel() {
-      if (unlockContent) {
-        unlockContent.innerHTML = renderUnlockRows();
-      }
-
-      if (activePanel === "dev") {
-        updateWinInfo();
-      }
     }
 
     // =========================
@@ -3088,28 +2150,32 @@
     // =========================
 
     function updateDevToolsVisibility() {
-      // Dev tools now render only in the separate info window.
-      if (devTools) {
+      if (devToolsUnlocked) {
+        devTools.classList.add("visible");
+      } else {
         devTools.classList.remove("visible");
       }
     }
 
     function activateThemeDev(themeName) {
       markDevToolsUsed();
-      playSound("click");
 
       unlockTheme(themeName);
-      applyUnlockedTheme(themeName);
+      activeTheme = themeName;
+      localStorage.setItem("activeTheme", activeTheme);
 
-      localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+      syncThemeIndex();
+      symbolPool = buildSymbolPool();
+      applyTheme(activeTheme);
+      createGrid();
       updateDisplay();
+      refreshReelGemGlow();
 
-      codeMessage.textContent = `${themes[themeName]?.label || themeName} activated.`;
+      codeMessage.textContent = `${themeName} theme activated.`;
     }
 
     function unlockAllThemes() {
       markDevToolsUsed();
-      playSound("click");
 
       Object.keys(themes).forEach(theme => {
         unlockedThemes[theme] = true;
@@ -3119,28 +2185,23 @@
 
       syncThemeIndex();
       updateDisplay();
+      updateStatsPanel();
 
       codeMessage.textContent = "All themes unlocked.";
     }
 
     function addDevTokens() {
       markDevToolsUsed();
-      playSound("click");
 
-      tokens += 100000000;
+      tokens += 100000000000;
 
       localStorage.setItem("forgeTokens", tokens);
 
       saveStats();
       updateDisplay();
+      updateStatsPanel();
 
-      codeMessage.textContent = "+100,000,000 Forge Tokens added.";
-    }
-
-    function toggleDevUnlocks() {
-      playSound("click");
-      devUnlockInfoVisible = !devUnlockInfoVisible;
-      updateWinInfo();
+      codeMessage.textContent = "+100,000,000,000 Forge Tokens added.";
     }
 
     // =========================
@@ -3148,8 +2209,6 @@
     // =========================
 
     function applyCode() {
-      playSound("click");
-
       const code = codeInput.value.trim().toUpperCase();
 
       if (!code) {
@@ -3214,10 +2273,6 @@
 
           markDevToolsUsed();
 
-          activePanel = "dev";
-          updateInfoButtons();
-          updateWinInfo();
-
           codeMessage.textContent = "Dev tools unlocked.";
         }
       };
@@ -3229,6 +2284,7 @@
         syncThemeIndex();
         updateDisplay();
         updateDevToolsVisibility();
+        updateStatsPanel();
       } else {
         codeMessage.textContent = "Invalid code.";
       }
@@ -3245,8 +2301,6 @@
     // =========================
 
     function resetGame() {
-      playSound("click");
-
       tokens = 0;
       totalSpins = 0;
 
@@ -3257,39 +2311,21 @@
       promoTokensRedeemed = 0;
       devToolsUsed = false;
 
-      lifetimeFreeGames = 0;
-      lifetimeFreeWinnings = 0;
-
-      lifetimePaidGames = 0;
-      lifetimePaidWagered = 0;
-      lifetimePaidWinnings = 0;
-
-      lifetimeBonusSpinsEarned = 0;
-      lifetimeBonusSpinsPlayed = 0;
-      lifetimeBonusSpinWinnings = 0;
-
-      bonusSpinQueue = 0;
-      bonusSpinLineBet = 0;
-      bonusSpinFinalBet = 0;
-      bonusSpinSource = "";
-
-      bonusSessionTotal = 0;
-      bonusSessionPlayed = 0;
-      bonusSessionWon = 0;
-      devUnlockInfoVisible = false;
-
-      unlockedThemes = {};
-      Object.keys(themes).forEach(themeKey => {
-        unlockedThemes[themeKey] = themeKey === "Default";
-      });
+      unlockedThemes = {
+        Default: true,
+        Maya: false,
+        Reign: false,
+        Kyra: false,
+        Nadia: false,
+        Winky: false
+      };
 
       activeTheme = "Default";
       themeIndex = 0;
       symbolPool = buildSymbolPool();
 
       devToolsUnlocked = false;
-      activePanel = null;
-      lastWinBreakdown = [];
+      statsVisible = false;
 
       localStorage.setItem("forgeTokens", tokens);
       localStorage.setItem("forgeTotalSpins", totalSpins);
@@ -3301,12 +2337,16 @@
 
       clearWinningHighlights();
       clearWinPopup();
-      hideLineOverlay();
+
+      if (statsPanel) {
+        statsPanel.classList.remove("visible");
+      }
 
       applyTheme(activeTheme);
       createGrid();
       updateDisplay();
       updateDevToolsVisibility();
+      updateStatsPanel();
       startLinePreview();
 
       codeMessage.textContent = "Game reset. Tokens, stats, and theme progress reset.";
@@ -3324,3 +2364,4 @@
   </script>
 </body>
 </html>
+

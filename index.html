@@ -304,18 +304,23 @@
       pointer-events: none;
       opacity: 0;
       transition: opacity 0.35s ease, transform 0.35s ease;
-      white-space: nowrap;
+      white-space: normal;
+      text-align: center;
+      line-height: 1.2;
     }
 
     .winPopup {
       bottom: 18px;
       font-size: 24px;
+      width: auto;
+      max-width: 82%;
     }
 
     .unlockPopup {
       top: 44%;
       font-size: 20px;
-      max-width: 90%;
+      width: 82%;
+      max-width: 360px;
     }
 
     .winPopup.show,
@@ -647,13 +652,10 @@
 
     .devTools {
       display: none;
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid var(--accent);
     }
 
     .devTools.visible {
-      display: block;
+      display: none;
     }
 
     .devUnlockPanel {
@@ -782,8 +784,15 @@
       padding: 8px;
     }
 
+    @media (max-width: 600px) {
+      body {
+        padding-top: 0;
+      }
+
       .pageWrap {
         width: 94vw;
+        margin-left: auto;
+        margin-right: auto;
       }
 
       .game,
@@ -793,6 +802,10 @@
 
       .logoText {
         font-size: 34px;
+      }
+
+      .slotFrame {
+        height: 310px;
       }
 
       .slotGrid {
@@ -806,10 +819,6 @@
         width: 64px;
         height: 64px;
         font-size: 30px;
-      }
-
-      .slotFrame {
-        height: 310px;
       }
 
       .controlTopRow,
@@ -849,6 +858,8 @@
 
       .unlockPopup {
         font-size: 16px;
+        width: 82%;
+        max-width: 320px;
       }
 
       .devButtonGrid {

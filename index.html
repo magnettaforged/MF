@@ -1,3 +1,5 @@
+
+
 <!-- =========================
      SECTION 1: HEAD + CSS
      ========================= -->
@@ -7,7 +9,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MagnettaForged Slots</title>
+  <title>Forge Spin</title>
 
   <style>
     :root {
@@ -61,10 +63,29 @@
       overflow-x: hidden;
     }
 
-    .game {
+    .pageShell {
       width: 570px;
       margin-left: auto;
       margin-right: auto;
+      box-sizing: border-box;
+    }
+
+    .gamePanel,
+    .settingsPanel,
+    .infoPanel,
+    .devPanel {
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+      border: 2px solid var(--accent);
+      border-radius: 18px;
+      padding: 12px;
+      text-align: center;
+      box-sizing: border-box;
+      box-shadow: 0 0 25px rgba(0,0,0,0.82);
+    }
+
+    .gamePanel {
       background-color: rgba(0,0,0,0.10);
       background-image:
         linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0)),
@@ -72,12 +93,25 @@
       background-position: center top;
       background-size: cover;
       background-repeat: no-repeat;
-      border: 2px solid var(--accent);
-      border-radius: 18px;
-      padding: 12px;
-      text-align: center;
-      box-shadow: 0 0 25px rgba(0,0,0,0.82);
       backdrop-filter: none;
+    }
+
+    .settingsPanel,
+    .infoPanel,
+    .devPanel {
+      margin-top: 12px;
+      background: var(--ui-bg);
+      border-color: var(--accent);
+      box-shadow: var(--ui-shadow);
+      backdrop-filter: none;
+    }
+
+    .devPanel {
+      display: none;
+    }
+
+    .devPanel.visible {
+      display: block;
     }
 
     .logoText {
@@ -216,13 +250,8 @@
     }
 
     @keyframes winPulse {
-      from {
-        filter: brightness(1);
-      }
-
-      to {
-        filter: brightness(1.28);
-      }
+      from { filter: brightness(1); }
+      to { filter: brightness(1.28); }
     }
 
     @keyframes shake {
@@ -519,9 +548,10 @@
     }
 
     .specialSettings {
-      margin-top: 12px;
-      padding: 10px;
       text-align: left;
+      background: transparent;
+      border: none;
+      box-shadow: none;
     }
 
     .specialTitle,
@@ -541,7 +571,7 @@
 
     .themeControl {
       display: grid;
-      grid-template-columns: auto 28px 150px 28px;
+      grid-template-columns: auto 28px 120px 28px;
       align-items: center;
       justify-content: center;
       gap: 8px;
@@ -551,11 +581,13 @@
     .themeLabel {
       color: var(--text-muted);
       font-size: 13px;
+      min-width: 72px;
+      text-align: right;
     }
 
     .themeValue {
       color: var(--text-accent);
-      width: 150px;
+      width: 120px;
       text-align: center;
       font-weight: bold;
       white-space: nowrap;
@@ -665,9 +697,9 @@
     }
 
     .winInfo {
-      margin-top: 12px;
-      border-top: 1px solid #333;
-      padding-top: 10px;
+      margin: 0;
+      border-top: none;
+      padding-top: 0;
       text-align: left;
       font-size: 13px;
       color: var(--text-main);
@@ -706,6 +738,7 @@
       margin-top: 12px;
       color: var(--text-muted);
       font-size: 13px;
+      text-align: center;
     }
 
     .codeArea {
@@ -739,6 +772,7 @@
       color: var(--text-muted);
       font-size: 12px;
       min-height: 16px;
+      text-align: center;
     }
 
     .resetButton {
@@ -750,8 +784,18 @@
     }
 
     @media (max-width: 600px) {
-      .game {
+      body {
+        padding-top: 0;
+      }
+
+      .pageShell {
         width: 94vw;
+      }
+
+      .gamePanel,
+      .settingsPanel,
+      .infoPanel,
+      .devPanel {
         padding: 10px;
       }
 
@@ -795,11 +839,16 @@
       }
 
       .themeControl {
-        grid-template-columns: auto 28px 130px 28px;
+        grid-template-columns: auto 28px 110px 28px;
+      }
+
+      .themeLabel {
+        min-width: 66px;
+        font-size: 12px;
       }
 
       .themeValue {
-        width: 130px;
+        width: 110px;
       }
 
       .winPopup {
@@ -834,112 +883,141 @@
 </head>
 
 <body>
-  <div class="game">
-    <a class="logoText" href="https://magnettaforged.com" target="_blank" rel="noopener">
-      Forge Spin
-    </a>
+  <div class="pageShell">
 
-    <div class="slotFrame">
-      <div class="lineOverlay" id="lineOverlay"></div>
-      <div class="slotGrid" id="slotGrid"></div>
-      <div class="winPopup" id="winPopup"></div>
-      <div class="unlockPopup" id="unlockPopup"></div>
+    <div class="gamePanel">
+      <a class="logoText" href="https://magnettaforged.com" target="_blank" rel="noopener">
+        Forge Spin
+      </a>
+
+      <div class="slotFrame">
+        <div class="lineOverlay" id="lineOverlay"></div>
+        <div class="slotGrid" id="slotGrid"></div>
+        <div class="winPopup" id="winPopup"></div>
+        <div class="unlockPopup" id="unlockPopup"></div>
+      </div>
+
+      <div class="controlPanel">
+        <div class="controlTopRow">
+          <div class="readout">
+            <span class="readoutLabel">Lines</span>
+            <button class="arrowButton" onclick="changeLineCount(-1)">‹</button>
+            <span class="readoutValue" id="lineCountDisplay">15</span>
+            <button class="arrowButton" onclick="changeLineCount(1)">›</button>
+          </div>
+
+          <div class="tokenReadout">
+            <span>Forge Tokens</span>
+            <span id="tokenBalance">0</span>
+          </div>
+        </div>
+
+        <div class="controlBottomRow">
+          <div class="readout">
+            <span class="readoutLabel">Bet</span>
+            <button class="arrowButton" onclick="changeBaseBet(-1)">‹</button>
+            <span class="readoutValue" id="baseBetDisplay">Free</span>
+            <button class="arrowButton" onclick="changeBaseBet(1)">›</button>
+          </div>
+
+          <div class="readout">
+            <span class="readoutLabel">Multi</span>
+            <button class="arrowButton" onclick="changeMultiplier(-1)">‹</button>
+            <span class="readoutValue" id="multiplierDisplay">1x</span>
+            <button class="arrowButton" onclick="changeMultiplier(1)">›</button>
+          </div>
+
+          <button class="spinButton" id="spinButton" onclick="spin()">FREE</button>
+        </div>
+
+        <div class="gemRow">
+          <div></div>
+
+          <div>
+            <button class="chaosGem gem-clear" id="chaosGem" onclick="activateGem()" title="Chaos Gem">
+              <img src="gem.png" alt="Chaos Gem">
+            </button>
+            <div class="gemMessage" id="gemMessage"></div>
+          </div>
+
+          <div></div>
+        </div>
+      </div>
     </div>
 
-    <div class="controlPanel">
-      <div class="controlTopRow">
-        <div class="readout">
-          <span class="readoutLabel">Lines</span>
-          <button class="arrowButton" onclick="changeLineCount(-1)">‹</button>
-          <span class="readoutValue" id="lineCountDisplay">15</span>
-          <button class="arrowButton" onclick="changeLineCount(1)">›</button>
+    <div class="settingsPanel">
+      <div class="specialSettings">
+        <div class="specialTitle">Special Settings</div>
+
+        <div class="themeControl">
+          <span class="themeLabel">Character</span>
+          <button class="arrowButton" onclick="changeThemeCharacter(-1)">‹</button>
+          <span class="themeValue" id="themeCharacterDisplay">Default</span>
+          <button class="arrowButton" onclick="changeThemeCharacter(1)">›</button>
         </div>
 
-        <div class="tokenReadout">
-          <span>Forge Tokens</span>
-          <span id="tokenBalance">000,000,000,000,000,000</span>
-        </div>
-      </div>
-
-      <div class="controlBottomRow">
-        <div class="readout">
-          <span class="readoutLabel">Bet</span>
-          <button class="arrowButton" onclick="changeBaseBet(-1)">‹</button>
-          <span class="readoutValue" id="baseBetDisplay">Free</span>
-          <button class="arrowButton" onclick="changeBaseBet(1)">›</button>
+        <div class="themeControl">
+          <span class="themeLabel">Theme</span>
+          <button class="arrowButton" onclick="changeThemeVariant(-1)">‹</button>
+          <span class="themeValue" id="themeVariantDisplay">Base</span>
+          <button class="arrowButton" onclick="changeThemeVariant(1)">›</button>
         </div>
 
-        <div class="readout">
-          <span class="readoutLabel">Multi</span>
-          <button class="arrowButton" onclick="changeMultiplier(-1)">‹</button>
-          <span class="readoutValue" id="multiplierDisplay">1x</span>
-          <button class="arrowButton" onclick="changeMultiplier(1)">›</button>
-        </div>
-
-        <button class="spinButton" id="spinButton" onclick="spin()">FREE</button>
-      </div>
-
-      <div class="gemRow">
-        <div></div>
-
-        <div>
-          <button class="chaosGem gem-clear" id="chaosGem" onclick="activateGem()" title="Chaos Gem">
-            <img src="gem.png" alt="Chaos Gem">
+        <div class="infoButtonRow">
+          <button class="infoButton" id="statsButton" onclick="setInfoMode('stats')">
+            Statistics
           </button>
-          <div class="gemMessage" id="gemMessage"></div>
+
+          <button class="infoButton" id="breakdownButton" onclick="setInfoMode('breakdown')">
+            Win Breakdown
+          </button>
         </div>
 
-        <div></div>
+        <div class="infoButtonRow">
+          <button class="infoButton" id="notationButton" onclick="setInfoMode('notation')">
+            Notation
+          </button>
+
+          <button class="infoButton" id="winkyButton" onclick="setInfoMode('winky')">
+            Winky
+          </button>
+        </div>
+
+        <div class="soundButtonRow">
+          <button class="infoButton" id="soundButton" onclick="toggleSound()">
+            Sound: On
+          </button>
+        </div>
+
+        <div class="codeArea">
+          <input class="codeInput" id="codeInput" placeholder="Enter code" autocomplete="off">
+          <button class="codeButton" onclick="applyCode()">Apply</button>
+        </div>
+
+        <div class="codeMessage" id="codeMessage"></div>
+
+        <button class="resetButton" onclick="resetGame()">Reset Game</button>
+
+        <div class="lastSpin" id="lastSpin">No spin yet.</div>
+
+        <div class="devTools" id="devTools">
+          <div id="unlockContent"></div>
+        </div>
       </div>
     </div>
 
-    <div class="specialSettings">
-      <div class="specialTitle">Special Settings</div>
+    <div class="infoPanel">
+      <div class="winInfo" id="winInfo"></div>
 
-      <div class="themeControl">
-        <span class="themeLabel">Theme</span>
-        <button class="arrowButton" onclick="changeTheme(-1)">‹</button>
-        <span class="themeValue" id="themeDisplay">Default</span>
-        <button class="arrowButton" onclick="changeTheme(1)">›</button>
-      </div>
-
-      <div class="infoButtonRow">
-        <button class="infoButton" id="statsButton" onclick="setInfoMode('stats')">
-          Statistics
-        </button>
-
-        <button class="infoButton" id="breakdownButton" onclick="setInfoMode('breakdown')">
-          Win Breakdown
-        </button>
-      </div>
-
-      <div class="soundButtonRow">
-        <button class="infoButton" id="soundButton" onclick="toggleSound()">
-          Sound: On
-        </button>
-      </div>
-
-      <div class="lastSpin" id="lastSpin">No spin yet.</div>
-
-      <div class="devTools" id="devTools">
-        <div id="unlockContent"></div>
+      <div class="bottomStats">
+        Total Spins: <span id="spinCount">0</span>
       </div>
     </div>
 
-    <div class="winInfo" id="winInfo"></div>
-
-    <div class="bottomStats">
-      Total Spins: <span id="spinCount">0</span>
+    <div class="devPanel" id="devPanel">
+      <div id="devPanelContent"></div>
     </div>
 
-    <div class="codeArea">
-      <input class="codeInput" id="codeInput" placeholder="Enter code" autocomplete="off">
-      <button class="codeButton" onclick="applyCode()">Apply</button>
-    </div>
-
-    <div class="codeMessage" id="codeMessage"></div>
-
-    <button class="resetButton" onclick="resetGame()">Reset Game</button>
   </div>
 
 
@@ -955,12 +1033,53 @@
     const VISIBLE_ROWS = 5;
     const COLS = 5;
 
-    const baseBetOptions = [0, 25, 50, 75, 100];
-    const multiplierOptions = [1, 10, 50, 100, 1000, 2500, 5000, 10000, 25000, 50000, 100000, 1000000, 10000000, 50000000];
+    const baseBetOptions = [0n, 25n, 50n, 75n, 100n];
+
+    const multiplierOptions = [
+      1n,
+      10n,
+      50n,
+      100n,
+      1000n,
+      2500n,
+      5000n,
+      10000n,
+      25000n,
+      50000n,
+      100000n,
+      1000000n,
+      10000000n,
+      50000000n,
+      100000000n,
+      500000000n,
+      1000000000n,
+      5000000000n,
+      10000000000n,
+      50000000000n,
+      100000000000n,
+      500000000000n,
+      1000000000000n,
+      5000000000000n,
+      10000000000000n,
+      50000000000000n,
+      100000000000000n,
+      500000000000000n,
+      1000000000000000n,
+      5000000000000000n,
+      10000000000000000n
+    ];
+
     const lineCountOptions = [5, 10, 15];
 
     const characterSymbols = ["Maya", "Reign", "Kyra", "Nadia"];
     const variantGemKeys = ["ruby", "emerald", "sapphire", "amethyst", "topaz", "skull"];
+
+    const skippedVariantThemes = [
+      "KyraSapphire",
+      "MayaRuby",
+      "NadiaAmethyst",
+      "ReignTopaz"
+    ];
 
     const defaultLineColors = [
       "#f0c35a", "#55d6ff", "#ff4fd8", "#60ff7a", "#ff7a32",
@@ -969,6 +1088,28 @@
     ];
 
     let lineColors = [...defaultLineColors];
+
+    // =========================
+    // BIGINT HELPERS
+    // =========================
+
+    function getStoredBigInt(key, fallback = 0n) {
+      const value = localStorage.getItem(key);
+
+      if (value === null || value === undefined || value === "") {
+        return fallback;
+      }
+
+      try {
+        return BigInt(value);
+      } catch {
+        return fallback;
+      }
+    }
+
+    function saveBigInt(key, value) {
+      localStorage.setItem(key, value.toString());
+    }
 
     // =========================
     // AUDIO SETTINGS
@@ -1010,7 +1151,9 @@
         pageImage: 'url("background.png")',
         gameImage: "none",
         lineColors: defaultLineColors,
-        unlockType: "base"
+        unlockType: "base",
+        characterGroup: "Default",
+        variantLabel: "Base"
       },
 
       Maya: {
@@ -1027,7 +1170,9 @@
           "#ff9b66", "#d6a84f", "#ffb199", "#c62828", "#ffd166",
           "#ff6b35", "#e76f51", "#f4a261", "#ffcc66", "#ffffff"
         ],
-        unlockType: "base"
+        unlockType: "base",
+        characterGroup: "Maya",
+        variantLabel: "Base"
       },
 
       Reign: {
@@ -1044,7 +1189,9 @@
           "#ff6b35", "#d97941", "#ffaa66", "#ffd166", "#b4532a",
           "#f8961e", "#e76f51", "#f4a261", "#ffb703", "#ffffff"
         ],
-        unlockType: "base"
+        unlockType: "base",
+        characterGroup: "Reign",
+        variantLabel: "Base"
       },
 
       Kyra: {
@@ -1061,7 +1208,9 @@
           "#55d6ff", "#80ffdb", "#0096ff", "#a8e6ff", "#3a86ff",
           "#00b4d8", "#caf0f8", "#48cae4", "#90e0ef", "#ffffff"
         ],
-        unlockType: "base"
+        unlockType: "base",
+        characterGroup: "Kyra",
+        variantLabel: "Base"
       },
 
       Nadia: {
@@ -1078,7 +1227,9 @@
           "#7b2cbf", "#ffd166", "#e0aaff", "#b8860b", "#ffcc66",
           "#a855ff", "#f5d76e", "#7209b7", "#ffe29a", "#ffffff"
         ],
-        unlockType: "base"
+        unlockType: "base",
+        characterGroup: "Nadia",
+        variantLabel: "Base"
       },
 
       Winky: {
@@ -1095,14 +1246,14 @@
           "#99ff33", "#ff4444", "#a855ff", "#55d6ff", "#f0c35a",
           "#80ffdb", "#ff7a32", "#c77dff", "#eaff00", "#ffffff"
         ],
-        unlockType: "special"
+        unlockType: "special",
+        characterGroup: "Winky",
+        variantLabel: "Base"
       }
     };
 
     // =========================
     // AUTO-GENERATED GEM VARIANT THEMES
-    // File naming:
-    // mayaruby.png, mayaemerald.png, etc.
     // =========================
 
     const gemVariantAccents = {
@@ -1141,6 +1292,11 @@
       characterSymbols.forEach(characterName => {
         variantGemKeys.forEach(gemKey => {
           const themeKey = `${characterName}${capitalize(gemKey)}`;
+
+          if (skippedVariantThemes.includes(themeKey)) {
+            return;
+          }
+
           const fileName = `${characterName.toLowerCase()}${gemKey}.png`;
           const accent = gemVariantAccents[gemKey] || themes[characterName].accent;
 
@@ -1155,6 +1311,8 @@
             gameImage: `url("${fileName}")`,
             lineColors: gemVariantLineColors[gemKey] || themes[characterName].lineColors,
             unlockType: "variant",
+            characterGroup: characterName,
+            variantLabel: capitalize(gemKey),
             baseCharacter: characterName,
             gemKey
           };
@@ -1163,6 +1321,23 @@
     }
 
     addVariantThemes();
+
+    const themeCharacterGroups = ["Default", "Maya", "Reign", "Kyra", "Nadia", "Winky"];
+    let themeCharacterIndex = 0;
+    let themeVariantIndex = 0;
+
+    function buildThemeGroupMap() {
+      return {
+        Default: ["Default"],
+        Maya: ["Maya", "MayaEmerald", "MayaSapphire", "MayaAmethyst", "MayaTopaz", "MayaSkull"],
+        Reign: ["Reign", "ReignRuby", "ReignEmerald", "ReignSapphire", "ReignAmethyst", "ReignSkull"],
+        Kyra: ["Kyra", "KyraRuby", "KyraEmerald", "KyraAmethyst", "KyraTopaz", "KyraSkull"],
+        Nadia: ["Nadia", "NadiaRuby", "NadiaEmerald", "NadiaSapphire", "NadiaTopaz", "NadiaSkull"],
+        Winky: ["Winky"]
+      };
+    }
+
+    let themeGroupMap = buildThemeGroupMap();
 
     // =========================
     // SAVED THEME / DEV STATE
@@ -1183,11 +1358,21 @@
       }
     });
 
+    skippedVariantThemes.forEach(themeKey => {
+      delete unlockedThemes[themeKey];
+    });
+
     localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
 
     let devToolsUnlocked = localStorage.getItem("devToolsUnlocked") === "true";
 
     let activeTheme = localStorage.getItem("activeTheme") || "Default";
+
+    if (!themes[activeTheme]) {
+      activeTheme = "Default";
+      localStorage.setItem("activeTheme", activeTheme);
+    }
+
     let themeIndex = 0;
 
     // =========================
@@ -1211,16 +1396,14 @@
     let activePanel = null;
     let lastWinBreakdown = [];
 
-    // Bonus spins = earned free spins
     let bonusSpinQueue = 0;
-    let bonusSpinLineBet = 0;
-    let bonusSpinFinalBet = 0;
+    let bonusSpinLineBet = 0n;
+    let bonusSpinFinalBet = 0n;
     let bonusSpinSource = "";
 
-    // Bonus session display
     let bonusSessionTotal = 0;
     let bonusSessionPlayed = 0;
-    let bonusSessionWon = 0;
+    let bonusSessionWon = 0n;
     let devUnlockInfoVisible = false;
 
     const BONUS_SPIN_DELAY = 1500;
@@ -1304,31 +1487,27 @@
     // SAVED VALUES / STATS
     // =========================
 
-    let tokens = Number(localStorage.getItem("forgeTokens"));
-    if (isNaN(tokens)) {
-      tokens = 0;
-      localStorage.setItem("forgeTokens", tokens);
-    }
+    let tokens = getStoredBigInt("forgeTokens", 0n);
 
     let totalSpins = Number(localStorage.getItem("forgeTotalSpins")) || 0;
 
-    let lifetimeTokensEarned = Number(localStorage.getItem("lifetimeTokensEarned")) || 0;
-    let lifetimeTokensWagered = Number(localStorage.getItem("lifetimeTokensWagered")) || 0;
-    let biggestSingleWin = Number(localStorage.getItem("biggestSingleWin")) || 0;
-    let highestBalance = Number(localStorage.getItem("highestBalance")) || tokens;
+    let lifetimeTokensEarned = getStoredBigInt("lifetimeTokensEarned", 0n);
+    let lifetimeTokensWagered = getStoredBigInt("lifetimeTokensWagered", 0n);
+    let biggestSingleWin = getStoredBigInt("biggestSingleWin", 0n);
+    let highestBalance = getStoredBigInt("highestBalance", tokens);
     let devToolsUsed = localStorage.getItem("devToolsUsed") === "true";
-    let promoTokensRedeemed = Number(localStorage.getItem("promoTokensRedeemed")) || 0;
+    let promoTokensRedeemed = getStoredBigInt("promoTokensRedeemed", 0n);
 
     let lifetimeFreeGames = Number(localStorage.getItem("lifetimeFreeGames")) || 0;
-    let lifetimeFreeWinnings = Number(localStorage.getItem("lifetimeFreeWinnings")) || 0;
+    let lifetimeFreeWinnings = getStoredBigInt("lifetimeFreeWinnings", 0n);
 
     let lifetimePaidGames = Number(localStorage.getItem("lifetimePaidGames")) || 0;
-    let lifetimePaidWagered = Number(localStorage.getItem("lifetimePaidWagered")) || 0;
-    let lifetimePaidWinnings = Number(localStorage.getItem("lifetimePaidWinnings")) || 0;
+    let lifetimePaidWagered = getStoredBigInt("lifetimePaidWagered", 0n);
+    let lifetimePaidWinnings = getStoredBigInt("lifetimePaidWinnings", 0n);
 
     let lifetimeBonusSpinsEarned = Number(localStorage.getItem("lifetimeBonusSpinsEarned")) || 0;
     let lifetimeBonusSpinsPlayed = Number(localStorage.getItem("lifetimeBonusSpinsPlayed")) || 0;
-    let lifetimeBonusSpinWinnings = Number(localStorage.getItem("lifetimeBonusSpinWinnings")) || 0;
+    let lifetimeBonusSpinWinnings = getStoredBigInt("lifetimeBonusSpinWinnings", 0n);
 
     // =========================
     // DOM REFERENCES
@@ -1339,7 +1518,8 @@
     const baseBetDisplay = document.getElementById("baseBetDisplay");
     const multiplierDisplay = document.getElementById("multiplierDisplay");
     const lineCountDisplay = document.getElementById("lineCountDisplay");
-    const themeDisplay = document.getElementById("themeDisplay");
+    const themeCharacterDisplay = document.getElementById("themeCharacterDisplay");
+    const themeVariantDisplay = document.getElementById("themeVariantDisplay");
     const slotGrid = document.getElementById("slotGrid");
     const lineOverlay = document.getElementById("lineOverlay");
     const winPopup = document.getElementById("winPopup");
@@ -1347,6 +1527,8 @@
     const lastSpin = document.getElementById("lastSpin");
     const spinButton = document.getElementById("spinButton");
     const devTools = document.getElementById("devTools");
+    const devPanel = document.getElementById("devPanel");
+    const devPanelContent = document.getElementById("devPanelContent");
     const codeInput = document.getElementById("codeInput");
     const codeMessage = document.getElementById("codeMessage");
     const unlockContent = document.getElementById("unlockContent");
@@ -1362,6 +1544,7 @@
 
     createGrid();
     syncThemeIndex();
+    syncThemeSelectors();
     applyTheme(activeTheme);
     updateDisplay();
     updateDevToolsVisibility();
@@ -1398,6 +1581,88 @@
     }
 
     // =========================
+    // NUMBER FORMATTING
+    // =========================
+
+    function formatGameNumber(amount) {
+      amount = BigInt(amount);
+
+      const units = [
+        { value: 1000000000000000000000000000000000000000n, suffix: "Dd" },
+        { value: 1000000000000000000000000000000000000n, suffix: "Ud" },
+        { value: 1000000000000000000000000000000000n, suffix: "Dc" },
+        { value: 1000000000000000000000000000000n, suffix: "No" },
+        { value: 1000000000000000000000000000n, suffix: "Oc" },
+        { value: 1000000000000000000000000n, suffix: "Sp" },
+        { value: 1000000000000000000000n, suffix: "Sx" },
+        { value: 1000000000000000000n, suffix: "Qi" },
+        { value: 1000000000000000n, suffix: "Q" },
+        { value: 1000000000000n, suffix: "T" },
+        { value: 1000000000n, suffix: "B" }
+      ];
+
+      for (const unit of units) {
+        if (amount >= unit.value) {
+          const whole = amount / unit.value;
+          const decimal = ((amount % unit.value) * 100n) / unit.value;
+
+          if (whole < 1000n && decimal > 0n) {
+            return `${whole}.${decimal.toString().padStart(2, "0")}${unit.suffix}`;
+          }
+
+          return `${whole.toLocaleString()}${unit.suffix}`;
+        }
+      }
+
+      return amount.toLocaleString();
+    }
+
+    function formatFullNumber(amount) {
+      return BigInt(amount).toLocaleString();
+    }
+
+    function formatMultiplier(amount) {
+      amount = BigInt(amount);
+
+      const units = [
+        { value: 1000000000000000000n, suffix: "Qix" },
+        { value: 1000000000000000n, suffix: "Qx" },
+        { value: 1000000000000n, suffix: "Tx" },
+        { value: 1000000000n, suffix: "Bx" },
+        { value: 1000000n, suffix: "Mx" },
+        { value: 1000n, suffix: "Kx" }
+      ];
+
+      for (const unit of units) {
+        if (amount >= unit.value) {
+          const whole = amount / unit.value;
+          const decimal = ((amount % unit.value) * 10n) / unit.value;
+
+          if (whole < 1000n && decimal > 0n) {
+            return `${whole}.${decimal}${unit.suffix}`;
+          }
+
+          return `${whole.toLocaleString()}${unit.suffix}`;
+        }
+      }
+
+      return amount.toLocaleString() + "x";
+    }
+
+    function formatPercent(numerator, denominator) {
+      numerator = BigInt(numerator);
+      denominator = BigInt(denominator);
+
+      if (denominator <= 0n) return "0.00";
+
+      const scaled = (numerator * 10000n) / denominator;
+      const whole = scaled / 100n;
+      const decimal = scaled % 100n;
+
+      return `${whole.toLocaleString()}.${decimal.toString().padStart(2, "0")}`;
+    }
+
+    // =========================
     // LINE COUNT / ACTIVE PAYLINES
     // =========================
 
@@ -1423,7 +1688,6 @@
 
     // =========================
     // LINE PREVIEW / WINNING LINE OVERLAY
-    // Keeps yesterday's fixed mobile fitment.
     // =========================
 
     function getGridMetrics() {
@@ -1521,9 +1785,7 @@
         const points = getLinePoints(line);
         const pointString = points.map(p => `${p.x},${p.y}`).join(" ");
 
-        return `
-          <polyline points="${pointString}" stroke="${color}" />
-        `;
+        return `<polyline points="${pointString}" stroke="${color}" />`;
       }).join("");
 
       lineOverlayVisible = true;
@@ -1576,6 +1838,18 @@
       return Object.keys(themes).filter(theme => unlockedThemes[theme]);
     }
 
+    function getAvailableThemeCharacters() {
+      return themeCharacterGroups.filter(group => {
+        const groupThemes = themeGroupMap[group] || [];
+        return groupThemes.some(themeKey => unlockedThemes[themeKey]);
+      });
+    }
+
+    function getUnlockedThemesForCharacter(characterName) {
+      const groupThemes = themeGroupMap[characterName] || [];
+      return groupThemes.filter(themeKey => unlockedThemes[themeKey] && themes[themeKey]);
+    }
+
     function syncThemeIndex() {
       const availableThemes = getAvailableThemes();
 
@@ -1587,17 +1861,37 @@
       themeIndex = availableThemes.indexOf(activeTheme);
     }
 
-    function changeTheme(direction) {
+    function syncThemeSelectors() {
+      const activeGroup = themes[activeTheme]?.characterGroup || "Default";
+      const availableCharacters = getAvailableThemeCharacters();
+
+      themeCharacterIndex = availableCharacters.indexOf(activeGroup);
+      if (themeCharacterIndex < 0) themeCharacterIndex = 0;
+
+      const characterName = availableCharacters[themeCharacterIndex] || "Default";
+      const unlockedGroupThemes = getUnlockedThemesForCharacter(characterName);
+
+      themeVariantIndex = unlockedGroupThemes.indexOf(activeTheme);
+      if (themeVariantIndex < 0) themeVariantIndex = 0;
+    }
+
+    function changeThemeCharacter(direction) {
       playSound("click");
 
-      const availableThemes = getAvailableThemes();
+      const availableCharacters = getAvailableThemeCharacters();
+      if (!availableCharacters.length) return;
 
-      themeIndex += direction;
+      themeCharacterIndex += direction;
 
-      if (themeIndex < 0) themeIndex = availableThemes.length - 1;
-      if (themeIndex >= availableThemes.length) themeIndex = 0;
+      if (themeCharacterIndex < 0) themeCharacterIndex = availableCharacters.length - 1;
+      if (themeCharacterIndex >= availableCharacters.length) themeCharacterIndex = 0;
 
-      activeTheme = availableThemes[themeIndex];
+      const characterName = availableCharacters[themeCharacterIndex];
+      const unlockedGroupThemes = getUnlockedThemesForCharacter(characterName);
+
+      themeVariantIndex = 0;
+      activeTheme = unlockedGroupThemes[0] || "Default";
+
       localStorage.setItem("activeTheme", activeTheme);
 
       symbolPool = buildSymbolPool();
@@ -1605,6 +1899,35 @@
       createGrid();
       updateDisplay();
       refreshReelGemGlow();
+    }
+
+    function changeThemeVariant(direction) {
+      playSound("click");
+
+      const availableCharacters = getAvailableThemeCharacters();
+      const characterName = availableCharacters[themeCharacterIndex] || "Default";
+      const unlockedGroupThemes = getUnlockedThemesForCharacter(characterName);
+
+      if (!unlockedGroupThemes.length) return;
+
+      themeVariantIndex += direction;
+
+      if (themeVariantIndex < 0) themeVariantIndex = unlockedGroupThemes.length - 1;
+      if (themeVariantIndex >= unlockedGroupThemes.length) themeVariantIndex = 0;
+
+      activeTheme = unlockedGroupThemes[themeVariantIndex];
+
+      localStorage.setItem("activeTheme", activeTheme);
+
+      symbolPool = buildSymbolPool();
+      applyTheme(activeTheme);
+      createGrid();
+      updateDisplay();
+      refreshReelGemGlow();
+    }
+
+    function changeTheme(direction) {
+      changeThemeCharacter(direction);
     }
 
     function unlockTheme(themeName) {
@@ -1642,10 +1965,11 @@
       localStorage.setItem("activeTheme", activeTheme);
 
       syncThemeIndex();
+      syncThemeSelectors();
+
       symbolPool = buildSymbolPool();
       applyTheme(activeTheme);
 
-      // Do not rebuild reels here. Keeps the winning board visible.
       updateDisplay();
       refreshReelGemGlow();
     }
@@ -1656,28 +1980,26 @@
     }
 
     function handleCharacterThemeUnlock(characterName) {
-      const baseUnlocked = unlockTheme(characterName);
+      unlockTheme(characterName);
+
       const gemKey = getUnlockGemKey();
 
       let themeToApply = characterName;
-      let unlockMessage = `${characterName} Unlocked`;
 
       if (gemKey !== "diamond") {
         const variantTheme = `${characterName}${capitalize(gemKey)}`;
-        const variantUnlocked = unlockTheme(variantTheme);
 
-        themeToApply = variantTheme;
-        unlockMessage = `${themes[variantTheme]?.label || variantTheme} Unlocked`;
-
-        if (!variantUnlocked && !baseUnlocked) {
-          unlockMessage = `${themes[variantTheme]?.label || variantTheme} Applied`;
+        if (themes[variantTheme]) {
+          unlockTheme(variantTheme);
+          themeToApply = variantTheme;
         }
-      } else if (!baseUnlocked) {
-        unlockMessage = `${characterName} Applied`;
       }
 
       applyUnlockedTheme(themeToApply);
-      showUnlockPopup(unlockMessage);
+
+      const themeLabel = themes[themeToApply]?.label || themeToApply;
+      showUnlockPopup(`${themeLabel} Unlocked`);
+
       playSound("unlock");
     }
 
@@ -1775,6 +2097,7 @@
         gem.textContent = "☠";
         message.textContent = "Stay awhile and Listen";
         unlockTheme("Winky");
+        syncThemeSelectors();
         updateUnlockPanel();
         playSound("winky");
       } else {
@@ -1876,21 +2199,16 @@
       const baseBet = getBaseBet();
       const multiplier = getMultiplier();
 
-      if (baseBet === 0) return 0;
+      if (baseBet === 0n) return 0n;
 
       return baseBet * multiplier;
     }
 
     function getFinalBet() {
       const lineBet = getLineBet();
-      const activeLines = getActivePaylines().length;
+      const activeLines = BigInt(getActivePaylines().length);
 
       return lineBet * activeLines;
-    }
-
-    function formatTokenBank(amount) {
-      const raw = String(Math.floor(amount)).padStart(18, "0");
-      return raw.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
 
     function updateDisplay() {
@@ -1898,18 +2216,29 @@
       const multiplier = getMultiplier();
       const finalBet = getFinalBet();
 
-      tokenBalance.textContent = formatTokenBank(tokens);
+      tokenBalance.textContent = formatGameNumber(tokens);
       spinCount.textContent = totalSpins.toLocaleString();
 
-      baseBetDisplay.textContent = baseBet === 0 ? "Free" : baseBet.toLocaleString();
-      multiplierDisplay.textContent = multiplier + "x";
+      baseBetDisplay.textContent = baseBet === 0n ? "Free" : formatGameNumber(baseBet);
+      multiplierDisplay.textContent = formatMultiplier(multiplier);
       lineCountDisplay.textContent = getLineCount();
-      themeDisplay.textContent = themes[activeTheme]?.label || activeTheme;
 
-      spinButton.textContent = finalBet === 0
+      const activeGroup = themes[activeTheme]?.characterGroup || "Default";
+      const activeVariant = themes[activeTheme]?.variantLabel || "Base";
+
+      if (themeCharacterDisplay) {
+        themeCharacterDisplay.textContent = activeGroup;
+      }
+
+      if (themeVariantDisplay) {
+        themeVariantDisplay.textContent = activeVariant;
+      }
+
+      spinButton.textContent = finalBet === 0n
         ? "FREE"
-        : finalBet.toLocaleString();
+        : formatGameNumber(finalBet);
 
+      syncThemeSelectors();
       updateInfoButtons();
       updateWinInfo();
       updateDevToolsVisibility();
@@ -1928,11 +2257,14 @@
 
       updateInfoButtons();
       updateWinInfo();
+      updateDevToolsVisibility();
     }
 
     function updateInfoButtons() {
       const statsButton = document.getElementById("statsButton");
       const breakdownButton = document.getElementById("breakdownButton");
+      const notationButton = document.getElementById("notationButton");
+      const winkyButton = document.getElementById("winkyButton");
 
       if (statsButton) {
         statsButton.classList.toggle("active", activePanel === "stats");
@@ -1941,18 +2273,27 @@
       if (breakdownButton) {
         breakdownButton.classList.toggle("active", activePanel === "breakdown");
       }
+
+      if (notationButton) {
+        notationButton.classList.toggle("active", activePanel === "notation");
+      }
+
+      if (winkyButton) {
+        winkyButton.classList.toggle("active", activePanel === "winky");
+      }
     }
 
     function updateAllPanels() {
       updateWinInfo();
       updateUnlockPanel();
       updateSoundButton();
+      updateDevToolsVisibility();
     }
 
     function toggleDevUnlocks() {
       playSound("click");
       devUnlockInfoVisible = !devUnlockInfoVisible;
-      updateWinInfo();
+      updateDevToolsVisibility();
     }
 
 
@@ -2015,24 +2356,28 @@
     }
 
     // =========================
-    // PAYOUT TABLES
+    // BIGINT PAYOUT TABLES
+    // Paid payout multipliers are scaled by 100.
+    // Example: 75n = 0.75x, 150n = 1.5x, 14000n = 140x.
     // =========================
+
+    const PAYOUT_SCALE = 100n;
 
     const payoutTables = {
       free: {
-        Axe: { 2: 15, 3: 75, 4: 200, 5: 750 },
-        Animal: { 2: 15, 3: 75, 4: 200, 5: 750 },
-        Gem: { 2: 100, 3: 400, 4: 1250, 5: 5000 },
-        Wild: { 2: 100, 3: 400, 4: 1250, 5: 5000 },
-        default: { 2: 40, 3: 175, 4: 500, 5: 1500 }
+        Axe: { 2: 15n, 3: 75n, 4: 200n, 5: 750n },
+        Animal: { 2: 15n, 3: 75n, 4: 200n, 5: 750n },
+        Gem: { 2: 100n, 3: 400n, 4: 1250n, 5: 5000n },
+        Wild: { 2: 100n, 3: 400n, 4: 1250n, 5: 5000n },
+        default: { 2: 40n, 3: 175n, 4: 500n, 5: 1500n }
       },
 
       paid: {
-        Axe: { 2: 0.75, 3: 4, 4: 15, 5: 75 },
-        Animal: { 2: 0.75, 3: 4, 4: 15, 5: 75 },
-        Gem: { 2: 3, 3: 15, 4: 75, 5: 350 },
-        Wild: { 2: 3, 3: 15, 4: 75, 5: 350 },
-        default: { 2: 1.5, 3: 8, 4: 35, 5: 150 }
+        Axe: { 2: 50n, 3: 300n, 4: 1400n, 5: 7000n },
+        Animal: { 2: 50n, 3: 300n, 4: 1400n, 5: 7000n },
+        Gem: { 2: 200n, 3: 1200n, 4: 7000n, 5: 32500n },
+        Wild: { 2: 200n, 3: 1200n, 4: 7000n, 5: 32500n },
+        default: { 2: 100n, 3: 600n, 4: 3200n, 5: 14000n }
       }
     };
 
@@ -2049,7 +2394,7 @@
       if (matchCount === 3) return table[3];
       if (matchCount === 2) return table[2];
 
-      return 0;
+      return 0n;
     }
 
     function paidMultiplierForMatch(matchCount, symbolName) {
@@ -2060,15 +2405,16 @@
       if (matchCount === 3) return table[3];
       if (matchCount === 2) return table[2];
 
-      return 0;
+      return 0n;
     }
 
     function paidPayoutForMatch(matchCount, symbolName, lineBet) {
-      return Math.floor(lineBet * paidMultiplierForMatch(matchCount, symbolName));
+      const scaledMultiplier = paidMultiplierForMatch(matchCount, symbolName);
+      return (lineBet * scaledMultiplier) / PAYOUT_SCALE;
     }
 
     function payoutForWin(win, finalBet, lineBet) {
-      if (finalBet === 0) {
+      if (finalBet === 0n) {
         return freePayoutForMatch(win.matchCount, win.symbol);
       }
 
@@ -2113,6 +2459,7 @@
 
       if (nonWild) return nonWild;
 
+      // Pure Wild line pays as Wild.
       return { name: "Wild", type: "image", value: "wild.png" };
     }
 
@@ -2281,7 +2628,7 @@
           ? ` — Wild x${win.wildCount}`
           : "";
 
-        const bonusText = finalBet > 0 && win.wildCount >= 2
+        const bonusText = finalBet > 0n && win.wildCount >= 2
           ? ` + ${win.wildCount} Bonus Spins`
           : "";
 
@@ -2303,12 +2650,14 @@
     }
 
     function showWinPopup(amount) {
-      if (amount <= 0) {
+      amount = BigInt(amount);
+
+      if (amount <= 0n) {
         clearWinPopup();
         return;
       }
 
-      winPopup.textContent = `+${amount.toLocaleString()}`;
+      winPopup.textContent = `+${formatGameNumber(amount)}`;
       winPopup.classList.add("show");
 
       winPopupTimer = setTimeout(() => {
@@ -2338,7 +2687,7 @@
     }
 
     function calculateSpinPayout(wins, finalBet, lineBet) {
-      let payout = 0;
+      let payout = 0n;
 
       wins.forEach(win => {
         payout += payoutForWin(win, finalBet, lineBet);
@@ -2357,9 +2706,9 @@
         return;
       }
 
-      if (finalBet > 0) {
+      if (finalBet > 0n) {
         tokens -= finalBet;
-        localStorage.setItem("forgeTokens", tokens);
+        saveBigInt("forgeTokens", tokens);
         updateDisplay();
       }
 
@@ -2411,7 +2760,7 @@
       const wins = evaluatePaylines(finalGrid);
       const payout = calculateSpinPayout(wins, finalBet, lineBet);
 
-      const earnedBonusSpins = spinType === "normal" && finalBet > 0
+      const earnedBonusSpins = spinType === "normal" && finalBet > 0n
         ? countBonusSpinsFromWins(wins)
         : 0;
 
@@ -2428,7 +2777,7 @@
       if (spinType === "normal") {
         lifetimeTokensWagered += finalBet;
 
-        if (finalBet === 0) {
+        if (finalBet === 0n) {
           lifetimeFreeGames += 1;
           lifetimeFreeWinnings += payout;
         } else {
@@ -2453,7 +2802,7 @@
 
         bonusSessionTotal = earnedBonusSpins;
         bonusSessionPlayed = 0;
-        bonusSessionWon = 0;
+        bonusSessionWon = 0n;
 
         lifetimeBonusSpinsEarned += earnedBonusSpins;
         showUnlockPopup(`${earnedBonusSpins} Bonus Spins Earned`);
@@ -2464,7 +2813,7 @@
         biggestSingleWin = payout;
       }
 
-      localStorage.setItem("forgeTokens", tokens);
+      saveBigInt("forgeTokens", tokens);
       localStorage.setItem("forgeTotalSpins", totalSpins);
       localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
 
@@ -2472,8 +2821,8 @@
       updateDisplay();
       showWinPopup(payout);
 
-      if (payout > 0) {
-        if (payout >= finalBet * 20 && finalBet > 0) {
+      if (payout > 0n) {
+        if (finalBet > 0n && payout >= finalBet * 20n) {
           playSound("bigWin");
         } else {
           playSound("smallWin");
@@ -2484,10 +2833,10 @@
         setTimeout(runBonusSpin, BONUS_SPIN_DELAY);
       } else {
         if (spinType === "bonus" && bonusSessionTotal > 0) {
-          showUnlockPopup(`Bonus Tokens Won<br>${bonusSessionWon.toLocaleString()}`);
+          showUnlockPopup(`Bonus Tokens Won<br>${formatGameNumber(bonusSessionWon)}`);
           bonusSessionTotal = 0;
           bonusSessionPlayed = 0;
-          bonusSessionWon = 0;
+          bonusSessionWon = 0n;
         }
 
         setControlsDisabled(false);
@@ -2515,8 +2864,8 @@
       const finalBet = getFinalBet();
       const lineBet = getLineBet();
 
-      let totalPayout = 0;
-      let totalWagered = 0;
+      let totalPayout = 0n;
+      let totalWagered = 0n;
       let completedSpins = 0;
       let earnedBonusTotal = 0;
       let playedBonusTotal = 0;
@@ -2524,7 +2873,7 @@
       for (let i = 0; i < amount; i++) {
         if (finalBet > tokens) break;
 
-        if (finalBet > 0) {
+        if (finalBet > 0n) {
           tokens -= finalBet;
           totalWagered += finalBet;
         }
@@ -2532,7 +2881,7 @@
         const grid = buildFinalGrid();
         const wins = evaluatePaylines(grid);
         const spinPayout = calculateSpinPayout(wins, finalBet, lineBet);
-        const earnedBonusSpins = finalBet > 0 ? countBonusSpinsFromWins(wins) : 0;
+        const earnedBonusSpins = finalBet > 0n ? countBonusSpinsFromWins(wins) : 0;
 
         checkThemeUnlocks(wins);
 
@@ -2544,7 +2893,7 @@
         lifetimeTokensEarned += spinPayout;
         lifetimeTokensWagered += finalBet;
 
-        if (finalBet === 0) {
+        if (finalBet === 0n) {
           lifetimeFreeGames += 1;
           lifetimeFreeWinnings += spinPayout;
         } else {
@@ -2584,7 +2933,7 @@
         }
       }
 
-      localStorage.setItem("forgeTokens", tokens);
+      saveBigInt("forgeTokens", tokens);
       localStorage.setItem("forgeTotalSpins", totalSpins);
       localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
 
@@ -2595,10 +2944,11 @@
       updateDisplay();
 
       const net = totalPayout - totalWagered;
-      const sign = net >= 0 ? "+" : "-";
+      const sign = net >= 0n ? "+" : "-";
+      const absNet = net >= 0n ? net : -net;
 
       codeMessage.textContent =
-        `Quick Spin: ${completedSpins} spins | Bonus ${playedBonusTotal}/${earnedBonusTotal} | Net ${sign}${Math.abs(net).toLocaleString()}`;
+        `Quick Spin: ${completedSpins} spins | Bonus ${playedBonusTotal}/${earnedBonusTotal} | Net ${sign}${formatGameNumber(absNet)}`;
     }
 
     // =========================
@@ -2610,23 +2960,23 @@
         highestBalance = tokens;
       }
 
-      localStorage.setItem("lifetimeTokensEarned", lifetimeTokensEarned);
-      localStorage.setItem("lifetimeTokensWagered", lifetimeTokensWagered);
-      localStorage.setItem("biggestSingleWin", biggestSingleWin);
-      localStorage.setItem("highestBalance", highestBalance);
+      saveBigInt("lifetimeTokensEarned", lifetimeTokensEarned);
+      saveBigInt("lifetimeTokensWagered", lifetimeTokensWagered);
+      saveBigInt("biggestSingleWin", biggestSingleWin);
+      saveBigInt("highestBalance", highestBalance);
       localStorage.setItem("devToolsUsed", devToolsUsed ? "true" : "false");
-      localStorage.setItem("promoTokensRedeemed", promoTokensRedeemed);
+      saveBigInt("promoTokensRedeemed", promoTokensRedeemed);
 
       localStorage.setItem("lifetimeFreeGames", lifetimeFreeGames);
-      localStorage.setItem("lifetimeFreeWinnings", lifetimeFreeWinnings);
+      saveBigInt("lifetimeFreeWinnings", lifetimeFreeWinnings);
 
       localStorage.setItem("lifetimePaidGames", lifetimePaidGames);
-      localStorage.setItem("lifetimePaidWagered", lifetimePaidWagered);
-      localStorage.setItem("lifetimePaidWinnings", lifetimePaidWinnings);
+      saveBigInt("lifetimePaidWagered", lifetimePaidWagered);
+      saveBigInt("lifetimePaidWinnings", lifetimePaidWinnings);
 
       localStorage.setItem("lifetimeBonusSpinsEarned", lifetimeBonusSpinsEarned);
       localStorage.setItem("lifetimeBonusSpinsPlayed", lifetimeBonusSpinsPlayed);
-      localStorage.setItem("lifetimeBonusSpinWinnings", lifetimeBonusSpinWinnings);
+      saveBigInt("lifetimeBonusSpinWinnings", lifetimeBonusSpinWinnings);
     }
 
     function markDevToolsUsed() {
@@ -2635,14 +2985,12 @@
       updateDisplay();
     }
 
-    function getPaidReturnRate() {
-      if (lifetimePaidWagered <= 0) return 0;
-      return (lifetimePaidWinnings / lifetimePaidWagered) * 100;
+    function getPaidReturnRateText() {
+      return formatPercent(lifetimePaidWinnings, lifetimePaidWagered);
     }
 
-    function getOverallReturnRate() {
-      if (lifetimeTokensWagered <= 0) return 0;
-      return (lifetimeTokensEarned / lifetimeTokensWagered) * 100;
+    function getOverallReturnRateText() {
+      return formatPercent(lifetimeTokensEarned, lifetimeTokensWagered);
     }
 
     function getNetGain() {
@@ -2657,9 +3005,12 @@
       return Object.keys(themes).length;
     }
 
-    function getWinkyJudgement() {
-      const paidReturn = getPaidReturnRate();
+    function paidReturnGreaterThan(percent) {
+      if (lifetimePaidWagered <= 0n) return false;
+      return lifetimePaidWinnings * 100n > lifetimePaidWagered * BigInt(percent);
+    }
 
+    function getWinkyJudgement() {
       if (devToolsUsed) {
         return {
           text: "Void — Timeline Corrupted",
@@ -2667,21 +3018,21 @@
         };
       }
 
-      if (tokens >= 8000000000 && totalSpins < 100) {
+      if (tokens >= 8000000000n && totalSpins < 100) {
         return {
           text: "Void — Impossible Snack Behavior",
           className: "judgementVoid"
         };
       }
 
-      if (lifetimePaidGames >= 1000 && paidReturn > 250) {
+      if (lifetimePaidGames >= 1000 && paidReturnGreaterThan(250)) {
         return {
           text: "Suspicious Snack",
           className: "judgementSuspicious"
         };
       }
 
-      if (lifetimePaidGames >= 5000 && paidReturn > 180) {
+      if (lifetimePaidGames >= 5000 && paidReturnGreaterThan(180)) {
         return {
           text: "Unusually Blessed",
           className: "judgementSuspicious"
@@ -2731,11 +3082,10 @@
     }
 
     function renderStatsInfo() {
-      const paidReturn = getPaidReturnRate();
-      const overallReturn = getOverallReturnRate();
       const netGain = getNetGain();
       const judgement = getWinkyJudgement();
-      const netSign = netGain >= 0 ? "+" : "-";
+      const netSign = netGain >= 0n ? "+" : "-";
+      const absNet = netGain >= 0n ? netGain : -netGain;
 
       return `
         <div class="winCard">
@@ -2761,7 +3111,7 @@
             </div>
             <div class="statRow">
               <span>Free Winnings</span>
-              <span>${lifetimeFreeWinnings.toLocaleString()}</span>
+              <span>${formatGameNumber(lifetimeFreeWinnings)}</span>
             </div>
           </div>
 
@@ -2773,15 +3123,15 @@
             </div>
             <div class="statRow">
               <span>Paid Wagered</span>
-              <span>${lifetimePaidWagered.toLocaleString()}</span>
+              <span>${formatGameNumber(lifetimePaidWagered)}</span>
             </div>
             <div class="statRow">
               <span>Paid Winnings</span>
-              <span>${lifetimePaidWinnings.toLocaleString()}</span>
+              <span>${formatGameNumber(lifetimePaidWinnings)}</span>
             </div>
             <div class="statRow">
               <span>Paid Return</span>
-              <span>${paidReturn.toFixed(2)}%</span>
+              <span>${getPaidReturnRateText()}%</span>
             </div>
           </div>
 
@@ -2797,7 +3147,7 @@
             </div>
             <div class="statRow">
               <span>Bonus Spin Winnings</span>
-              <span>${lifetimeBonusSpinWinnings.toLocaleString()}</span>
+              <span>${formatGameNumber(lifetimeBonusSpinWinnings)}</span>
             </div>
           </div>
 
@@ -2809,27 +3159,27 @@
             </div>
             <div class="statRow">
               <span>Total Tokens Earned</span>
-              <span>${lifetimeTokensEarned.toLocaleString()}</span>
+              <span>${formatGameNumber(lifetimeTokensEarned)}</span>
             </div>
             <div class="statRow">
               <span>Total Wagered</span>
-              <span>${lifetimeTokensWagered.toLocaleString()}</span>
+              <span>${formatGameNumber(lifetimeTokensWagered)}</span>
             </div>
             <div class="statRow">
               <span>Net Gain</span>
-              <span>${netSign}${Math.abs(netGain).toLocaleString()}</span>
+              <span>${netSign}${formatGameNumber(absNet)}</span>
             </div>
             <div class="statRow">
               <span>Overall Return</span>
-              <span>${overallReturn.toFixed(2)}%</span>
+              <span>${getOverallReturnRateText()}%</span>
             </div>
             <div class="statRow">
               <span>Highest Balance</span>
-              <span>${highestBalance.toLocaleString()}</span>
+              <span>${formatGameNumber(highestBalance)}</span>
             </div>
             <div class="statRow">
               <span>Biggest Win</span>
-              <span>${biggestSingleWin.toLocaleString()}</span>
+              <span>${formatGameNumber(biggestSingleWin)}</span>
             </div>
           </div>
         </div>
@@ -2855,11 +3205,67 @@
           ${lastWinBreakdown.map(item => `
             <div class="breakdownRow">
               <span>${item.text}</span>
-              <span>${item.payout > 0 ? "+" + item.payout.toLocaleString() : ""}</span>
+              <span>${item.payout > 0n ? "+" + formatGameNumber(item.payout) : ""}</span>
             </div>
           `).join("")}
         </div>
       `;
+    }
+
+    function renderNotationInfo() {
+      return `
+        <div class="winCard">
+          <strong>Number Legend</strong>
+
+          <div class="winRow"><span>B</span><span>Billion</span></div>
+          <div class="winRow"><span>T</span><span>Trillion</span></div>
+          <div class="winRow"><span>Q</span><span>Quadrillion</span></div>
+          <div class="winRow"><span>Qi</span><span>Quintillion</span></div>
+          <div class="winRow"><span>Sx</span><span>Sextillion</span></div>
+          <div class="winRow"><span>Sp</span><span>Septillion</span></div>
+          <div class="winRow"><span>Oc</span><span>Octillion</span></div>
+          <div class="winRow"><span>No</span><span>Nonillion</span></div>
+          <div class="winRow"><span>Dc</span><span>Decillion</span></div>
+          <div class="winRow"><span>Ud</span><span>Undecillion</span></div>
+          <div class="winRow"><span>Dd</span><span>Duodecillion</span></div>
+        </div>
+      `;
+    }
+
+    function renderWinkyInfo() {
+      return `
+        <div class="winCard">
+          <strong>Winky Check</strong>
+
+          <div class="statGroup">
+            <div class="statRow">
+              <span>Did you feed Winky today?</span>
+              <span></span>
+            </div>
+
+            <div class="infoButtonRow">
+              <button class="infoButton" onclick="winkyYes()">Yes</button>
+              <button class="infoButton" onclick="winkyNo()">No</button>
+            </div>
+
+            <div class="codeMessage" id="winkyMessage"></div>
+          </div>
+        </div>
+      `;
+    }
+
+    function winkyYes() {
+      const message = document.getElementById("winkyMessage");
+      if (message) {
+        message.textContent = "Winky accepts your offering.";
+      }
+    }
+
+    function winkyNo() {
+      const message = document.getElementById("winkyMessage");
+      if (message) {
+        message.textContent = "Winky is staring.";
+      }
     }
 
     function renderUnlockRows() {
@@ -2909,7 +3315,7 @@
 
     function renderDevToolsInfo() {
       if (!devToolsUnlocked) {
-        return renderOddsInfo();
+        return "";
       }
 
       return `
@@ -2931,7 +3337,7 @@
           <div class="statGroup">
             <div class="statGroupTitle">Token Tools</div>
             <div class="devButtonGrid">
-              <button class="devButton" onclick="addDevTokens()">+100,000,000</button>
+              <button class="devButton" onclick="addDevTokens()">+100M</button>
               <button class="devButton" onclick="quickSpin(100)">Quick Spin x100</button>
               <button class="devButton" onclick="quickSpin(500)">Quick Spin x500</button>
             </div>
@@ -2964,8 +3370,13 @@
         return;
       }
 
-      if (activePanel === "dev") {
-        winInfo.innerHTML = renderDevToolsInfo();
+      if (activePanel === "notation") {
+        winInfo.innerHTML = renderNotationInfo();
+        return;
+      }
+
+      if (activePanel === "winky") {
+        winInfo.innerHTML = renderWinkyInfo();
         return;
       }
 
@@ -2977,9 +3388,7 @@
         unlockContent.innerHTML = renderUnlockRows();
       }
 
-      if (activePanel === "dev") {
-        updateWinInfo();
-      }
+      updateDevToolsVisibility();
     }
 
     // =========================
@@ -2987,6 +3396,16 @@
     // =========================
 
     function updateDevToolsVisibility() {
+      if (!devPanel || !devPanelContent) return;
+
+      if (devToolsUnlocked) {
+        devPanel.classList.add("visible");
+        devPanelContent.innerHTML = renderDevToolsInfo();
+      } else {
+        devPanel.classList.remove("visible");
+        devPanelContent.innerHTML = "";
+      }
+
       if (devTools) {
         devTools.classList.remove("visible");
       }
@@ -3016,6 +3435,7 @@
       localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
 
       syncThemeIndex();
+      syncThemeSelectors();
       updateDisplay();
 
       codeMessage.textContent = "All themes unlocked.";
@@ -3025,14 +3445,14 @@
       markDevToolsUsed();
       playSound("click");
 
-      tokens += 100000000;
+      tokens += 100000000n;
 
-      localStorage.setItem("forgeTokens", tokens);
+      saveBigInt("forgeTokens", tokens);
 
       saveStats();
       updateDisplay();
 
-      codeMessage.textContent = "+100,000,000 Forge Tokens added.";
+      codeMessage.textContent = "+100M Forge Tokens added.";
     }
 
     // =========================
@@ -3051,17 +3471,17 @@
 
       const codeRewards = {
         EMAIL1000: () => {
-          tokens += 1000;
-          promoTokensRedeemed += 1000;
-          localStorage.setItem("forgeTokens", tokens);
+          tokens += 1000n;
+          promoTokensRedeemed += 1000n;
+          saveBigInt("forgeTokens", tokens);
           saveStats();
           codeMessage.textContent = "+1,000 Forge Tokens.";
         },
 
         EVENT5000: () => {
-          tokens += 5000;
-          promoTokensRedeemed += 5000;
-          localStorage.setItem("forgeTokens", tokens);
+          tokens += 5000n;
+          promoTokensRedeemed += 5000n;
+          saveBigInt("forgeTokens", tokens);
           saveStats();
           codeMessage.textContent = "+5,000 Forge Tokens.";
         },
@@ -3102,9 +3522,7 @@
 
           markDevToolsUsed();
 
-          activePanel = "dev";
-          updateInfoButtons();
-          updateWinInfo();
+          updateDevToolsVisibility();
 
           codeMessage.textContent = "Dev tools unlocked.";
         }
@@ -3115,6 +3533,7 @@
         codeInput.value = "";
 
         syncThemeIndex();
+        syncThemeSelectors();
         updateDisplay();
         updateDevToolsVisibility();
       } else {
@@ -3135,35 +3554,35 @@
     function resetGame() {
       playSound("click");
 
-      tokens = 0;
+      tokens = 0n;
       totalSpins = 0;
 
-      lifetimeTokensEarned = 0;
-      lifetimeTokensWagered = 0;
-      biggestSingleWin = 0;
-      highestBalance = 0;
-      promoTokensRedeemed = 0;
+      lifetimeTokensEarned = 0n;
+      lifetimeTokensWagered = 0n;
+      biggestSingleWin = 0n;
+      highestBalance = 0n;
+      promoTokensRedeemed = 0n;
       devToolsUsed = false;
 
       lifetimeFreeGames = 0;
-      lifetimeFreeWinnings = 0;
+      lifetimeFreeWinnings = 0n;
 
       lifetimePaidGames = 0;
-      lifetimePaidWagered = 0;
-      lifetimePaidWinnings = 0;
+      lifetimePaidWagered = 0n;
+      lifetimePaidWinnings = 0n;
 
       lifetimeBonusSpinsEarned = 0;
       lifetimeBonusSpinsPlayed = 0;
-      lifetimeBonusSpinWinnings = 0;
+      lifetimeBonusSpinWinnings = 0n;
 
       bonusSpinQueue = 0;
-      bonusSpinLineBet = 0;
-      bonusSpinFinalBet = 0;
+      bonusSpinLineBet = 0n;
+      bonusSpinFinalBet = 0n;
       bonusSpinSource = "";
 
       bonusSessionTotal = 0;
       bonusSessionPlayed = 0;
-      bonusSessionWon = 0;
+      bonusSessionWon = 0n;
       devUnlockInfoVisible = false;
 
       unlockedThemes = {};
@@ -3173,13 +3592,15 @@
 
       activeTheme = "Default";
       themeIndex = 0;
+      themeCharacterIndex = 0;
+      themeVariantIndex = 0;
       symbolPool = buildSymbolPool();
 
       devToolsUnlocked = false;
       activePanel = null;
       lastWinBreakdown = [];
 
-      localStorage.setItem("forgeTokens", tokens);
+      saveBigInt("forgeTokens", tokens);
       localStorage.setItem("forgeTotalSpins", totalSpins);
       localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
       localStorage.setItem("activeTheme", activeTheme);
@@ -3191,6 +3612,8 @@
       clearWinPopup();
       hideLineOverlay();
 
+      syncThemeIndex();
+      syncThemeSelectors();
       applyTheme(activeTheme);
       createGrid();
       updateDisplay();

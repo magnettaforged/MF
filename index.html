@@ -3125,7 +3125,7 @@
 
       if (!nextMultiplier) return;
 
-      const threshold = getMultiplierUnlockThreshold(nextMultiplier);
+      const threshold = getMultiplierUnlockThreshold(unlockedMultiplierMax);
 
       if (tokens >= threshold) {
         unlockedMultiplierMax = nextMultiplier;

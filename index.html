@@ -9,7 +9,6 @@
 <head>
   <meta charset="UTF-8" />
 
-  <!-- Keep this at 1.0. Do not use browser zoom as the layout fix. -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>Forge Spin</title>
@@ -89,6 +88,7 @@
     }
 
     .gamePanel {
+      position: relative;
       background-color: rgba(0,0,0,0.10);
       background-image:
         linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0)),
@@ -97,6 +97,7 @@
       background-size: cover;
       background-repeat: no-repeat;
       backdrop-filter: none;
+      min-height: 520px;
     }
 
     .settingsPanel,
@@ -176,6 +177,7 @@
       border: var(--ui-border);
       box-shadow: inset 0 0 18px rgba(0,0,0,0.78);
       box-sizing: border-box;
+      transition: opacity 0.35s ease;
     }
 
     .slotGrid {
@@ -353,6 +355,7 @@
       background: transparent;
       border: none;
       border-radius: 0;
+      transition: opacity 0.35s ease;
     }
 
     .controlTopRow,
@@ -797,6 +800,101 @@
     }
 
     /* =========================
+       THEME PEEK
+       ========================= */
+
+    .themePeekActive .slotFrame,
+    .themePeekActive .controlPanel,
+    .themePeekActive .winPopup,
+    .themePeekActive .unlockPopup {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .themePeekNotice {
+      position: absolute;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      z-index: 10;
+      padding: 8px 18px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.72);
+      border: 1px solid var(--accent);
+      color: var(--text-accent);
+      font-size: 14px;
+      font-weight: bold;
+      text-shadow: 0 0 8px var(--accent);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .themePeekActive .themePeekNotice {
+      opacity: 1;
+    }
+
+    /* =========================
+       WINKY POPUP
+       ========================= */
+
+    .winkyOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.48);
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .winkyOverlay.show {
+      display: flex;
+    }
+
+    .winkyPopup {
+      width: min(340px, 92vw);
+      background: rgba(0,0,0,0.88);
+      border: 2px solid var(--accent);
+      border-radius: 18px;
+      box-shadow: 0 0 24px var(--accent-soft);
+      padding: 16px;
+      text-align: center;
+      color: var(--text-main);
+    }
+
+    .winkyPopupTitle {
+      color: var(--text-accent);
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      text-shadow: 0 0 8px var(--accent);
+    }
+
+    .winkyPopupText {
+      color: var(--text-main);
+      font-size: 15px;
+      margin-bottom: 12px;
+    }
+
+    .winkyButtonRow {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .winkyPopupMessage {
+      margin-top: 10px;
+      min-height: 18px;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    /* =========================
        MOBILE LAYOUT ONLY
        Keep this obvious and isolated.
        ========================= */
@@ -816,6 +914,10 @@
       .devPanel {
         padding: 8px;
         border-radius: 16px;
+      }
+
+      .gamePanel {
+        min-height: 450px;
       }
 
       .logoText {
@@ -905,10 +1007,14 @@
 <body>
   <div class="pageShell">
 
-    <div class="gamePanel">
+    <div class="gamePanel" id="gamePanel">
       <a class="logoText" href="https://magnettaforged.com" target="_blank" rel="noopener">
         Forge Spin
       </a>
+
+      <div class="themePeekNotice" id="themePeekNotice">
+        Theme Preview
+      </div>
 
       <div class="slotFrame">
         <div class="lineOverlay" id="lineOverlay"></div>
@@ -951,16 +1057,12 @@
         </div>
 
         <div class="gemRow">
-          <div></div>
-
           <div>
             <button class="chaosGem gem-clear" id="chaosGem" onclick="activateGem()" title="Chaos Gem">
               <img src="gem.png" alt="Chaos Gem">
             </button>
             <div class="gemMessage" id="gemMessage"></div>
           </div>
-
-          <div></div>
         </div>
       </div>
     </div>
@@ -1000,8 +1102,18 @@
             Notation
           </button>
 
+          <button class="infoButton" id="themePeekButton" onclick="startThemePeek()">
+            Theme Peek
+          </button>
+        </div>
+
+        <div class="infoButtonRow">
           <button class="infoButton" id="soundButton" onclick="toggleSound()">
             Sound: On
+          </button>
+
+          <button class="infoButton" onclick="startLinePreview()">
+            Show Lines
           </button>
         </div>
 
@@ -1034,6 +1146,20 @@
       <div id="devPanelContent"></div>
     </div>
 
+  </div>
+
+  <div class="winkyOverlay" id="winkyOverlay">
+    <div class="winkyPopup">
+      <div class="winkyPopupTitle">Winky Intervention</div>
+      <div class="winkyPopupText">Did you feed Winky?</div>
+
+      <div class="winkyButtonRow">
+        <button class="infoButton" onclick="answerWinky(true)">Yes</button>
+        <button class="infoButton" onclick="answerWinky(false)">No</button>
+      </div>
+
+      <div class="winkyPopupMessage" id="winkyPopupMessage"></div>
+    </div>
   </div>
 
 
@@ -2719,6 +2845,90 @@
     // SECTION 6: SPIN / DEV TOOLS / CODES / STATS / CLOSE
     // =========================
 
+    let themePeekTimer = null;
+    let winkyOverlayActive = false;
+
+    // =========================
+    // THEME PEEK
+    // =========================
+
+    function startThemePeek() {
+      const gamePanel = document.getElementById("gamePanel");
+      if (!gamePanel) return;
+
+      if (spinButton.disabled) {
+        codeMessage.textContent = "Theme Peek is unavailable while spinning.";
+        return;
+      }
+
+      playSound("click");
+      hideLineOverlay();
+      clearWinPopup();
+
+      gamePanel.classList.add("themePeekActive");
+
+      if (themePeekTimer) {
+        clearTimeout(themePeekTimer);
+      }
+
+      themePeekTimer = setTimeout(() => {
+        gamePanel.classList.remove("themePeekActive");
+        themePeekTimer = null;
+        startLinePreview();
+      }, 4000);
+    }
+
+    // =========================
+    // WINKY INTERVENTION SHELL
+    // =========================
+
+    function maybeTriggerWinkyIntervention(finalBet, spinType) {
+      if (winkyOverlayActive) return;
+      if (spinType !== "normal") return;
+      if (finalBet <= 0n) return;
+
+      const roll = Math.random();
+
+      if (roll < 0.01) {
+        triggerWinkyIntervention();
+      }
+    }
+
+    function triggerWinkyIntervention() {
+      const overlay = document.getElementById("winkyOverlay");
+      const message = document.getElementById("winkyPopupMessage");
+
+      if (!overlay) return;
+
+      winkyOverlayActive = true;
+
+      if (message) {
+        message.textContent = "";
+      }
+
+      overlay.classList.add("show");
+      playSound("winky");
+    }
+
+    function answerWinky(fedWinky) {
+      const overlay = document.getElementById("winkyOverlay");
+      const message = document.getElementById("winkyPopupMessage");
+
+      if (message) {
+        message.textContent = fedWinky
+          ? "Winky accepts your offering."
+          : "Winky is staring.";
+      }
+
+      setTimeout(() => {
+        if (overlay) {
+          overlay.classList.remove("show");
+        }
+
+        winkyOverlayActive = false;
+      }, fedWinky ? 1400 : 2200);
+    }
+
     // =========================
     // SPIN CONTROL
     // =========================
@@ -2891,6 +3101,7 @@
         }
 
         setControlsDisabled(false);
+        maybeTriggerWinkyIntervention(finalBet, spinType);
       }
     }
 
@@ -3390,6 +3601,7 @@
               <button class="devButton" onclick="quickSpin(100)">Quick Spin x100</button>
               <button class="devButton" onclick="quickSpin(500)">Quick Spin x500</button>
               <button class="devButton" onclick="unlockNextMultiplierDev()">Unlock Next Multi</button>
+              <button class="devButton" onclick="triggerWinkyIntervention()">Test Winky</button>
             </div>
           </div>
 
@@ -3651,6 +3863,7 @@
       bonusSessionPlayed = 0;
       bonusSessionWon = 0n;
       devUnlockInfoVisible = false;
+      winkyOverlayActive = false;
 
       unlockedThemes = {};
       Object.keys(themes).forEach(themeKey => {
@@ -3666,6 +3879,16 @@
       devToolsUnlocked = false;
       activePanel = null;
       lastWinBreakdown = [];
+
+      const winkyOverlay = document.getElementById("winkyOverlay");
+      if (winkyOverlay) {
+        winkyOverlay.classList.remove("show");
+      }
+
+      const gamePanel = document.getElementById("gamePanel");
+      if (gamePanel) {
+        gamePanel.classList.remove("themePeekActive");
+      }
 
       saveBigInt("forgeTokens", tokens);
       saveBigInt("unlockedMultiplierMax", unlockedMultiplierMax);

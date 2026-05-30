@@ -40,6 +40,10 @@
       --cell-bg: rgba(0,0,0,0.1);
     }
 
+        * {
+      box-sizing: border-box;
+    }
+
     html {
       min-height: 100%;
       background: #050505;
@@ -926,21 +930,27 @@
       }
 
       .slotFrame {
-        height: 310px;
-        padding: 6px;
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        min-height: 300px;
+        overflow: hidden;
       }
 
       .slotGrid {
-        grid-template-columns: repeat(5, 64px);
-        grid-template-rows: repeat(5, 64px);
-        gap: 6px;
+        width: 100%;
+        max-width: 100%;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        grid-template-rows: repeat(5, auto);
+        gap: clamp(4px, 1.4vw, 8px);
         transform: translateY(-14px);
       }
 
       .cell {
-        width: 64px;
-        height: 64px;
-        font-size: 30px;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        height: auto;
+        font-size: clamp(22px, 7vw, 30px);
       }
 
       .controlTopRow,

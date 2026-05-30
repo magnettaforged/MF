@@ -8,7 +8,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=0.90" />
+
+  <!-- Keep this at 1.0. Do not use browser zoom as the layout fix. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Forge Spin</title>
 
   <style>
@@ -64,7 +67,7 @@
     }
 
     .pageShell {
-      width: 550px;
+      width: min(570px, 96vw);
       margin-left: auto;
       margin-right: auto;
       box-sizing: border-box;
@@ -93,7 +96,7 @@
       background-position: center top;
       background-size: cover;
       background-repeat: no-repeat;
-      backdrop-filter: none; 
+      backdrop-filter: none;
     }
 
     .settingsPanel,
@@ -172,6 +175,7 @@
       background: var(--slot-bg);
       border: var(--ui-border);
       box-shadow: inset 0 0 18px rgba(0,0,0,0.78);
+      box-sizing: border-box;
     }
 
     .slotGrid {
@@ -352,8 +356,7 @@
     }
 
     .controlTopRow,
-    .controlBottomRow,
-    .gemRow {
+    .controlBottomRow {
       display: grid;
       gap: 8px;
       align-items: center;
@@ -364,14 +367,16 @@
       margin-bottom: 5px;
     }
 
-    .gemRow {
-      grid-template-columns: 1fr auto 1fr;
+    .controlBottomRow {
+      grid-template-columns: 1fr 1fr 1.25fr;
     }
 
     .gemRow {
-      grid-template-columns: 1fr 1fr 1.25fr;
-      margin-top: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       min-height: 42px;
+      margin-top: 0;
     }
 
     .readout {
@@ -789,6 +794,104 @@
       color: var(--button-text);
       font-size: 12px;
       padding: 8px;
+    }
+
+    /* =========================
+       MOBILE LAYOUT ONLY
+       Keep this obvious and isolated.
+       ========================= */
+
+    @media (max-width: 600px) {
+      body {
+        padding-top: 0;
+      }
+
+      .pageShell {
+        width: min(390px, 96vw);
+      }
+
+      .gamePanel,
+      .settingsPanel,
+      .infoPanel,
+      .devPanel {
+        padding: 8px;
+        border-radius: 16px;
+      }
+
+      .logoText {
+        font-size: 28px;
+        margin-bottom: 6px;
+      }
+
+      .slotFrame {
+        height: 310px;
+        padding: 6px;
+      }
+
+      .slotGrid {
+        grid-template-columns: repeat(5, 64px);
+        grid-template-rows: repeat(5, 64px);
+        gap: 6px;
+        transform: translateY(-14px);
+      }
+
+      .cell {
+        width: 64px;
+        height: 64px;
+        font-size: 30px;
+      }
+
+      .controlTopRow,
+      .controlBottomRow {
+        grid-template-columns: 1fr;
+        gap: 5px;
+      }
+
+      .readout,
+      .tokenReadout {
+        min-height: 30px;
+        padding: 3px 5px;
+      }
+
+      #tokenBalance {
+        font-size: 12px;
+        letter-spacing: 0;
+      }
+
+      .spinButton {
+        height: 38px;
+      }
+
+      .themeSelectorRow {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .themeControl {
+        grid-template-columns: 72px 24px 1fr 24px;
+      }
+
+      .themeLabel {
+        text-align: right;
+      }
+
+      .winPopup {
+        font-size: 20px;
+        bottom: 16px;
+      }
+
+      .unlockPopup {
+        font-size: 16px;
+        width: 82%;
+        max-width: 320px;
+      }
+
+      .statRow,
+      .breakdownRow,
+      .unlockRow {
+        font-size: 12px;
+        gap: 6px;
+      }
     }
   </style>
 
@@ -1630,18 +1733,21 @@
     // =========================
 
     function getGridMetrics() {
-      const cellSize = 80;
-      const gap = 8;
+      const mobile = window.innerWidth <= 600;
+      const cellSize = mobile ? 64 : 80;
+      const gap = mobile ? 6 : 8;
       const pitch = cellSize + gap;
+      const gridTop = mobile ? -10 : -10;
+      const gridLeft = mobile ? 6 : 8;
 
       return {
-        viewW: 456,
-        viewH: 390,
+        viewW: mobile ? 360 : 456,
+        viewH: mobile ? 310 : 390,
         cellSize: cellSize,
         gap: gap,
         pitch: pitch,
-        gridTop: -10,
-        gridLeft: 8
+        gridTop: gridTop,
+        gridLeft: gridLeft
       };
     }
 

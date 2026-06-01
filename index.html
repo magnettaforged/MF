@@ -3854,20 +3854,20 @@
       }
 
       const codeRewards = {
-        EMAIL1000: () => {
-          tokens += 1000n;
-          promoTokensRedeemed += 1000n;
+        MFEMAIL: () => {
+          tokens += 2000000n;
+          promoTokensRedeemed += 2000000n;
           saveBigInt("forgeTokens", tokens);
           saveStats();
-          codeMessage.textContent = "+1,000 Forge Tokens.";
+          codeMessage.textContent = "MFEMAIL redeemed +2,000,000 Forge Tokens.";
         },
 
-        EVENT5000: () => {
-          tokens += 5000n;
-          promoTokensRedeemed += 5000n;
+        PHONECHK: () => {
+          tokens += 1000000n;
+          promoTokensRedeemed += 1000000n;
           saveBigInt("forgeTokens", tokens);
           saveStats();
-          codeMessage.textContent = "+5,000 Forge Tokens.";
+          codeMessage.textContent = "PHONECHK redeemed +1,000,000 Forge Tokens.";
         },
 
         MAYAFOX: () => {

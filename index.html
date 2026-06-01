@@ -3839,97 +3839,108 @@
       codeMessage.textContent = "+100M Forge Tokens added.";
     }
 
-    // =========================
-    // CODES
-    // =========================
+// =========================
+// CODES
+// =========================
 
-    function applyCode() {
-      playSound("click");
+function applyCode() {
+  playSound("click");
 
-      const code = codeInput.value.trim().toUpperCase();
+  const code = codeInput.value.trim().toUpperCase();
 
-      if (!code) {
-        codeMessage.textContent = "Enter a code.";
-        return;
-      }
+  if (!code) {
+    codeMessage.textContent = "Enter a code.";
+    return;
+  }
 
-      const codeRewards = {
-        MFEMAIL: () => {
-          tokens += 2000000n;
-          promoTokensRedeemed += 2000000n;
-          saveBigInt("forgeTokens", tokens);
-          saveStats();
-          codeMessage.textContent = "MFEMAIL redeemed +2,000,000 Forge Tokens.";
-        },
+  const redeemedCodes = JSON.parse(localStorage.getItem("redeemedCodes")) || [];
 
-        PHONECHK: () => {
-          tokens += 1000000n;
-          promoTokensRedeemed += 1000000n;
-          saveBigInt("forgeTokens", tokens);
-          saveStats();
-          codeMessage.textContent = "PHONECHK redeemed +1,000,000 Forge Tokens.";
-        },
+  if (redeemedCodes.includes(code)) {
+    codeMessage.textContent = "Code already redeemed on this device.";
+    return;
+  }
 
-        MAYAFOX: () => {
-          unlockTheme("Maya");
-          localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
-          codeMessage.textContent = "Maya theme unlocked.";
-        },
+  const codeRewards = {
+    MFEMAIL: () => {
+      tokens += 2000000n;
+      promoTokensRedeemed += 2000000n;
+      saveBigInt("forgeTokens", tokens);
+      saveStats();
+      codeMessage.textContent = "MFEMAIL redeemed: +2,000,000 Forge Tokens.";
+    },
 
-        REIGNBEAR: () => {
-          unlockTheme("Reign");
-          localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
-          codeMessage.textContent = "Reign theme unlocked.";
-        },
+    PHONECHK: () => {
+      tokens += 1000000n;
+      promoTokensRedeemed += 1000000n;
+      saveBigInt("forgeTokens", tokens);
+      saveStats();
+      codeMessage.textContent = "PHONECHK redeemed: +1,000,000 Forge Tokens.";
+    },
 
-        KYRASCYTHE: () => {
-          unlockTheme("Kyra");
-          localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
-          codeMessage.textContent = "Kyra theme unlocked.";
-        },
+    MAYAFOX: () => {
+      unlockTheme("Maya");
+      localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+      codeMessage.textContent = "Maya theme unlocked.";
+    },
 
-        NADIASPELL: () => {
-          unlockTheme("Nadia");
-          localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
-          codeMessage.textContent = "Nadia theme unlocked.";
-        },
+    REIGNBEAR: () => {
+      unlockTheme("Reign");
+      localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+      codeMessage.textContent = "Reign theme unlocked.";
+    },
 
-        WINKYCHAOS: () => {
-          unlockTheme("Winky");
-          localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
-          codeMessage.textContent = "Winky theme unlocked.";
-        },
+    KYRASCYTHE: () => {
+      unlockTheme("Kyra");
+      localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+      codeMessage.textContent = "Kyra theme unlocked.";
+    },
 
-        FORGEDEV: () => {
-          devToolsUnlocked = true;
-          localStorage.setItem("devToolsUnlocked", "true");
+    NADIASPELL: () => {
+      unlockTheme("Nadia");
+      localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+      codeMessage.textContent = "Nadia theme unlocked.";
+    },
 
-          markDevToolsUsed();
+    WINKYCHAOS: () => {
+      unlockTheme("Winky");
+      localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+      codeMessage.textContent = "Winky theme unlocked.";
+    },
 
-          updateDevToolsVisibility();
+    FORGEDEV: () => {
+      devToolsUnlocked = true;
+      localStorage.setItem("devToolsUnlocked", "true");
 
-          codeMessage.textContent = "Dev tools unlocked.";
-        }
-      };
+      markDevToolsUsed();
 
-      if (codeRewards[code]) {
-        codeRewards[code]();
-        codeInput.value = "";
+      updateDevToolsVisibility();
 
-        syncThemeIndex();
-        syncThemeSelectors();
-        updateDisplay();
-        updateDevToolsVisibility();
-      } else {
-        codeMessage.textContent = "Invalid code.";
-      }
+      codeMessage.textContent = "Dev tools unlocked.";
     }
+  };
 
-    codeInput.addEventListener("keydown", function(event) {
-      if (event.key === "Enter") {
-        applyCode();
-      }
-    });
+  if (codeRewards[code]) {
+    codeRewards[code]();
+
+    redeemedCodes.push(code);
+    localStorage.setItem("redeemedCodes", JSON.stringify(redeemedCodes));
+
+    codeInput.value = "";
+
+    syncThemeIndex();
+    syncThemeSelectors();
+    updateDisplay();
+    updateDevToolsVisibility();
+  } else {
+    codeMessage.textContent = "Invalid code.";
+  }
+}
+
+codeInput.addEventListener("keydown", function(event) {
+  if (event.key === "Enter") {
+    applyCode();
+  }
+});
 
     // =========================
     // RESET

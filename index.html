@@ -898,6 +898,52 @@
       font-weight: bold;
     }
 
+    .leaderboardField {
+      margin-top: 10px;
+      text-align: left;
+    }
+
+    .leaderboardField label {
+      display: block;
+      color: var(--text-muted);
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .leaderboardField input {
+      width: 100%;
+      background: var(--button-bg);
+      color: var(--text-main);
+      border: var(--ui-border);
+      border-radius: 8px;
+      padding: 8px;
+      font-size: 13px;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    .leaderboardField input:focus {
+      border-color: var(--accent);
+    }
+
+    .leaderboardPlayerId {
+      margin-top: 8px;
+      padding: 7px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.35);
+      border: var(--ui-border);
+      color: var(--text-muted);
+      font-size: 11px;
+      overflow-wrap: anywhere;
+      text-align: left;
+    }
+
+    .smallStatButton {
+      min-height: 24px;
+      padding: 4px 8px;
+      font-size: 11px;
+    }
+
 
     /* =========================
        TEMP HIDDEN SOUND + MULTIPLIER LOCK
@@ -1202,6 +1248,32 @@
       </div>
 
       <div class="winkyPopupMessage" id="winkyPopupMessage"></div>
+    </div>
+  </div>
+
+  <div class="winkyOverlay" id="leaderboardOverlay">
+    <div class="winkyPopup">
+      <div class="winkyPopupTitle">Optional Leaderboard</div>
+      <div class="winkyPopupText">Submit your score to the leaderboard?</div>
+
+      <div class="leaderboardPlayerId" id="leaderboardPlayerIdDisplay"></div>
+
+      <div class="leaderboardField">
+        <label for="leaderboardUsernameInput">Username</label>
+        <input id="leaderboardUsernameInput" placeholder="Example: WinkyFan22" maxlength="30" autocomplete="off">
+      </div>
+
+      <div class="leaderboardField">
+        <label for="leaderboardDeviceInput">Device Info</label>
+        <input id="leaderboardDeviceInput" placeholder="Example: Galaxy S22 / Chrome" maxlength="60" autocomplete="off">
+      </div>
+
+      <div class="winkyButtonRow">
+        <button class="infoButton" onclick="submitLeaderboardFromPrompt()">Submit</button>
+        <button class="infoButton" onclick="declineLeaderboardPrompt()">No Thanks</button>
+      </div>
+
+      <div class="winkyPopupMessage" id="leaderboardMessage"></div>
     </div>
   </div>
 
@@ -1624,6 +1696,33 @@
     const BONUS_SPIN_DELAY = 1500;
 
     // =========================
+    // LEADERBOARD SETTINGS
+    // =========================
+
+    const LEADERBOARD_URL = "https://script.google.com/macros/s/AKfycby0gs4pBMKVwDEXpD3RgnhILqZTfvUwIiAO5Q8JCprWY7AcAovO7T13uVDDKTKbVqFZag/exec";
+
+    function createPlayerId() {
+      if (window.crypto && typeof window.crypto.randomUUID === "function") {
+        return window.crypto.randomUUID();
+      }
+
+      return "fs-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 12);
+    }
+
+    let playerId = localStorage.getItem("forgePlayerId");
+
+    if (!playerId) {
+      playerId = createPlayerId();
+      localStorage.setItem("forgePlayerId", playerId);
+    }
+
+    let leaderboardUsername = localStorage.getItem("leaderboardUsername") || "";
+    let leaderboardDeviceInfo = localStorage.getItem("leaderboardDeviceInfo") || "";
+    let leaderboardPromptAnswered = localStorage.getItem("leaderboardPromptAnswered") === "true";
+    let leaderboardOptedIn = localStorage.getItem("leaderboardOptedIn") === "true";
+    let lastLeaderboardAutoSpin = Number(localStorage.getItem("lastLeaderboardAutoSpin")) || 0;
+
+    // =========================
     // SYMBOL IMAGES
     // =========================
 
@@ -1769,6 +1868,7 @@
     updateDevToolsVisibility();
     updateSoundButton();
     startLinePreview();
+    maybeShowLeaderboardPrompt();
 
     // =========================
     // AUDIO
@@ -2622,7 +2722,7 @@
       free: {
         Axe: { 2: 15n, 3: 75n, 4: 200n, 5: 750n },
         Animal: { 2: 15n, 3: 75n, 4: 200n, 5: 750n },
-        Gem: { 2: 100n, 3: 400n, 4: 1250n, 5: 5000n },
+        Gem: { 2: 150n, 3: 600n, 4: 1750n, 5: 7500n },
         Wild: { 2: 100n, 3: 400n, 4: 1250n, 5: 5000n },
         default: { 2: 40n, 3: 175n, 4: 500n, 5: 1500n }
       },
@@ -2630,7 +2730,7 @@
       paid: {
         Axe: { 2: 50n, 3: 300n, 4: 1400n, 5: 7000n },
         Animal: { 2: 50n, 3: 300n, 4: 1400n, 5: 7000n },
-        Gem: { 2: 200n, 3: 1200n, 4: 7000n, 5: 32500n },
+        Gem: { 2: 300n, 3: 1800n, 4: 10000n, 5: 50000n },
         Wild: { 2: 200n, 3: 1200n, 4: 7000n, 5: 32500n },
         default: { 2: 100n, 3: 600n, 4: 3200n, 5: 14000n }
       }
@@ -3172,6 +3272,7 @@
 
       saveStats();
       updateDisplay();
+      maybeAutoSubmitLeaderboard();
       showWinPopup(payout);
 
       if (payout > 0n) {
@@ -3324,6 +3425,7 @@
       clearWinPopup();
       hideLineOverlay();
       updateDisplay();
+      maybeAutoSubmitLeaderboard();
 
       const net = totalPayout - totalWagered;
       const sign = net >= 0n ? "+" : "-";
@@ -3491,6 +3593,34 @@
             <div class="statRow">
               <span>Highest Multiplier</span>
               <span>${formatMultiplier(unlockedMultiplierMax)}</span>
+            </div>
+          </div>
+
+          <div class="statGroup">
+            <div class="statGroupTitle">Leaderboard</div>
+            <div class="statRow">
+              <span>Player ID</span>
+              <span>${playerId.slice(0, 8)}...</span>
+            </div>
+            <div class="statRow">
+              <span>Username</span>
+              <span>${leaderboardUsername || "Not set"}</span>
+            </div>
+            <div class="statRow">
+              <span>Device</span>
+              <span>${leaderboardDeviceInfo || "Not set"}</span>
+            </div>
+            <div class="statRow">
+              <span>Status</span>
+              <span>${leaderboardOptedIn ? "Opted In" : "Not Submitted"}</span>
+            </div>
+            <div class="statRow">
+              <span>Edit Info</span>
+              <span><button class="infoButton smallStatButton" onclick="openLeaderboardPrompt(true)">Create/Edit</button></span>
+            </div>
+            <div class="statRow">
+              <span>Submit Score</span>
+              <span><button class="infoButton smallStatButton" onclick="manualSubmitLeaderboardScore()">Submit</button></span>
             </div>
           </div>
 
@@ -3839,6 +3969,178 @@
       codeMessage.textContent = "+100M Forge Tokens added.";
     }
 
+
+    // =========================
+    // LEADERBOARD
+    // =========================
+
+    function getLeaderboardPayload() {
+      const judgement = getWinkyJudgement();
+
+      return {
+        playerId: playerId,
+        username: leaderboardUsername || "Anonymous",
+        deviceInfo: leaderboardDeviceInfo || "Not set",
+        highestBalance: highestBalance.toString(),
+        currentTokens: tokens.toString(),
+        totalSpins: totalSpins,
+        paidReturn: getPaidReturnRateText(),
+        totalReturn: getOverallReturnRateText(),
+        winkyCansFed: winkyCansFed,
+        winkyHungryNights: winkyHungryNights,
+        devToolsUsed: devToolsUsed,
+        judgement: judgement.text
+      };
+    }
+
+    function updateLeaderboardPromptFields() {
+      const idDisplay = document.getElementById("leaderboardPlayerIdDisplay");
+      const usernameInput = document.getElementById("leaderboardUsernameInput");
+      const deviceInput = document.getElementById("leaderboardDeviceInput");
+      const message = document.getElementById("leaderboardMessage");
+
+      if (idDisplay) {
+        idDisplay.textContent = "Player ID: " + playerId;
+      }
+
+      if (usernameInput) {
+        usernameInput.value = leaderboardUsername;
+      }
+
+      if (deviceInput) {
+        deviceInput.value = leaderboardDeviceInfo;
+      }
+
+      if (message) {
+        message.textContent = "";
+      }
+    }
+
+    function openLeaderboardPrompt(manual = false) {
+      const overlay = document.getElementById("leaderboardOverlay");
+      if (!overlay) return;
+
+      updateLeaderboardPromptFields();
+      overlay.classList.add("show");
+    }
+
+    function closeLeaderboardPrompt() {
+      const overlay = document.getElementById("leaderboardOverlay");
+      if (overlay) {
+        overlay.classList.remove("show");
+      }
+    }
+
+    function maybeShowLeaderboardPrompt() {
+      if (leaderboardPromptAnswered) return;
+
+      setTimeout(() => {
+        if (!leaderboardPromptAnswered) {
+          openLeaderboardPrompt(false);
+        }
+      }, 900);
+    }
+
+    function saveLeaderboardFields() {
+      const usernameInput = document.getElementById("leaderboardUsernameInput");
+      const deviceInput = document.getElementById("leaderboardDeviceInput");
+
+      leaderboardUsername = usernameInput ? usernameInput.value.trim().slice(0, 30) : leaderboardUsername;
+      leaderboardDeviceInfo = deviceInput ? deviceInput.value.trim().slice(0, 60) : leaderboardDeviceInfo;
+
+      localStorage.setItem("leaderboardUsername", leaderboardUsername);
+      localStorage.setItem("leaderboardDeviceInfo", leaderboardDeviceInfo);
+    }
+
+    function declineLeaderboardPrompt() {
+      playSound("click");
+
+      leaderboardPromptAnswered = true;
+      leaderboardOptedIn = false;
+
+      localStorage.setItem("leaderboardPromptAnswered", "true");
+      localStorage.setItem("leaderboardOptedIn", "false");
+
+      closeLeaderboardPrompt();
+      updateDisplay();
+    }
+
+    function submitLeaderboardFromPrompt() {
+      playSound("click");
+
+      saveLeaderboardFields();
+
+      if (!leaderboardUsername) {
+        const message = document.getElementById("leaderboardMessage");
+        if (message) message.textContent = "Enter a username first.";
+        return;
+      }
+
+      leaderboardPromptAnswered = true;
+      leaderboardOptedIn = true;
+
+      localStorage.setItem("leaderboardPromptAnswered", "true");
+      localStorage.setItem("leaderboardOptedIn", "true");
+
+      submitLeaderboardScore("manual", true);
+      closeLeaderboardPrompt();
+      updateDisplay();
+    }
+
+    function manualSubmitLeaderboardScore() {
+      playSound("click");
+
+      if (!leaderboardUsername) {
+        openLeaderboardPrompt(true);
+        return;
+      }
+
+      leaderboardPromptAnswered = true;
+      leaderboardOptedIn = true;
+
+      localStorage.setItem("leaderboardPromptAnswered", "true");
+      localStorage.setItem("leaderboardOptedIn", "true");
+
+      submitLeaderboardScore("manual", true);
+      updateDisplay();
+    }
+
+    function submitLeaderboardScore(source = "manual", showMessage = false) {
+      if (!LEADERBOARD_URL) return;
+      if (!leaderboardOptedIn && source === "auto") return;
+
+      const payload = getLeaderboardPayload();
+
+      fetch(LEADERBOARD_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify(payload)
+      }).then(() => {
+        if (showMessage && codeMessage) {
+          codeMessage.textContent = "Leaderboard score submitted.";
+        }
+      }).catch(() => {
+        if (showMessage && codeMessage) {
+          codeMessage.textContent = "Leaderboard submit failed. Try again later.";
+        }
+      });
+    }
+
+    function maybeAutoSubmitLeaderboard() {
+      if (!leaderboardOptedIn) return;
+      if (totalSpins <= 0) return;
+      if (totalSpins % 10 !== 0) return;
+      if (lastLeaderboardAutoSpin === totalSpins) return;
+
+      lastLeaderboardAutoSpin = totalSpins;
+      localStorage.setItem("lastLeaderboardAutoSpin", String(lastLeaderboardAutoSpin));
+
+      submitLeaderboardScore("auto", false);
+    }
+
 // =========================
 // CODES
 // =========================
@@ -4037,6 +4339,7 @@ codeInput.addEventListener("keydown", function(event) {
       localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
       localStorage.setItem("activeTheme", activeTheme);
       localStorage.setItem("devToolsUnlocked", "false");
+      localStorage.removeItem("redeemedCodes");
 
       saveStats();
 

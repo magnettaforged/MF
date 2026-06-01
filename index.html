@@ -11,7 +11,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Forge Spin</title>
+  <title>MagnettaForged: Forge Spin</title>
 
   <style>
     :root {
@@ -898,6 +898,21 @@
       font-weight: bold;
     }
 
+
+    /* =========================
+       TEMP HIDDEN SOUND + MULTIPLIER LOCK
+       ========================= */
+
+    #soundButton {
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
+    .multiplierLocked {
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
     /* =========================
        MOBILE LAYOUT ONLY
        Keep this obvious and isolated.
@@ -936,6 +951,11 @@
         min-height: 300px;
         overflow: hidden;
       }
+
+      .lineOverlay {
+        transform: translateY(-10px);
+      }
+
 
       .slotGrid {
         width: 100%;
@@ -1018,8 +1038,8 @@
   <div class="pageShell">
 
     <div class="gamePanel" id="gamePanel">
-      <a class="logoText" href="https://magnettaforged.com" target="_blank" rel="noopener">
-        Forge Spin
+      <a class="logoText" href="https://magnettaforged.square.site" target="_blank" rel="noopener">
+        MagnettaForged: Forge Spin
       </a>
 
       <div class="themePeekNotice" id="themePeekNotice">
@@ -1056,7 +1076,7 @@
             <button class="arrowButton" onclick="changeBaseBet(1)">›</button>
           </div>
 
-          <div class="readout">
+          <div class="readout" id="multiplierRow">
             <span class="readoutLabel">Multi</span>
             <button class="arrowButton" onclick="changeMultiplier(-1)">‹</button>
             <span class="readoutValue" id="multiplierDisplay">1x</span>
@@ -1156,6 +1176,19 @@
       <div id="devPanelContent"></div>
     </div>
 
+  </div>
+
+
+  <div class="winkyOverlay" id="resetOverlay">
+    <div class="winkyPopup">
+      <div class="winkyPopupTitle">Are you sure?</div>
+      <div class="winkyPopupText">This will reset all tokens, unlocks, and stats.</div>
+
+      <div class="winkyButtonRow">
+        <button class="infoButton" onclick="confirmResetGame()">Yes</button>
+        <button class="infoButton" onclick="closeResetConfirm()">No</button>
+      </div>
+    </div>
   </div>
 
   <div class="winkyOverlay" id="winkyOverlay">
@@ -1296,7 +1329,7 @@
 
     const themes = {
       Default: {
-        label: "Default",
+        label: "Default 1",
         accent: "#d6a84f",
         textMain: "#ffffff",
         textMuted: "#d8d0bd",
@@ -1307,11 +1340,11 @@
         lineColors: defaultLineColors,
         unlockType: "base",
         characterGroup: "Default",
-        variantLabel: "Base"
+        variantLabel: "1"
       },
 
       Maya: {
-        label: "Maya",
+        label: "Maya 1",
         accent: "#D13A2F",
         textMain: "#ffffff",
         textMuted: "#ffd0c8",
@@ -1326,11 +1359,11 @@
         ],
         unlockType: "base",
         characterGroup: "Maya",
-        variantLabel: "Base"
+        variantLabel: "1"
       },
 
       Reign: {
-        label: "Reign",
+        label: "Reign 1",
         accent: "#8A4A2A",
         textMain: "#ffffff",
         textMuted: "#d8c2b3",
@@ -1345,11 +1378,11 @@
         ],
         unlockType: "base",
         characterGroup: "Reign",
-        variantLabel: "Base"
+        variantLabel: "1"
       },
 
       Kyra: {
-        label: "Kyra",
+        label: "Kyra 1",
         accent: "#36A3FF",
         textMain: "#ffffff",
         textMuted: "#d7eaff",
@@ -1364,11 +1397,11 @@
         ],
         unlockType: "base",
         characterGroup: "Kyra",
-        variantLabel: "Base"
+        variantLabel: "1"
       },
 
       Nadia: {
-        label: "Nadia",
+        label: "Nadia 1",
         accent: "#9B5DE5",
         textMain: "#ffffff",
         textMuted: "#ead8ff",
@@ -1383,11 +1416,11 @@
         ],
         unlockType: "base",
         characterGroup: "Nadia",
-        variantLabel: "Base"
+        variantLabel: "1"
       },
 
       Winky: {
-        label: "Winky",
+        label: "Winky 1",
         accent: "#39ff88",
         textMain: "#ffffff",
         textMuted: "#d6ffe5",
@@ -1402,7 +1435,7 @@
         ],
         unlockType: "special",
         characterGroup: "Winky",
-        variantLabel: "Base"
+        variantLabel: "1"
       }
     };
 
@@ -1443,7 +1476,11 @@
     }
 
     function addVariantThemes() {
+      const publicThemeNumbers = {};
+
       characterSymbols.forEach(characterName => {
+        publicThemeNumbers[characterName] = 2;
+
         variantGemKeys.forEach(gemKey => {
           const themeKey = `${characterName}${capitalize(gemKey)}`;
 
@@ -1453,9 +1490,10 @@
 
           const fileName = `${characterName.toLowerCase()}${gemKey}.png`;
           const accent = gemVariantAccents[gemKey] || themes[characterName].accent;
+          const publicNumber = publicThemeNumbers[characterName]++;
 
           themes[themeKey] = {
-            label: `${characterName} ${capitalize(gemKey)}`,
+            label: `${characterName} ${publicNumber}`,
             accent,
             textMain: "#ffffff",
             textMuted: gemVariantTextMuted[gemKey] || themes[characterName].textMuted,
@@ -1466,7 +1504,7 @@
             lineColors: gemVariantLineColors[gemKey] || themes[characterName].lineColors,
             unlockType: "variant",
             characterGroup: characterName,
-            variantLabel: capitalize(gemKey),
+            variantLabel: String(publicNumber),
             baseCharacter: characterName,
             gemKey
           };
@@ -1686,6 +1724,9 @@
     let lifetimeBonusSpinsPlayed = Number(localStorage.getItem("lifetimeBonusSpinsPlayed")) || 0;
     let lifetimeBonusSpinWinnings = getStoredBigInt("lifetimeBonusSpinWinnings", 0n);
 
+    let winkyCansFed = Number(localStorage.getItem("winkyCansFed")) || 0;
+    let winkyHungryNights = Number(localStorage.getItem("winkyHungryNights")) || 0;
+
     // =========================
     // DOM REFERENCES
     // =========================
@@ -1694,6 +1735,7 @@
     const spinCount = document.getElementById("spinCount");
     const baseBetDisplay = document.getElementById("baseBetDisplay");
     const multiplierDisplay = document.getElementById("multiplierDisplay");
+    const multiplierRow = document.getElementById("multiplierRow");
     const lineCountDisplay = document.getElementById("lineCountDisplay");
     const themeCharacterDisplay = document.getElementById("themeCharacterDisplay");
     const themeVariantDisplay = document.getElementById("themeVariantDisplay");
@@ -2111,13 +2153,13 @@
     function unlockTheme(themeName) {
       if (!themes[themeName]) return false;
 
-      if (!unlockedThemes[themeName]) {
-        unlockedThemes[themeName] = true;
-        localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
-        return true;
+      if (unlockedThemes[themeName]) {
+        return false;
       }
 
-      return false;
+      unlockedThemes[themeName] = true;
+      localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+      return true;
     }
 
     function applyTheme(themeName) {
@@ -2158,19 +2200,27 @@
     }
 
     function handleCharacterThemeUnlock(characterName) {
-      unlockTheme(characterName);
+      const baseUnlocked = unlockTheme(characterName);
 
       const gemKey = getUnlockGemKey();
 
       let themeToApply = characterName;
+      let variantUnlocked = false;
 
       if (gemKey !== "diamond") {
         const variantTheme = `${characterName}${capitalize(gemKey)}`;
 
         if (themes[variantTheme]) {
-          unlockTheme(variantTheme);
-          themeToApply = variantTheme;
+          variantUnlocked = unlockTheme(variantTheme);
+
+          if (variantUnlocked) {
+            themeToApply = variantTheme;
+          }
         }
+      }
+
+      if (!baseUnlocked && !variantUnlocked) {
+        return false;
       }
 
       applyUnlockedTheme(themeToApply);
@@ -2179,6 +2229,7 @@
       showUnlockPopup(`${themeLabel} Unlocked`);
 
       playSound("unlock");
+      return true;
     }
 
     function showUnlockPopup(message) {
@@ -2357,6 +2408,12 @@
     function changeMultiplier(direction) {
       playSound("click");
 
+      if (getBaseBet() === 0n) {
+        multiplierIndex = 0;
+        updateDisplay();
+        return;
+      }
+
       const availableMultipliers = getUnlockedMultiplierOptions();
 
       multiplierIndex += direction;
@@ -2372,6 +2429,11 @@
     }
 
     function getMultiplier() {
+      if (getBaseBet() === 0n) {
+        multiplierIndex = 0;
+        return 1n;
+      }
+
       const availableMultipliers = getUnlockedMultiplierOptions();
 
       if (multiplierIndex >= availableMultipliers.length) {
@@ -2402,6 +2464,10 @@
     }
 
     function updateDisplay() {
+      if (getBaseBet() === 0n) {
+        multiplierIndex = 0;
+      }
+
       const baseBet = getBaseBet();
       const multiplier = getMultiplier();
       const finalBet = getFinalBet();
@@ -2412,6 +2478,10 @@
       baseBetDisplay.textContent = baseBet === 0n ? "Free" : formatGameNumber(baseBet);
       multiplierDisplay.textContent = formatMultiplier(multiplier);
       lineCountDisplay.textContent = getLineCount();
+
+      if (multiplierRow) {
+        multiplierRow.classList.toggle("multiplierLocked", baseBet === 0n);
+      }
 
       const activeGroup = themes[activeTheme]?.characterGroup || "Default";
       const activeVariant = themes[activeTheme]?.variantLabel || "Base";
@@ -2757,8 +2827,11 @@
         if (win.matchCount < 5) return;
 
         if (characterSymbols.includes(win.symbol)) {
-          handleCharacterThemeUnlock(win.symbol);
-          unlockedSomething = true;
+          const wasUnlocked = handleCharacterThemeUnlock(win.symbol);
+
+          if (wasUnlocked) {
+            unlockedSomething = true;
+          }
         }
 
         if (win.symbol === "Gem" || win.symbol === "Wild") {
@@ -2923,6 +2996,15 @@
     function answerWinky(fedWinky) {
       const overlay = document.getElementById("winkyOverlay");
       const message = document.getElementById("winkyPopupMessage");
+
+      if (fedWinky) {
+        winkyCansFed += 4;
+      } else {
+        winkyHungryNights += 2;
+      }
+
+      saveStats();
+      updateWinInfo();
 
       if (message) {
         message.textContent = fedWinky
@@ -3279,6 +3361,9 @@
       localStorage.setItem("lifetimeBonusSpinsEarned", lifetimeBonusSpinsEarned);
       localStorage.setItem("lifetimeBonusSpinsPlayed", lifetimeBonusSpinsPlayed);
       saveBigInt("lifetimeBonusSpinWinnings", lifetimeBonusSpinWinnings);
+
+      localStorage.setItem("winkyCansFed", winkyCansFed);
+      localStorage.setItem("winkyHungryNights", winkyHungryNights);
     }
 
     function markDevToolsUsed() {
@@ -3406,6 +3491,18 @@
             <div class="statRow">
               <span>Highest Multiplier</span>
               <span>${formatMultiplier(unlockedMultiplierMax)}</span>
+            </div>
+          </div>
+
+          <div class="statGroup">
+            <div class="statGroupTitle">Winky Care</div>
+            <div class="statRow">
+              <span>Winky Cans Fed</span>
+              <span>${winkyCansFed.toLocaleString()}</span>
+            </div>
+            <div class="statRow">
+              <span>Winky Hungry Nights</span>
+              <span>${winkyHungryNights.toLocaleString()}</span>
             </div>
           </div>
 
@@ -3841,6 +3938,26 @@
     function resetGame() {
       playSound("click");
 
+      const resetOverlay = document.getElementById("resetOverlay");
+      if (resetOverlay) {
+        resetOverlay.classList.add("show");
+      }
+    }
+
+    function closeResetConfirm() {
+      const resetOverlay = document.getElementById("resetOverlay");
+      if (resetOverlay) {
+        resetOverlay.classList.remove("show");
+      }
+    }
+
+    function confirmResetGame() {
+      playSound("click");
+      closeResetConfirm();
+      resetGameConfirmed();
+    }
+
+    function resetGameConfirmed() {
       tokens = 0n;
       totalSpins = 0;
 
@@ -3861,6 +3978,9 @@
       lifetimeBonusSpinsEarned = 0;
       lifetimeBonusSpinsPlayed = 0;
       lifetimeBonusSpinWinnings = 0n;
+
+      winkyCansFed = 0;
+      winkyHungryNights = 0;
 
       unlockedMultiplierMax = STARTING_MULTIPLIER_MAX;
 

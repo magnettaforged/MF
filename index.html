@@ -11,7 +11,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>MagnettaForged: Forge Spin</title>
+  <title>MagnettaForged</title>
 
   <style>
     :root {
@@ -38,6 +38,19 @@
 
       --slot-bg: rgba(0,0,0,0);
       --cell-bg: rgba(0,0,0,0.1);
+
+      /* =========================
+         MASTER LAYOUT SETTINGS
+         Change these to resize the entire game layout.
+         ========================= */
+      --app-width: 390px;
+      --panel-padding: 8px;
+      --panel-radius: 16px;
+      --game-min-height: 450px;
+      --slot-frame-min-height: 218px;
+      --slot-gap: clamp(4px, 1.4vw, 8px);
+      --slot-lift: 0px;
+      --slot-font-size: clamp(22px, 7vw, 30px);
     }
 
         * {
@@ -70,7 +83,7 @@
     }
 
     .pageShell {
-      width: min(570px, 96vw);
+      width: min(var(--app-width), 96vw);
       margin-left: auto;
       margin-right: auto;
       box-sizing: border-box;
@@ -85,7 +98,7 @@
       margin-right: auto;
       border: 2px solid var(--accent);
       border-radius: 18px;
-      padding: 12px;
+      padding: var(--panel-padding);
       text-align: center;
       box-sizing: border-box;
       box-shadow: 0 0 25px rgba(0,0,0,0.82);
@@ -960,228 +973,13 @@
       pointer-events: none;
     }
 
-    /* =========================
-       MOBILE LAYOUT ONLY
-       Keep this obvious and isolated.
-       ========================= */
-
-    @media (max-width: 600px) {
-      body {
-        padding-top: 0;
-      }
-
-      .pageShell {
-        width: min(390px, 96vw);
-      }
-
-      .gamePanel,
-      .settingsPanel,
-      .infoPanel,
-      .devPanel {
-        padding: 8px;
-        border-radius: 16px;
-      }
-
-      .gamePanel {
-        min-height: 450px;
-      }
-
-      .logoText {
-        font-size: 28px;
-        margin-bottom: 6px;
-      }
-
-      .slotFrame {
-        width: 100%;
-        max-width: 100%;
-        height: auto;
-        min-height: 300px;
-        overflow: hidden;
-      }
-
-      .lineOverlay {
-        transform: translateY(-10px);
-      }
 
 
-      .slotGrid {
-        width: 100%;
-        max-width: 100%;
-        grid-template-columns: repeat(5, minmax(0, 1fr));
-        grid-template-rows: repeat(5, auto);
-        gap: clamp(4px, 1.4vw, 8px);
-        transform: translateY(-14px);
-      }
-
-      .cell {
-        width: 100%;
-        aspect-ratio: 1 / 1;
-        height: auto;
-        font-size: clamp(22px, 7vw, 30px);
-      }
-
-      .controlTopRow,
-      .controlBottomRow {
-        grid-template-columns: 1fr;
-        gap: 5px;
-      }
-
-      .readout,
-      .tokenReadout {
-        min-height: 30px;
-        padding: 3px 5px;
-      }
-
-      #tokenBalance {
-        font-size: 12px;
-        letter-spacing: 0;
-      }
-
-      .spinButton {
-        height: 38px;
-      }
-
-      .themeSelectorRow {
-        grid-template-columns: 1fr;
-        gap: 6px;
-      }
-
-      .themeControl {
-        grid-template-columns: 72px 24px 1fr 24px;
-      }
-
-      .themeLabel {
-        text-align: right;
-      }
-
-      .winPopup {
-        font-size: 20px;
-        bottom: 16px;
-      }
-
-      .unlockPopup {
-        font-size: 16px;
-        width: 82%;
-        max-width: 320px;
-      }
-
-      .statRow,
-      .breakdownRow,
-      .unlockRow {
-        font-size: 12px;
-        gap: 6px;
-      }
-    }
 
 
     /* =========================
-       MASTER MOBILE LAYOUT
-       This is the only layout; desktop uses the same centered mobile layout.
-       ========================= */
-
-    .pageShell {
-      width: min(390px, 96vw) !important;
-    }
-
-    .gamePanel {
-      min-height: 450px !important;
-    }
-
-    .gamePanel,
-    .settingsPanel,
-    .infoPanel,
-    .devPanel {
-      padding: 8px !important;
-      border-radius: 16px !important;
-    }
-
-    .logoText {
-      font-size: 28px !important;
-      margin-bottom: 6px !important;
-    }
-
-    .slotFrame {
-      width: 100% !important;
-      max-width: 100% !important;
-      height: auto !important;
-      min-height: 300px !important;
-      overflow: hidden !important;
-    }
-
-    .slotGrid {
-      width: 100% !important;
-      max-width: 100% !important;
-      grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
-      grid-template-rows: repeat(5, auto) !important;
-      gap: clamp(4px, 1.4vw, 8px) !important;
-      transform: translateY(-14px) !important;
-    }
-
-    .cell {
-      width: 100% !important;
-      aspect-ratio: 1 / 1 !important;
-      height: auto !important;
-      font-size: clamp(22px, 7vw, 30px) !important;
-    }
-
-    .controlTopRow,
-    .controlBottomRow {
-      grid-template-columns: 1fr !important;
-      gap: 5px !important;
-    }
-
-    .themeSelectorRow {
-      grid-template-columns: 1fr !important;
-      gap: 6px !important;
-    }
-
-    .themeControl {
-      grid-template-columns: 72px 24px 1fr 24px !important;
-    }
-
-    .lineSelectorHidden {
-      display: none !important;
-    }
-
-    .statsGrid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-      align-items: start;
-    }
-
-    .statsGrid .statGroup {
-      margin-top: 0;
-      padding: 8px;
-      border: 1px solid var(--accent-soft);
-      border-radius: 8px;
-      min-width: 0;
-    }
-
-    .statsGrid .statRow {
-      gap: 5px;
-      min-width: 0;
-    }
-
-    .statsGrid .statRow span {
-      min-width: 0;
-      overflow-wrap: anywhere;
-    }
-
-    .statsGrid .statRow span:last-child {
-      text-align: right;
-    }
-
-    .smallStatButton {
-      width: 100%;
-      min-height: 26px;
-      padding: 5px 6px;
-      font-size: 11px;
-    }
-
-
-    /* =========================
-       MOBILE MASTER LAYOUT + STAT CARDS
+       SINGLE MASTER LAYOUT
+       Desktop and mobile use the same centered layout.
        ========================= */
 
     body {
@@ -1189,19 +987,19 @@
     }
 
     .pageShell {
-      width: min(390px, 96vw);
+      width: min(var(--app-width), 96vw);
     }
 
     .gamePanel,
     .settingsPanel,
     .infoPanel,
     .devPanel {
-      padding: 8px;
-      border-radius: 16px;
+      padding: var(--panel-padding);
+      border-radius: var(--panel-radius);
     }
 
     .gamePanel {
-      min-height: 450px;
+      min-height: var(--game-min-height);
     }
 
     .logoText {
@@ -1213,28 +1011,28 @@
       width: 100%;
       max-width: 100%;
       height: auto;
-      min-height: 300px;
+      min-height: var(--slot-frame-min-height);
       overflow: hidden;
     }
 
     .lineOverlay {
-      transform: translateY(-10px);
+      transform: none;
     }
 
     .slotGrid {
       width: 100%;
       max-width: 100%;
       grid-template-columns: repeat(5, minmax(0, 1fr));
-      grid-template-rows: repeat(5, auto);
-      gap: clamp(4px, 1.4vw, 8px);
-      transform: translateY(-14px);
+      grid-template-rows: repeat(3, auto);
+      gap: var(--slot-gap);
+      transform: translateY(var(--slot-lift));
     }
 
     .cell {
       width: 100%;
       aspect-ratio: 1 / 1;
       height: auto;
-      font-size: clamp(22px, 7vw, 30px);
+      font-size: var(--slot-font-size);
     }
 
     .controlTopRow,
@@ -1258,19 +1056,6 @@
       height: 38px;
     }
 
-    .themeSelectorRow {
-      grid-template-columns: 1fr;
-      gap: 6px;
-    }
-
-    .themeControl {
-      grid-template-columns: 72px 24px 1fr 24px;
-    }
-
-    .themeLabel {
-      text-align: right;
-    }
-
     .winPopup {
       font-size: 20px;
       bottom: 16px;
@@ -1282,130 +1067,102 @@
       max-width: 320px;
     }
 
-    .statsGrid .statRow {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 46px;
-      gap: 3px;
-      padding: 6px 4px;
-      text-align: center;
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 8px;
-      background: rgba(0,0,0,0.18);
+    .lineSelectorHidden,
+    .settingsPanel .themeSelectorRow.movedUnderGem,
+    .slotFrameTitle {
+      display: none !important;
     }
 
-    .statsGrid .statRow span {
-      width: 100%;
-      text-align: center !important;
-      overflow-wrap: anywhere;
+    .teaserCell {
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
     }
-
-    .statsGrid .statRow span:first-child {
-      color: var(--text-muted);
-      font-size: 11px;
-      line-height: 1.1;
-    }
-
-    .statsGrid .statRow span:last-child {
-      color: var(--text-accent);
-      font-weight: bold;
-      font-size: 12px;
-      line-height: 1.15;
-    }
-
 
     /* =========================
-       CLEAN STAT CARDS / STORE / CODES
+       STACKED IN-GAME THEME / SOUND SELECTOR
        ========================= */
 
-    .statsGrid .statRow,
-    .storeGrid .statRow,
-    .codesGrid .statRow {
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 3px;
-      text-align: center;
-      padding: 6px 4px;
-    }
-
-    .statsGrid .statRow span,
-    .storeGrid .statRow span,
-    .codesGrid .statRow span {
-      text-align: center !important;
-      overflow-wrap: anywhere;
-    }
-
-    .statsGrid .statRow span:first-child,
-    .storeGrid .statRow span:first-child,
-    .codesGrid .statRow span:first-child {
-      color: var(--text-muted);
-      font-size: 11px;
-      line-height: 1.15;
-    }
-
-    .statsGrid .statRow span:last-child,
-    .storeGrid .statRow span:last-child,
-    .codesGrid .statRow span:last-child {
-      color: var(--text-accent);
-      font-size: 13px;
-      font-weight: bold;
-      line-height: 1.2;
-    }
-
-    .storeGrid,
-    .codesGrid {
+    .selectorStack {
+      width: 100%;
+      max-width: 100%;
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-      align-items: start;
+      grid-template-columns: 1fr;
+      gap: 5px;
+      margin: 7px auto 8px;
+      padding: 6px;
+      border: var(--ui-border);
+      border-radius: 10px;
+      background: var(--ui-bg);
+      box-shadow: var(--ui-shadow);
+      overflow: hidden;
+      box-sizing: border-box;
     }
 
-    .storeItem,
-    .codeItem {
-      padding: 8px;
-      border: 1px solid var(--accent-soft);
-      border-radius: 8px;
-      background: rgba(0,0,0,0.22);
-      text-align: center;
+    .themeSelectorRow.inGameThemeSelector {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      align-items: center !important;
+      justify-content: stretch !important;
+      gap: 5px !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100%;
       min-width: 0;
     }
 
-    .storeItemName,
-    .codeItemName {
-      color: var(--text-muted);
-      font-size: 12px;
-      margin-bottom: 4px;
-      overflow-wrap: anywhere;
-    }
-
-    .storeItemPrice,
-    .codeItemStatus {
-      color: var(--text-accent);
-      font-size: 13px;
-      font-weight: bold;
-      margin-bottom: 6px;
-      overflow-wrap: anywhere;
-    }
-
-    .storeItem.locked,
-    .codeItem.used {
-      opacity: 0.68;
-    }
-
-    .storeButton,
-    .codeApplyButton {
+    .themeSelectorRow.inGameThemeSelector .themeControl {
+      display: grid !important;
+      grid-template-columns: 72px 24px minmax(0, 1fr) 24px !important;
+      align-items: center !important;
+      gap: 5px !important;
       width: 100%;
-      min-height: 28px;
-      padding: 5px 6px;
-      font-size: 11px;
+      min-width: 0 !important;
+      margin: 0 !important;
+      padding: 2px 0 !important;
+      box-sizing: border-box;
     }
 
+    .themeSelectorRow.inGameThemeSelector .themeLabel {
+      min-width: 0 !important;
+      font-size: 11px !important;
+      line-height: 1 !important;
+      text-align: right !important;
+      white-space: nowrap !important;
+      color: var(--text-muted);
+    }
+
+    .themeSelectorRow.inGameThemeSelector .themeValue {
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: none !important;
+      font-size: 13px !important;
+      line-height: 1 !important;
+      text-align: center !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      color: var(--text-accent);
+      font-weight: bold;
+    }
+
+    .themeSelectorRow.inGameThemeSelector .arrowButton {
+      width: 24px !important;
+      height: 22px !important;
+      min-width: 24px !important;
+    }
+
+    .soundSelectorPlaceholder {
+      opacity: 0.42;
+      pointer-events: none;
+    }
+
+    .themeDivider {
+      display: none !important;
+    }
 
     /* =========================
-       CLEANER STATS / COMPACT STORE
+       STATISTICS / STORE / CODES
        ========================= */
 
     .statsGrid {
@@ -1424,22 +1181,29 @@
       background: rgba(0,0,0,0.14);
     }
 
-    .statsGrid .statGroup.fullSpan {
+    .statsGrid .statGroup.fullSpan,
+    .statsGrid .currentGameGroup {
       grid-column: 1 / -1;
     }
 
     .statsGrid .statGroupInner {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: 1fr;
       gap: 6px;
     }
 
-    .statsGrid .statRow {
+    .statsGrid .currentGameGroup .statGroupInner {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .statsGrid .statRow,
+    .storeGrid .statRow,
+    .codesGrid .statRow {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 46px;
+      min-height: 40px;
       gap: 3px;
       padding: 6px 4px;
       text-align: center;
@@ -1448,32 +1212,41 @@
       background: rgba(0,0,0,0.18);
     }
 
-    .statsGrid .statRow span {
+    .statsGrid .statRow span,
+    .storeGrid .statRow span,
+    .codesGrid .statRow span {
       width: 100%;
       text-align: center !important;
       overflow-wrap: anywhere;
     }
 
-    .statsGrid .statRow span:first-child {
+    .statsGrid .statRow span:first-child,
+    .storeGrid .statRow span:first-child,
+    .codesGrid .statRow span:first-child {
       color: var(--text-muted);
       font-size: 11px;
-      line-height: 1.1;
-    }
-
-    .statsGrid .statRow span:last-child {
-      color: var(--text-accent);
-      font-weight: bold;
-      font-size: 12px;
       line-height: 1.15;
     }
 
-    .storeGrid {
+    .statsGrid .statRow span:last-child,
+    .storeGrid .statRow span:last-child,
+    .codesGrid .statRow span:last-child {
+      color: var(--text-accent);
+      font-size: 12px;
+      font-weight: bold;
+      line-height: 1.2;
+    }
+
+    .storeGrid,
+    .codesGrid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 6px;
+      align-items: start;
     }
 
-    .storeItem {
+    .storeItem,
+    .codeItem {
       display: grid;
       grid-template-columns: 1fr auto;
       gap: 8px;
@@ -1486,41 +1259,35 @@
       text-align: left;
     }
 
-    .storeItemName {
+    .storeItemName,
+    .codeItemName {
       color: var(--text-muted);
       font-size: 13px;
       margin-bottom: 0;
       overflow-wrap: anywhere;
     }
 
-    .storeButton {
-      min-width: 74px;
-      min-height: 30px;
-      padding: 5px 8px;
-      font-size: 12px;
+    .storeItemPrice,
+    .codeItemStatus {
+      color: var(--text-accent);
+      font-size: 13px;
+      font-weight: bold;
+      overflow-wrap: anywhere;
+    }
+
+    .storeItem.locked,
+    .codeItem.used {
+      opacity: 0.68;
+    }
+
+    .storeButton,
+    .codeApplyButton,
+    .smallStatButton {
+      width: 100%;
+      min-height: 28px;
+      padding: 5px 6px;
+      font-size: 11px;
       white-space: nowrap;
-    }
-
-
-    /* =========================
-       STATS TWO-COLUMN FIX
-       Keep only two total columns: section cards left/right,
-       with each section's stats stacked vertically.
-       ========================= */
-
-    .statsGrid .statGroupInner {
-      grid-template-columns: 1fr !important;
-      gap: 6px !important;
-    }
-
-    .statsGrid .statRow {
-      min-height: 40px;
-    }
-
-
-    /* Hide duplicate footer spin count; Statistics panel now owns visible stats. */
-    .bottomStats {
-      display: none !important;
     }
 
   </style>
@@ -1537,7 +1304,7 @@
 
     <div class="gamePanel" id="gamePanel">
       <a class="logoText" href="https://magnettaforged.square.site" target="_blank" rel="noopener">
-        MagnettaForged: Forge Spin
+        MagnettaForged
       </a>
 
       <div class="themePeekNotice" id="themePeekNotice">
@@ -1569,16 +1336,16 @@
         <div class="controlBottomRow">
           <div class="readout">
             <span class="readoutLabel">Bet per Line</span>
-            <button class="arrowButton" onclick="changeBaseBet(-1)">‹</button>
+            <button class="arrowButton" id="baseBetDownButton" onclick="changeBaseBet(-1)">‹</button>
             <span class="readoutValue" id="baseBetDisplay">Free</span>
-            <button class="arrowButton" onclick="changeBaseBet(1)">›</button>
+            <button class="arrowButton" id="baseBetUpButton" onclick="changeBaseBet(1)">›</button>
           </div>
 
           <div class="readout" id="multiplierRow">
             <span class="readoutLabel">Multiplier</span>
-            <button class="arrowButton" onclick="changeMultiplier(-1)">‹</button>
+            <button class="arrowButton" id="multiplierDownButton" onclick="changeMultiplier(-1)">‹</button>
             <span class="readoutValue" id="multiplierDisplay">1</span>
-            <button class="arrowButton" onclick="changeMultiplier(1)">›</button>
+            <button class="arrowButton" id="multiplierUpButton" onclick="changeMultiplier(1)">›</button>
           </div>
 
           <button class="spinButton" id="spinButton" onclick="spin()">FREE</button>
@@ -1592,28 +1359,50 @@
             <div class="gemMessage" id="gemMessage"></div>
           </div>
         </div>
+
+        <div class="selectorStack">
+          <div class="themeSelectorRow inGameThemeSelector">
+            <div class="themeControl characterSelectorControl">
+              <span class="themeLabel">Character</span>
+              <button class="arrowButton" onclick="changeThemeCharacter(-1)">‹</button>
+              <span class="themeValue" id="themeCharacterDisplay">Default</span>
+              <button class="arrowButton" onclick="changeThemeCharacter(1)">›</button>
+            </div>
+
+            <span class="themeDivider">|</span>
+
+            <div class="themeControl themeSelectorControl">
+              <span class="themeLabel">Theme</span>
+              <button class="arrowButton" onclick="changeThemeVariant(-1)">‹</button>
+              <span class="themeValue" id="themeVariantDisplay">1</span>
+              <button class="arrowButton" onclick="changeThemeVariant(1)">›</button>
+            </div>
+          </div>
+
+          <div class="themeSelectorRow inGameThemeSelector soundSelectorPlaceholder" title="Music and sound pack selector placeholder">
+            <div class="themeControl musicSelectorControl">
+              <span class="themeLabel">Music</span>
+              <button class="arrowButton" disabled>‹</button>
+              <span class="themeValue">Default</span>
+              <button class="arrowButton" disabled>›</button>
+            </div>
+
+            <span class="themeDivider">|</span>
+
+            <div class="themeControl soundSelectorControl">
+              <span class="themeLabel">Sounds</span>
+              <button class="arrowButton" disabled>‹</button>
+              <span class="themeValue">Forge</span>
+              <button class="arrowButton" disabled>›</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="settingsPanel">
       <div class="specialSettings">
         <div class="specialTitle">Special Settings</div>
-
-        <div class="themeSelectorRow">
-          <div class="themeControl">
-            <span class="themeLabel">Character</span>
-            <button class="arrowButton" onclick="changeThemeCharacter(-1)">‹</button>
-            <span class="themeValue" id="themeCharacterDisplay">Default</span>
-            <button class="arrowButton" onclick="changeThemeCharacter(1)">›</button>
-          </div>
-
-          <div class="themeControl">
-            <span class="themeLabel">Theme</span>
-            <button class="arrowButton" onclick="changeThemeVariant(-1)">‹</button>
-            <span class="themeValue" id="themeVariantDisplay">Base</span>
-            <button class="arrowButton" onclick="changeThemeVariant(1)">›</button>
-          </div>
-        </div>
 
         <div class="infoButtonRow">
           <button class="infoButton" id="statsButton" onclick="setInfoMode('stats')">
@@ -1636,8 +1425,8 @@
         </div>
 
         <div class="infoButtonRow">
-          <button class="infoButton" id="soundButton" onclick="toggleSound()">
-            Sound: On
+          <button class="infoButton" id="oddsButton" onclick="setInfoMode('odds')">
+            Odds
           </button>
 
           <button class="infoButton" onclick="startLinePreview()">
@@ -1690,7 +1479,7 @@
   <div class="winkyOverlay" id="resetOverlay">
     <div class="winkyPopup">
       <div class="winkyPopupTitle">Are you sure?</div>
-      <div class="winkyPopupText">This will reset current tokens, unlocks, and code redemptions. Lifetime stats and Player ID stay saved.</div>
+      <div class="winkyPopupText">This will reset current tokens and code redemptions. Themes, lifetime stats, and Player ID stay saved.</div>
 
       <div class="winkyButtonRow">
         <button class="infoButton" onclick="confirmResetGame()">Yes</button>
@@ -1749,7 +1538,7 @@
     // CORE SETTINGS
     // =========================
 
-    const VISIBLE_ROWS = 5;
+    const VISIBLE_ROWS = 3;
     const COLS = 5;
 
     // Main adjustable economy controls.
@@ -2027,7 +1816,10 @@
             characterGroup: characterName,
             variantLabel: String(publicNumber),
             baseCharacter: characterName,
-            gemKey
+            gemKey,
+            iconOverrides: {},
+            rotationInterval: 10,
+            rotationFrames: []
           };
         });
       });
@@ -2035,19 +1827,175 @@
 
     addVariantThemes();
 
-    const themeCharacterGroups = ["Default", "Maya", "Reign", "Kyra", "Nadia", "Winky"];
+
+    // =========================
+    // =========================
+    // ADD NEW THEMES HERE
+    // =========================
+    // One block = one theme/store entry. Normal future theme format:
+    //
+    // ThemeKey: { group: "Pet Warrior", theme: "1", bg: "petwarrior1.png", store: [true, 100000n] }
+    //
+    // Optional fields:
+    // - soon: true                 -> store shows Coming Soon / ? / locked
+    // - accent: "#39ff88"          -> overrides UI accent while theme is active
+    // - icons: "default"           -> uses normal icons; this can be omitted
+    // - icons: { Animal:"dog.png" } -> replaces only listed icons
+    // - rotateEvery: 10            -> rotation interval in spins
+    // - rotate: [{ bg:"a.png", icons:{ Animal:"dog.png" } }, ...]
+    //
+    // Store format:
+    // store: [active, priceMultiplier]
+    // price = THEME_STORE_BASE_COST * priceMultiplier
+    // =========================
+
+    const ADD_ON_THEMES = {
+      WarriorPets1: {
+        group: "Warrior Pets",
+        theme: "1",
+        bg: "pwpocketbk.png",
+        store: [true, 5000n],
+
+        rotateEvery: 10,
+        rotate: [
+          {
+            bg: "pwpocketbk.png",
+            icons: {
+              Maya: "pwpocketicon.png",
+              Reign: "pwziggyicon.png",
+              Kyra: "pwhagasicon.png",
+              Nadia: "pweddieicon.png"
+            }
+          },
+          {
+            bg: "pweddiebk.png",
+            icons: {
+              Maya: "pwpocketicon.png",
+              Reign: "pwziggyicon.png",
+              Kyra: "pwhagasicon.png",
+              Nadia: "pweddieicon.png"
+            }
+          },
+          {
+            bg: "pwziggybk.png",
+            icons: {
+              Maya: "pwpocketicon.png",
+              Reign: "pwziggyicon.png",
+              Kyra: "pwhagasicon.png",
+              Nadia: "pweddieicon.png"
+            }
+          },
+          {
+            bg: "pwhagasbk.png",
+            icons: {
+              Maya: "pwpocketicon.png",
+              Reign: "pwziggyicon.png",
+              Kyra: "pwhagasicon.png",
+              Nadia: "pweddieicon.png"
+            }
+          }
+        ]
+      },
+    
+      WarriorPets2: { group: "Warrior Pets", theme: "2", bg: "warriorpets2.png", store: [false, 100n], soon: true },
+      WarriorPets3: { group: "Warrior Pets", theme: "3", bg: "warriorpets3.png", store: [false, 100n], soon: true },
+      WarriorPets4: { group: "Warrior Pets", theme: "4", bg: "warriorpets4.png", store: [false, 100n], soon: true },
+      WarriorPets5: { group: "Warrior Pets", theme: "5", bg: "warriorpets5.png", store: [false, 100n], soon: true },
+
+      Cryptid1: { group: "Cryptids", theme: "1", bg: "cryptid1.png", accent: "#39ff88", store: [false, 250n], soon: true },
+      Cryptid2: { group: "Cryptids", theme: "2", bg: "cryptid2.png", accent: "#39ff88", store: [false, 250n], soon: true },
+      Cryptid3: { group: "Cryptids", theme: "3", bg: "cryptid3.png", accent: "#39ff88", store: [false, 250n], soon: true },
+      Cryptid4: { group: "Cryptids", theme: "4", bg: "cryptid4.png", accent: "#39ff88", store: [false, 250n], soon: true },
+      Cryptid5: { group: "Cryptids", theme: "5", bg: "cryptid5.png", accent: "#39ff88", store: [false, 250n], soon: true },
+
+      YsAzzz: { group: "Secret", theme: "1", bg: "ysazzz.png", accent: "#ff4fd8", store: [false, 1000n], soon: true }
+    };
+
+    function getAddOnThemeLabel(def, themeKey) {
+      const group = def.group || "Extra";
+      const variant = def.theme || "1";
+      return def.label || `${group} ${variant}`;
+    }
+
+    function getAddOnThemeStoreConfig(def, themeKey) {
+      const store = Array.isArray(def.store) ? def.store : [false, 1n];
+
+      return {
+        active: Boolean(store[0]),
+        comingSoon: Boolean(def.soon),
+        multiplier: BigInt(store[1] || 1n),
+        label: getAddOnThemeLabel(def, themeKey)
+      };
+    }
+
+    function registerAddOnThemes() {
+      Object.entries(ADD_ON_THEMES).forEach(([themeKey, def]) => {
+        const storeConfig = getAddOnThemeStoreConfig(def, themeKey);
+
+        // Coming Soon items stay in the store but are not selectable themes yet.
+        if (storeConfig.comingSoon) return;
+
+        const accent = def.accent || "#d6a84f";
+        const icons = def.icons && def.icons !== "default" ? def.icons : {};
+        const rotationFrames = Array.isArray(def.rotate) ? def.rotate.map(frame => ({
+          image: frame.bg || frame.background || frame.image,
+          icons: frame.icons || frame.iconOverrides || {}
+        })) : [];
+
+        themes[themeKey] = {
+          label: getAddOnThemeLabel(def, themeKey),
+          accent,
+          textMain: "#ffffff",
+          textMuted: def.textMuted || "#d8d0bd",
+          textAccent: def.textAccent || accent,
+          buttonText: def.buttonText || accent,
+          pageImage: 'url("background.png")',
+          gameImage: asCssUrl(def.bg || def.background || "comingsoon.png"),
+          lineColors: def.lineColors || defaultLineColors,
+          unlockType: def.unlockType || "storeOnly",
+          characterGroup: def.group || "Extra",
+          variantLabel: String(def.theme || "1"),
+          iconOverrides: icons,
+          rotationInterval: Number(def.rotateEvery || def.rotationInterval || 10),
+          rotationFrames,
+          storeOnly: true
+        };
+      });
+    }
+
+    registerAddOnThemes();
+
+    let themeCharacterGroups = ["Default", "Maya", "Reign", "Kyra", "Nadia", "Winky"];
     let themeCharacterIndex = 0;
     let themeVariantIndex = 0;
 
     function buildThemeGroupMap() {
-      return {
-        Default: ["Default"],
-        Maya: ["Maya", "MayaEmerald", "MayaSapphire", "MayaAmethyst", "MayaTopaz", "MayaSkull"],
-        Reign: ["Reign", "ReignRuby", "ReignEmerald", "ReignSapphire", "ReignAmethyst", "ReignSkull"],
-        Kyra: ["Kyra", "KyraRuby", "KyraEmerald", "KyraAmethyst", "KyraTopaz", "KyraSkull"],
-        Nadia: ["Nadia", "NadiaRuby", "NadiaEmerald", "NadiaSapphire", "NadiaTopaz", "NadiaSkull"],
-        Winky: ["Winky"]
-      };
+      const groupMap = {};
+
+      Object.keys(themes).forEach(themeKey => {
+        const theme = themes[themeKey];
+        const group = theme.characterGroup || themeKey;
+
+        if (!groupMap[group]) {
+          groupMap[group] = [];
+        }
+
+        groupMap[group].push(themeKey);
+      });
+
+      Object.keys(groupMap).forEach(group => {
+        if (!themeCharacterGroups.includes(group)) {
+          themeCharacterGroups.push(group);
+        }
+      });
+
+      themeCharacterGroups.forEach(group => {
+        if (!groupMap[group]) {
+          groupMap[group] = [];
+        }
+      });
+
+      return groupMap;
     }
 
     let themeGroupMap = buildThemeGroupMap();
@@ -2061,51 +2009,45 @@
 
     const THEME_STORE_BASE_COST = 1000000000000n; // 1T
 
-    const themeStoreConfig = {
+    let themeStoreConfig = {
       Maya: { active: true, multiplier: 1n },
       Reign: { active: true, multiplier: 1n },
       Kyra: { active: true, multiplier: 1n },
       Nadia: { active: true, multiplier: 1n },
-      Winky: { active: true, multiplier: 10n },
+      Winky: { active: false, multiplier: 10n },
 
       MayaEmerald: { active: true, multiplier: 200n },
-      MayaSapphire: { active: true, multiplier: 3000n },
-      MayaAmethyst: { active: false, comingSoon: true, multiplier: 100n },
-      MayaTopaz: { active: true, multiplier: 10n },
-      MayaSkull: { active: true, multiplier: 10000n },
+      MayaSapphire: { active: true, multiplier: 5n },
+      MayaAmethyst: { active: false, comingSoon: true, multiplier: 1n },
+      MayaTopaz: { active: true, multiplier: 1n },
+      MayaSkull: { active: true, multiplier: 300n },
 
-      ReignRuby: { active: true, multiplier: 20n },
-      ReignEmerald: { active: false, comingSoon: true, multiplier: 100n },
-      ReignSapphire: { active: false, comingSoon: true, multiplier: 100n },
-      ReignAmethyst: { active: false, comingSoon: true, multiplier: 100n },
-      ReignSkull: { active: false, comingSoon: true, multiplier: 10000n },
+      ReignRuby: { active: true, multiplier: 10n },
+      ReignEmerald: { active: false, comingSoon: true, multiplier: 1n },
+      ReignSapphire: { active: false, comingSoon: true, multiplier: 1n },
+      ReignAmethyst: { active: false, comingSoon: true, multiplier: 1n },
+      ReignSkull: { active: false, comingSoon: true, multiplier: 1n },
 
-      KyraRuby: { active: true, multiplier: 200n },
-      KyraEmerald: { active: true, multiplier: 3000n },
-      KyraAmethyst: { active: false, comingSoon: true, multiplier: 100n },
+      KyraRuby: { active: true, multiplier: 20n },
+      KyraEmerald: { active: true, multiplier: 5n },
+      KyraAmethyst: { active: false, comingSoon: true, multiplier: 1n },
       KyraTopaz: { active: true, multiplier: 10n },
-      KyraSkull: { active: true, multiplier: 10000n },
+      KyraSkull: { active: true, multiplier: 300n },
 
       NadiaRuby: { active: true, multiplier: 10n },
-      NadiaEmerald: { active: true, multiplier: 20n },
-      NadiaSapphire: { active: false, comingSoon: true, multiplier: 100n },
-      NadiaTopaz: { active: false, comingSoon: true, multiplier: 100n },
-      NadiaSkull: { active: true, multiplier: 10000n },
-
-      WarriorPets1: { active: false, comingSoon: true, multiplier: 100n, label: "Warrior Pets 1" },
-      WarriorPets2: { active: false, comingSoon: true, multiplier: 100n, label: "Warrior Pets 2" },
-      WarriorPets3: { active: false, comingSoon: true, multiplier: 100n, label: "Warrior Pets 3" },
-      WarriorPets4: { active: false, comingSoon: true, multiplier: 100n, label: "Warrior Pets 4" },
-      WarriorPets5: { active: false, comingSoon: true, multiplier: 100n, label: "Warrior Pets 5" },
-
-      Cryptid1: { active: false, comingSoon: true, multiplier: 250n, label: "Cryptid 1" },
-      Cryptid2: { active: false, comingSoon: true, multiplier: 250n, label: "Cryptid 2" },
-      Cryptid3: { active: false, comingSoon: true, multiplier: 250n, label: "Cryptid 3" },
-      Cryptid4: { active: false, comingSoon: true, multiplier: 250n, label: "Cryptid 4" },
-      Cryptid5: { active: false, comingSoon: true, multiplier: 250n, label: "Cryptid 5" },
-
-      YsAzzz: { active: false, comingSoon: true, multiplier: 1000n, label: "YsAzzz" }
+      NadiaEmerald: { active: true, multiplier: 50n },
+      NadiaSapphire: { active: false, comingSoon: true, multiplier: 1n },
+      NadiaTopaz: { active: false, comingSoon: true, multiplier: 1n },
+      NadiaSkull: { active: true, multiplier: 300n }
     };
+
+    function applyAddOnThemeStoreConfig() {
+      Object.entries(ADD_ON_THEMES).forEach(([themeKey, def]) => {
+        themeStoreConfig[themeKey] = getAddOnThemeStoreConfig(def, themeKey);
+      });
+    }
+
+    applyAddOnThemeStoreConfig();
 
     // =========================
     // SAVED THEME / DEV STATE
@@ -2158,9 +2100,28 @@
     // CONTROL STATE
     // =========================
 
-    let baseBetIndex = 0;
-    let multiplierIndex = 0;
+    function getStoredIndex(key, fallback, maxExclusive) {
+      const value = Number(localStorage.getItem(key));
+
+      if (!Number.isInteger(value) || value < 0 || value >= maxExclusive) {
+        return fallback;
+      }
+
+      return value;
+    }
+
+    function saveBetSettings() {
+      localStorage.setItem("baseBetIndex", String(baseBetIndex));
+      localStorage.setItem("multiplierIndex", String(multiplierIndex));
+    }
+
+    let baseBetIndex = getStoredIndex("baseBetIndex", 0, baseBetOptions.length);
+    let multiplierIndex = getStoredIndex("multiplierIndex", 0, allMultiplierOptions.length);
     let lineCountIndex = 2; // locked to 15 lines
+
+    let controlsLocked = false;
+    let autoSpinEnabled = false;
+    let autoSpinTimer = null;
 
     let gemActive = false;
     let currentGem = "clear";
@@ -2186,6 +2147,13 @@
     let devUnlockInfoVisible = false;
 
     const BONUS_SPIN_DELAY = 1500;
+
+    // Reel timing. These values are tuned for short anvil-style stop sounds.
+    const FIRST_REEL_STOP_DELAY = 900;
+    const REEL_STOP_SPACING = 600;
+
+    // Dev/demo auto-spin timing. Spins normally using current bet settings.
+    const AUTO_SPIN_DELAY = 1000;
 
     // =========================
     // LEADERBOARD SETTINGS
@@ -2230,37 +2198,93 @@
     }
 
     // =========================
+    // THEME ASSET OVERRIDES / ROTATION
+    // =========================
+
+    function asCssUrl(fileNameOrCss) {
+      if (!fileNameOrCss) return "";
+      if (String(fileNameOrCss).startsWith("url(")) return fileNameOrCss;
+      return `url("${fileNameOrCss}")`;
+    }
+
+    function getThemeRotationFrame(themeName = activeTheme) {
+      const theme = themes[themeName];
+
+      if (!theme || !Array.isArray(theme.rotationFrames) || theme.rotationFrames.length === 0) {
+        return null;
+      }
+
+      const interval = Math.max(1, Number(theme.rotationInterval || 10));
+
+      let spinCountForRotation = 0;
+
+      if (typeof window !== "undefined") {
+        spinCountForRotation = Number(localStorage.getItem("forgeTotalSpins")) || 0;
+      }
+
+      if (typeof totalSpins !== "undefined") {
+        spinCountForRotation = totalSpins;
+      }
+
+      const frameIndex = Math.floor(spinCountForRotation / interval) % theme.rotationFrames.length;
+
+      return theme.rotationFrames[frameIndex] || null;
+    }
+
+    function getThemeIconOverride(symbolName, fallback) {
+      const theme = themes[activeTheme] || {};
+      const frame = getThemeRotationFrame(activeTheme);
+      const baseIcons = theme.iconOverrides || {};
+      const frameIcons = (frame && (frame.icons || frame.iconOverrides)) || {};
+      const mergedIcons = { ...baseIcons, ...frameIcons };
+
+      return mergedIcons[symbolName] || mergedIcons[symbolName.toLowerCase()] || fallback;
+    }
+
+    function updateThemeRotationIfNeeded() {
+      const theme = themes[activeTheme];
+      if (!theme || !Array.isArray(theme.rotationFrames) || theme.rotationFrames.length === 0) return;
+
+      applyTheme(activeTheme);
+      symbolPool = buildSymbolPool();
+    }
+
+    // =========================
     // SYMBOL IMAGES
     // =========================
 
     function getThemeSymbolImage() {
-      if (activeTheme.includes("Kyra")) return "scythe.png";
-      if (activeTheme.includes("Nadia")) return "ankh.png";
-      if (activeTheme.includes("Winky")) return "chaosaxe.png";
+      let fallback = "axe.png";
 
-      return "axe.png";
+      if (activeTheme.includes("Kyra")) fallback = "scythe.png";
+      if (activeTheme.includes("Nadia")) fallback = "ankh.png";
+      if (activeTheme.includes("Winky")) fallback = "chaosaxe.png";
+
+      return getThemeIconOverride("Axe", fallback);
     }
 
     function getAnimalImage() {
-      if (activeTheme.includes("Maya")) return "fox.png";
-      if (activeTheme.includes("Reign")) return "bear.png";
-      if (activeTheme.includes("Kyra")) return "wing.png";
-      if (activeTheme.includes("Nadia")) return "purplemagic.png";
-      if (activeTheme.includes("Winky")) return "chaosanimal.png";
+      let fallback = "animal.png";
 
-      return "animal.png";
+      if (activeTheme.includes("Maya")) fallback = "fox.png";
+      if (activeTheme.includes("Reign")) fallback = "bear.png";
+      if (activeTheme.includes("Kyra")) fallback = "wing.png";
+      if (activeTheme.includes("Nadia")) fallback = "purplemagic.png";
+      if (activeTheme.includes("Winky")) fallback = "chaosanimal.png";
+
+      return getThemeIconOverride("Animal", fallback);
     }
 
     function buildSymbolPool() {
       const symbolConfig = [
         ["Axe", 3, () => getThemeSymbolImage()],
         ["Animal", 3, () => getAnimalImage()],
-        ["Maya", 3, () => "maya.png"],
-        ["Reign", 3, () => "reign.png"],
-        ["Kyra", 3, () => "kyra.png"],
-        ["Nadia", 3, () => "nadia.png"],
-        ["Gem", 2, () => "gem.png"],
-        ["Wild", 1, () => "wild.png"]
+        ["Maya", 3, () => getThemeIconOverride("Maya", "maya.png")],
+        ["Reign", 3, () => getThemeIconOverride("Reign", "reign.png")],
+        ["Kyra", 3, () => getThemeIconOverride("Kyra", "kyra.png")],
+        ["Nadia", 3, () => getThemeIconOverride("Nadia", "nadia.png")],
+        ["Gem", 2, () => getThemeIconOverride("Gem", "gem.png")],
+        ["Wild", 1, () => getThemeIconOverride("Wild", "wild.png")]
       ];
 
       const pool = [];
@@ -2278,7 +2302,7 @@
       return pool;
     }
 
-    let symbolPool = buildSymbolPool();
+    let symbolPool = [];
 
     // =========================
     // PAYLINES
@@ -2311,6 +2335,8 @@
     let tokens = getStoredBigInt("forgeTokens", 0n);
 
     let totalSpins = Number(localStorage.getItem("forgeTotalSpins")) || 0;
+
+    symbolPool = buildSymbolPool();
 
     let lifetimeTokensEarned = getStoredBigInt("lifetimeTokensEarned", 0n);
     let lifetimeTokensWagered = getStoredBigInt("lifetimeTokensWagered", 0n);
@@ -2347,6 +2373,10 @@
     const baseBetDisplay = document.getElementById("baseBetDisplay");
     const multiplierDisplay = document.getElementById("multiplierDisplay");
     const multiplierRow = document.getElementById("multiplierRow");
+    const baseBetDownButton = document.getElementById("baseBetDownButton");
+    const baseBetUpButton = document.getElementById("baseBetUpButton");
+    const multiplierDownButton = document.getElementById("multiplierDownButton");
+    const multiplierUpButton = document.getElementById("multiplierUpButton");
     const lineCountDisplay = document.getElementById("lineCountDisplay");
     const themeCharacterDisplay = document.getElementById("themeCharacterDisplay");
     const themeVariantDisplay = document.getElementById("themeVariantDisplay");
@@ -2386,6 +2416,14 @@
     // AUDIO
     // =========================
 
+    function stopSound(soundName) {
+      const sound = sounds[soundName];
+      if (!sound) return;
+
+      sound.pause();
+      sound.currentTime = 0;
+    }
+
     function playSound(soundName) {
       if (!soundEnabled) return;
 
@@ -2394,6 +2432,15 @@
 
       sound.currentTime = 0;
       sound.play().catch(() => {});
+    }
+
+    function playSingleSound(soundName) {
+      stopSound(soundName);
+      playSound(soundName);
+    }
+
+    function stopResultSounds() {
+      ["smallWin", "bigWin", "bonus", "unlock", "winky"].forEach(stopSound);
     }
 
     function toggleSound() {
@@ -2562,43 +2609,38 @@
 
     // =========================
     // LINE PREVIEW / WINNING LINE OVERLAY
-    // Desktop-fixed for now. Mobile polish later.
+    // Uses live cell positions so the 3-row reel layout stays aligned.
     // =========================
 
     function getGridMetrics() {
-      const mobile = window.innerWidth <= 600;
-      const cellSize = mobile ? 64 : 80;
-      const gap = mobile ? 6 : 8;
-      const pitch = cellSize + gap;
-      const gridTop = mobile ? -10 : -10;
-      const gridLeft = mobile ? 6 : 8;
+      const frame = document.querySelector(".slotFrame");
+      const rect = frame ? frame.getBoundingClientRect() : { width: 360, height: 220 };
 
       return {
-        viewW: mobile ? 360 : 456,
-        viewH: mobile ? 310 : 390,
-        cellSize: cellSize,
-        gap: gap,
-        pitch: pitch,
-        gridTop: gridTop,
-        gridLeft: gridLeft
+        viewW: Math.max(1, rect.width),
+        viewH: Math.max(1, rect.height)
       };
     }
 
     function getLinePoints(line) {
-      const m = getGridMetrics();
+      const frame = document.querySelector(".slotFrame");
+      const frameRect = frame ? frame.getBoundingClientRect() : { left: 0, top: 0 };
 
-      const rowMap = {
-        1: m.gridTop + m.pitch * 1 + m.cellSize / 2,
-        2: m.gridTop + m.pitch * 2 + m.cellSize / 2,
-        3: m.gridTop + m.pitch * 3 + m.cellSize / 2
-      };
+      return line.rows.map((paylineRow, col) => {
+        const rowIndex = paylineRow - 1;
+        const cell = getCell(rowIndex, col);
 
-      const colX = col => m.gridLeft + m.pitch * col + m.cellSize / 2;
+        if (!cell) {
+          return { x: 0, y: 0 };
+        }
 
-      return line.rows.map((row, col) => ({
-        x: colX(col),
-        y: rowMap[row]
-      }));
+        const cellRect = cell.getBoundingClientRect();
+
+        return {
+          x: cellRect.left - frameRect.left + cellRect.width / 2,
+          y: cellRect.top - frameRect.top + cellRect.height / 2
+        };
+      });
     }
 
     function drawSingleLinePreview() {
@@ -2822,10 +2864,15 @@
 
       lineColors = theme.lineColors || defaultLineColors;
 
+      const rotationFrame = getThemeRotationFrame(themeName);
+      const rotationGameImage = rotationFrame && (rotationFrame.gameImage || rotationFrame.background || rotationFrame.image);
+      const gameImage = rotationGameImage ? asCssUrl(rotationGameImage) : (theme.gameImage || "none");
+      const pageImage = rotationFrame && rotationFrame.pageImage ? asCssUrl(rotationFrame.pageImage) : (theme.pageImage || 'url("background.png")');
+
       document.documentElement.style.setProperty("--accent", theme.accent);
       document.documentElement.style.setProperty("--accent-soft", theme.accent + "40");
-      document.documentElement.style.setProperty("--page-bg", theme.pageImage || 'url("background.png")');
-      document.documentElement.style.setProperty("--game-bg", theme.gameImage || "none");
+      document.documentElement.style.setProperty("--page-bg", pageImage);
+      document.documentElement.style.setProperty("--game-bg", gameImage);
 
       document.documentElement.style.setProperty("--text-main", theme.textMain || "#ffffff");
       document.documentElement.style.setProperty("--text-muted", theme.textMuted || "#c9c9c9");
@@ -3033,9 +3080,8 @@
       for (let row = 0; row < VISIBLE_ROWS; row++) {
         for (let col = 0; col < COLS; col++) {
           const cell = document.createElement("div");
-          const isTeaserRow = row === 0 || row === 4;
 
-          cell.className = isTeaserRow ? "cell teaserCell" : "cell activeCell";
+          cell.className = "cell activeCell";
           cell.id = `cell-${row}-${col}`;
 
           showSymbol(cell, randomSymbol());
@@ -3055,11 +3101,22 @@
     function changeBaseBet(direction) {
       playSound("click");
 
-      baseBetIndex += direction;
+      const nextIndex = baseBetIndex + direction;
 
-      if (baseBetIndex < 0) baseBetIndex = baseBetOptions.length - 1;
-      if (baseBetIndex >= baseBetOptions.length) baseBetIndex = 0;
+      if (nextIndex < 0 || nextIndex >= baseBetOptions.length) {
+        updateControlBoundaryStates();
+        return;
+      }
 
+      baseBetIndex = nextIndex;
+
+      if (getBaseBet() === 0n) {
+        multiplierIndex = 0;
+      }
+
+      saveBetSettings();
+
+      saveBetSettings();
       updateDisplay();
     }
 
@@ -3068,17 +3125,22 @@
 
       if (getBaseBet() === 0n) {
         multiplierIndex = 0;
+        saveBetSettings();
         updateDisplay();
         return;
       }
 
       const availableMultipliers = getUnlockedMultiplierOptions();
+      const nextIndex = multiplierIndex + direction;
 
-      multiplierIndex += direction;
+      if (nextIndex < 0 || nextIndex >= availableMultipliers.length) {
+        updateControlBoundaryStates();
+        return;
+      }
 
-      if (multiplierIndex < 0) multiplierIndex = availableMultipliers.length - 1;
-      if (multiplierIndex >= availableMultipliers.length) multiplierIndex = 0;
+      multiplierIndex = nextIndex;
 
+      saveBetSettings();
       updateDisplay();
     }
 
@@ -3162,6 +3224,7 @@
       updateDevToolsVisibility();
       updateUnlockPanel();
       updateSoundButton();
+      updateControlBoundaryStates();
     }
 
     // =========================
@@ -3182,6 +3245,7 @@
       const statsButton = document.getElementById("statsButton");
       const breakdownButton = document.getElementById("breakdownButton");
       const notationButton = document.getElementById("notationButton");
+      const oddsButton = document.getElementById("oddsButton");
       const codesButton = document.getElementById("codesButton");
       const storeButton = document.getElementById("storeButton");
 
@@ -3195,6 +3259,10 @@
 
       if (notationButton) {
         notationButton.classList.toggle("active", activePanel === "notation");
+      }
+
+      if (oddsButton) {
+        oddsButton.classList.toggle("active", activePanel === "odds");
       }
 
       if (codesButton) {
@@ -3228,7 +3296,7 @@
     // ODDS DISPLAY
     // =========================
 
-    function getSymbolProbabilities() {
+    function getSymbolDistribution() {
       const counts = {};
       const total = symbolPool.length;
 
@@ -3236,35 +3304,79 @@
         counts[symbol.name] = (counts[symbol.name] || 0) + 1;
       });
 
-      return Object.values(counts).map(count => count / total);
+      return Object.keys(counts).map(name => ({
+        name,
+        probability: counts[name] / total
+      }));
+    }
+
+    function symbolsMatchByName(baseName, testName) {
+      return baseName === "Wild" || testName === "Wild" || baseName === testName;
+    }
+
+    function getDirectedMatchCountFromNames(names) {
+      const firstName = names[0];
+      let baseName = firstName === "Wild" ? null : firstName;
+      let matchCount = 1;
+
+      for (let i = 1; i < names.length; i++) {
+        const symbolName = names[i];
+
+        if (!baseName && symbolName !== "Wild") {
+          baseName = symbolName;
+        }
+
+        const compareName = baseName || firstName;
+
+        if (symbolsMatchByName(compareName, symbolName)) {
+          matchCount++;
+        } else {
+          break;
+        }
+      }
+
+      return matchCount >= 2 ? matchCount : 0;
+    }
+
+    function calculateDirectedLineOdds() {
+      const distribution = getSymbolDistribution();
+      const odds = { 2: 0, 3: 0, 4: 0, 5: 0 };
+
+      function walk(position, names, probability) {
+        if (position === COLS) {
+          const matchCount = getDirectedMatchCountFromNames(names);
+
+          if (matchCount >= 2) {
+            odds[Math.min(matchCount, 5)] += probability;
+          }
+
+          return;
+        }
+
+        distribution.forEach(symbol => {
+          names[position] = symbol.name;
+          walk(position + 1, names, probability * symbol.probability);
+        });
+      }
+
+      walk(0, new Array(COLS), 1);
+      return odds;
     }
 
     function calculateOdds() {
-      const probabilities = getSymbolProbabilities();
       const activeLines = getActivePaylines().length;
+      const directed = calculateDirectedLineOdds();
+      const anyDirectedWin = directed[2] + directed[3] + directed[4] + directed[5];
 
-      let twoInRow = 0;
-      let threeInRow = 0;
-      let fourInRow = 0;
-      let fiveInRow = 0;
-
-      probabilities.forEach(p => {
-        twoInRow += Math.pow(p, 2) * (1 - p);
-        threeInRow += Math.pow(p, 3) * (1 - p);
-        fourInRow += Math.pow(p, 4) * (1 - p);
-        fiveInRow += Math.pow(p, 5);
-      });
-
-      const anyLineWin = twoInRow + threeInRow + fourInRow + fiveInRow;
-
-      // Approximate only. True odds are higher because of Wilds and right-to-left wins.
-      const approxAnySpinWin = 1 - Math.pow(1 - anyLineWin, activeLines * 2);
+      // Exact per directed line. Full-spin chance is an estimate because paylines overlap on the same grid cells.
+      const approxAnySpinWin = 1 - Math.pow(1 - anyDirectedWin, activeLines * 2);
 
       return {
-        twoInRow,
-        threeInRow,
-        fourInRow,
-        fiveInRow,
+        twoInRow: directed[2],
+        threeInRow: directed[3],
+        fourInRow: directed[4],
+        fiveInRow: directed[5],
+        anyDirectedWin,
         approxAnySpinWin
       };
     }
@@ -3410,7 +3522,7 @@
         : [4, 3, 2, 1, 0];
 
       const firstCol = columns[0];
-      const firstRow = line.rows[firstCol];
+      const firstRow = line.rows[firstCol] - 1;
       const firstSymbol = grid[firstRow][firstCol];
 
       let checkedSymbols = [firstSymbol];
@@ -3420,7 +3532,7 @@
 
       for (let i = 1; i < columns.length; i++) {
         const col = columns[i];
-        const row = line.rows[col];
+        const row = line.rows[col] - 1;
         const symbol = grid[row][col];
 
         if (!baseSymbol && !isWild(symbol)) {
@@ -3694,6 +3806,7 @@
     // =========================
 
     function setControlsDisabled(disabled) {
+      controlsLocked = disabled;
       spinButton.disabled = disabled;
 
       document.querySelectorAll(".arrowButton").forEach(button => {
@@ -3703,6 +3816,23 @@
       document.querySelectorAll(".infoButton").forEach(button => {
         button.disabled = disabled;
       });
+
+      if (!disabled) {
+        updateControlBoundaryStates();
+      }
+    }
+
+    function updateControlBoundaryStates() {
+      if (controlsLocked) return;
+
+      if (baseBetDownButton) baseBetDownButton.disabled = baseBetIndex <= 0;
+      if (baseBetUpButton) baseBetUpButton.disabled = baseBetIndex >= baseBetOptions.length - 1;
+
+      const multiplierLocked = getBaseBet() === 0n;
+      const availableMultipliers = getUnlockedMultiplierOptions();
+
+      if (multiplierDownButton) multiplierDownButton.disabled = multiplierLocked || multiplierIndex <= 0;
+      if (multiplierUpButton) multiplierUpButton.disabled = multiplierLocked || multiplierIndex >= availableMultipliers.length - 1;
     }
 
     function calculateSpinPayout(wins, finalBet, lineBet) {
@@ -3736,6 +3866,7 @@
     }
 
     function animateSpin(finalBet, lineBet, spinType = "normal", tokensBeforeSpin = null) {
+      stopResultSounds();
       playSound("spin");
       hideLineOverlay();
       clearWinPopup();
@@ -3761,7 +3892,7 @@
 
         setTimeout(() => {
           clearInterval(intervals[col]);
-          playSound("stop");
+          playSingleSound("stop");
 
           for (let row = 0; row < VISIBLE_ROWS; row++) {
             const cell = getCell(row, col);
@@ -3772,7 +3903,7 @@
           if (col === COLS - 1) {
             finishSpin(finalGrid, finalBet, lineBet, spinType, tokensBeforeSpin);
           }
-        }, 900 + col * 350);
+        }, FIRST_REEL_STOP_DELAY + col * REEL_STOP_SPACING);
       }
     }
 
@@ -3792,6 +3923,7 @@
 
       tokens += payout;
       totalSpins += 1;
+      updateThemeRotationIfNeeded();
       lifetimeTokensEarned += payout;
 
 
@@ -3864,17 +3996,69 @@
 
         setControlsDisabled(false);
         maybeTriggerWinkyIntervention(finalBet, spinType);
+        scheduleAutoSpin();
       }
     }
 
     function runBonusSpin() {
       if (bonusSpinQueue <= 0) {
         setControlsDisabled(false);
+        scheduleAutoSpin();
         return;
       }
 
       bonusSpinQueue -= 1;
       animateSpin(bonusSpinFinalBet, bonusSpinLineBet, "bonus");
+    }
+
+
+    // =========================
+    // AUTO SPIN DEV/DEMO TOOL
+    // Plays normally using current bet settings and updates normal stats.
+    // =========================
+
+    function toggleAutoSpin() {
+      markDevToolsUsed();
+      playSound("click");
+
+      autoSpinEnabled = !autoSpinEnabled;
+
+      if (!autoSpinEnabled && autoSpinTimer) {
+        clearTimeout(autoSpinTimer);
+        autoSpinTimer = null;
+      }
+
+      updateDevToolsVisibility();
+      scheduleAutoSpin();
+    }
+
+    function scheduleAutoSpin() {
+      if (!autoSpinEnabled) return;
+
+      if (autoSpinTimer) {
+        clearTimeout(autoSpinTimer);
+        autoSpinTimer = null;
+      }
+
+      autoSpinTimer = setTimeout(() => {
+        autoSpinTimer = null;
+
+        if (!autoSpinEnabled) return;
+
+        if (spinButton.disabled || controlsLocked || bonusSpinQueue > 0) {
+          scheduleAutoSpin();
+          return;
+        }
+
+        if (getFinalBet() > tokens) {
+          autoSpinEnabled = false;
+          codeMessage.textContent = "Auto Spin stopped: not enough Forge Tokens.";
+          updateDevToolsVisibility();
+          return;
+        }
+
+        spin();
+      }, AUTO_SPIN_DELAY);
     }
 
     // =========================
@@ -3910,9 +4094,9 @@
         checkThemeUnlocks(wins);
 
         tokens += spinPayout;
-
         totalPayout += spinPayout;
         totalSpins += 1;
+        updateThemeRotationIfNeeded();
         completedSpins += 1;
 
         lifetimeTokensEarned += spinPayout;
@@ -3943,6 +4127,7 @@
 
             totalPayout += bonusPayout;
             totalSpins += 1;
+            updateThemeRotationIfNeeded();
 
             lifetimeTokensEarned += bonusPayout;
             lifetimeBonusSpinsPlayed += 1;
@@ -4124,32 +4309,44 @@
 
       return `
         <div class="winCard">
-          <strong>Possibilities & Odds — ${activeLines} Lines</strong>
+          <strong>Possibilities & Odds</strong>
 
           <div class="winRow">
-            <span>2 in row</span>
+            <span>Active Lines</span>
+            <span>${activeLines}</span>
+          </div>
+
+          <div class="winRow">
+            <span>2 in row / direction</span>
             <span>${formatOdds(odds.twoInRow)}</span>
           </div>
 
           <div class="winRow">
-            <span>3 in row</span>
+            <span>3 in row / direction</span>
             <span>${formatOdds(odds.threeInRow)}</span>
           </div>
 
           <div class="winRow">
-            <span>4 in row</span>
+            <span>4 in row / direction</span>
             <span>${formatOdds(odds.fourInRow)}</span>
           </div>
 
           <div class="winRow">
-            <span>5 in row</span>
+            <span>5 in row / direction</span>
             <span>${formatOdds(odds.fiveInRow)}</span>
           </div>
 
           <div class="winRow winGap">
-            <span>Hit Chance</span>
+            <span>Any payout / direction</span>
+            <span>${formatOdds(odds.anyDirectedWin)}</span>
+          </div>
+
+          <div class="winRow">
+            <span>Estimated spin hit</span>
             <span>${formatOdds(odds.approxAnySpinWin)}</span>
           </div>
+
+          <div class="codeMessage">Per-direction odds include Wild behavior. Spin hit is an estimate because paylines overlap.</div>
         </div>
       `;
     }
@@ -4174,9 +4371,18 @@
     }
 
     function renderStatsInfo() {
-      const netGain = getLifetimeNetGain();
-      const netSign = netGain >= 0n ? "+" : "-";
-      const absNet = netGain >= 0n ? netGain : -netGain;
+      const lifetimeCards = `
+        ${statCard("Tokens", formatGameNumber(tokens))}
+        ${statCard("Themes", `${getUnlockCount()} / ${getTotalUnlockCount()}`)}
+        ${statCard("Lifetime Spins", totalSpins.toLocaleString())}
+        ${statCard("Highest Balance", formatGameNumber(highestBalance))}
+        ${statCard("Largest Win", formatGameNumber(biggestSingleWin))}
+        ${statCard("Free Won", formatGameNumber(lifetimeFreeWinnings))}
+        ${statCard("Paid Won", formatGameNumber(lifetimePaidWinnings))}
+        ${statCard("Paid Wagered", formatGameNumber(lifetimePaidWagered))}
+        ${statCard("Bonus Won", formatGameNumber(lifetimeBonusSpinWinnings))}
+        ${statCard("Cans Fed", winkyCansFed.toLocaleString())}
+      `;
 
       const leaderboardCards = `
         ${statCard("Player ID", `${playerId.slice(0, 8)}...`)}
@@ -4187,50 +4393,13 @@
         ${statCard("Submit", `<button class="infoButton smallStatButton" onclick="manualSubmitLeaderboardScore()">Submit</button>`)}
       `;
 
-      const overallCards = `
-        ${statCard("Tokens", formatGameNumber(tokens))}
-        ${statCard("Themes", `${getUnlockCount()} / ${getTotalUnlockCount()}`)}
-        ${statCard("Highest Balance", formatGameNumber(highestBalance))}
-        ${statCard("Largest Win", formatGameNumber(biggestSingleWin))}
-      `;
-
-      const freeCards = `
-        ${statCard("Free Spins", lifetimeFreeGames.toLocaleString())}
-        ${statCard("Free Won", formatGameNumber(lifetimeFreeWinnings))}
-        ${statCard("Bonus Earned", lifetimeBonusSpinsEarned.toLocaleString())}
-        ${statCard("Bonus Played", lifetimeBonusSpinsPlayed.toLocaleString())}
-        ${statCard("Bonus Won", formatGameNumber(lifetimeBonusSpinWinnings))}
-      `;
-
-      const paidCards = `
-        ${statCard("Paid Spins", lifetimePaidGames.toLocaleString())}
-        ${statCard("Paid Wagered", formatGameNumber(lifetimePaidWagered))}
-        ${statCard("Paid Won", formatGameNumber(lifetimePaidWinnings))}
-      `;
-
-      const lifetimeCards = `
-        ${statCard("Free Spins", lifetimeFreeGames.toLocaleString())}
-        ${statCard("Free Won", formatGameNumber(lifetimeFreeWinnings))}
-        ${statCard("Bonus Spins", lifetimeBonusSpinsPlayed.toLocaleString())}
-        ${statCard("Bonus Won", formatGameNumber(lifetimeBonusSpinWinnings))}
-        ${statCard("Paid Spins", lifetimePaidGames.toLocaleString())}
-        ${statCard("Paid Won", formatGameNumber(lifetimePaidWinnings))}
-        ${statCard("Paid Wagered", formatGameNumber(lifetimePaidWagered))}
-        ${statCard("Highest Balance", formatGameNumber(highestBalance))}
-        ${statCard("Largest Win", formatGameNumber(biggestSingleWin))}
-        ${statCard("Cans Fed", winkyCansFed.toLocaleString())}
-      `;
-
       return `
         <div class="winCard">
-          <strong>Statistics</strong>
+          <strong>Lifetime Stats</strong>
 
           <div class="statsGrid">
+            ${statGroup("Lifetime", lifetimeCards)}
             ${statGroup("Leaderboard", leaderboardCards)}
-            ${statGroup("Overall", overallCards)}
-            ${statGroup("Free", freeCards)}
-            ${statGroup("Paid", paidCards)}
-            ${statGroup("Lifetime", lifetimeCards, "fullSpan")}
           </div>
         </div>
       `;
@@ -4444,12 +4613,7 @@
           <div class="statGroup">
             <div class="statGroupTitle">Theme Tools</div>
             <div class="devButtonGrid">
-              <button class="devButton" onclick="unlockAllThemes()">Unlock All</button>
-              <button class="devButton" onclick="activateThemeDev('Maya')">Activate Maya</button>
-              <button class="devButton" onclick="activateThemeDev('Reign')">Activate Reign</button>
-              <button class="devButton" onclick="activateThemeDev('Kyra')">Activate Kyra</button>
-              <button class="devButton" onclick="activateThemeDev('Nadia')">Activate Nadia</button>
-              <button class="devButton" onclick="activateThemeDev('Winky')">Activate Winky</button>
+              <button class="devButton" onclick="devResetThemes()">Reset Themes</button>
             </div>
           </div>
 
@@ -4457,19 +4621,9 @@
             <div class="statGroupTitle">Token Tools</div>
             <div class="devButtonGrid">
               <button class="devButton" onclick="addDevTokens()">+100M</button>
-              <button class="devButton" onclick="quickSpin(100)">Quick Spin x100</button>
               <button class="devButton" onclick="quickSpin(500)">Quick Spin x500</button>
               <button class="devButton" onclick="triggerWinkyIntervention()">Test Winky</button>
-            </div>
-          </div>
-
-          <div class="statGroup">
-            <div class="statGroupTitle">Unlock Tracker</div>
-            <button class="devButton" onclick="toggleDevUnlocks()" style="width:100%;">
-              Show / Hide Unlocks
-            </button>
-            <div id="devUnlockInfo">
-              ${devUnlockInfoVisible ? renderUnlockRows() : ""}
+              <button class="devButton" onclick="toggleAutoSpin()">Auto Spin: ${autoSpinEnabled ? "On" : "Off"}</button>
             </div>
           </div>
         </div>
@@ -4479,6 +4633,16 @@
     function updateWinInfo() {
       const winInfo = document.getElementById("winInfo");
       if (!winInfo) return;
+
+      const infoPanel = winInfo.closest(".infoPanel");
+
+      if (!activePanel) {
+        winInfo.innerHTML = "";
+        if (infoPanel) infoPanel.style.display = "none";
+        return;
+      }
+
+      if (infoPanel) infoPanel.style.display = "block";
 
       if (activePanel === "stats") {
         winInfo.innerHTML = renderStatsInfo();
@@ -4495,6 +4659,11 @@
         return;
       }
 
+      if (activePanel === "odds") {
+        winInfo.innerHTML = renderOddsInfo();
+        return;
+      }
+
       if (activePanel === "codes") {
         winInfo.innerHTML = renderCodesUnlockedInfo();
         return;
@@ -4505,7 +4674,7 @@
         return;
       }
 
-      winInfo.innerHTML = renderOddsInfo();
+      winInfo.innerHTML = "";
     }
 
     function updateUnlockPanel() {
@@ -4549,21 +4718,26 @@
       codeMessage.textContent = `${themes[themeName]?.label || themeName} activated.`;
     }
 
-    function unlockAllThemes() {
+    function devResetThemes() {
       markDevToolsUsed();
       playSound("click");
 
-      Object.keys(themes).forEach(theme => {
-        unlockedThemes[theme] = true;
+      Object.keys(unlockedThemes).forEach(themeKey => {
+        unlockedThemes[themeKey] = themeKey === "Default";
       });
 
+      activeTheme = "Default";
+      localStorage.setItem("activeTheme", activeTheme);
       localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
 
       syncThemeIndex();
       syncThemeSelectors();
+      applyTheme(activeTheme);
+      createGrid();
       updateDisplay();
+      updateWinInfo();
 
-      codeMessage.textContent = "All themes unlocked.";
+      codeMessage.textContent = "Themes reset. Default only.";
     }
 
     function addDevTokens() {
@@ -4802,6 +4976,12 @@
           codeMessage.textContent = "Reign theme unlocked.";
         },
 
+        LETMESEETHEKITTIES: () => {
+          unlockTheme("WarriorPets1");
+          localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+          codeMessage.textContent = "Warrior Pets 1 unlocked.";
+        },
+
         KYRASCYTHE: () => {
           unlockTheme("Kyra");
           localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
@@ -4927,18 +5107,10 @@
       devUnlockInfoVisible = false;
       winkyOverlayActive = false;
 
-      unlockedThemes = {};
-      Object.keys(themes).forEach(themeKey => {
-        unlockedThemes[themeKey] = themeKey === "Default";
-      });
-
-      activeTheme = "Default";
       lineCountIndex = lineCountOptions.length - 1;
-      baseBetIndex = 0;
-      multiplierIndex = 0;
-      themeIndex = 0;
-      themeCharacterIndex = 0;
-      themeVariantIndex = 0;
+      baseBetIndex = getStoredIndex("baseBetIndex", 0, baseBetOptions.length);
+      multiplierIndex = getStoredIndex("multiplierIndex", 0, allMultiplierOptions.length);
+      themeGroupMap = buildThemeGroupMap();
       symbolPool = buildSymbolPool();
 
       activePanel = null;
@@ -4973,7 +5145,7 @@
       updateDevToolsVisibility();
       startLinePreview();
 
-      codeMessage.textContent = "Current game reset. Lifetime stats and Player ID were kept.";
+      codeMessage.textContent = "Current game reset. Themes, lifetime stats, and Player ID were kept.";
     }
 
     // =========================

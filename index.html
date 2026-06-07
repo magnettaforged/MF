@@ -1895,7 +1895,7 @@
     
       WarriorPets2: {
         group: "Warrior Pets",
-        theme: "3",
+        theme: "2",
         bg: "pwlouiebk.png",
         store: [true, 5000n],
 
@@ -5022,6 +5022,12 @@
           unlockTheme("WarriorPets1");
           localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
           codeMessage.textContent = "Warrior Pets 1 unlocked.";
+        },
+           
+        SILLYDAWG: () => {
+          unlockTheme("WarriorPets2");
+          localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+          codeMessage.textContent = "Warrior Pets 2 unlocked.";
         },
 
         KYRASCYTHE: () => {

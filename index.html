@@ -863,7 +863,7 @@
       display: none;
       align-items: center;
       justify-content: center;
-      background: rgba(0,0,0,0.48);
+      background: rgba(0,0,0,0.72);
       padding: 16px;
       box-sizing: border-box;
     }
@@ -874,7 +874,7 @@
 
     .winkyPopup {
       width: min(340px, 92vw);
-      background: rgba(0,0,0,0.88);
+      background: rgba(0,0,0,0.96);
       border: 2px solid var(--accent);
       border-radius: 18px;
       box-shadow: 0 0 24px var(--accent-soft);
@@ -1286,6 +1286,115 @@
       white-space: nowrap;
     }
 
+
+
+    .infoButtonRow.singleButtonRow {
+      grid-template-columns: 1fr;
+    }
+
+    .hiddenUtilityButton {
+      display: none !important;
+    }
+
+    .currencyGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .rebornButtonAvailable {
+      animation: rebornPulse 1.35s ease-in-out infinite alternate;
+    }
+
+    @keyframes rebornPulse {
+      0% { border-color: #d6a84f; color: #d6a84f; box-shadow: 0 0 6px rgba(214,168,79,0.25); }
+      50% { border-color: #ff4fd8; color: #ff4fd8; box-shadow: 0 0 12px rgba(255,79,216,0.42); }
+      100% { border-color: #39ff88; color: #39ff88; box-shadow: 0 0 14px rgba(57,255,136,0.42); }
+    }
+
+    .gemSkillRow {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 8px;
+      align-items: center;
+      margin: 7px auto 6px;
+      width: 100%;
+    }
+
+    .skillButton {
+      min-height: 38px;
+      padding: 5px 6px;
+      font-size: 11px;
+      line-height: 1.1;
+      white-space: normal;
+    }
+
+    .skillButton.ready {
+      border-color: #39ff88;
+      color: #39ff88;
+      box-shadow: 0 0 8px rgba(57,255,136,0.22);
+    }
+
+    .skillButton.activeSkill {
+      border-color: #ff4fd8;
+      color: #ff4fd8;
+      box-shadow: 0 0 10px rgba(255,79,216,0.28);
+    }
+
+    .emberStoreGrid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      align-items: start;
+    }
+
+    .emberStoreItem {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 7px;
+      padding: 9px 10px;
+      border: 1px solid var(--accent-soft);
+      border-radius: 10px;
+      background: rgba(0,0,0,0.22);
+      text-align: left;
+    }
+
+    .emberStoreTopRow,
+    .emberStoreActionRow {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .emberStoreName {
+      color: var(--text-accent);
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .emberStoreDetails {
+      color: var(--text-muted);
+      font-size: 11px;
+      line-height: 1.25;
+    }
+
+    .emberStoreDescription {
+      color: var(--text-main);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .emberStatusText {
+      color: var(--text-muted);
+      font-size: 11px;
+      text-align: right;
+    }
+
+    .soundPackActive .themeValue.active {
+      color: #39ff88;
+    }
   </style>
 
 
@@ -1323,9 +1432,16 @@
             <button class="arrowButton" onclick="changeLineCount(1)">›</button>
           </div>
 
-          <div class="tokenReadout">
-            <span>Forge Tokens</span>
-            <span id="tokenBalance">0</span>
+          <div class="currencyGrid">
+            <div class="tokenReadout">
+              <span id="rebornCurrencyLabel">Embers</span>
+              <span id="rebornCurrencyBalance">0</span>
+            </div>
+
+            <div class="tokenReadout">
+              <span>Forge Tokens</span>
+              <span id="tokenBalance">0</span>
+            </div>
           </div>
         </div>
 
@@ -1347,13 +1463,21 @@
           <button class="spinButton" id="spinButton" onclick="spin()">FREE</button>
         </div>
 
-        <div class="gemRow">
+        <div class="gemSkillRow">
+          <button class="infoButton skillButton" id="forgeSurgeButton" onclick="activateEmberSkill('forgeSurge')">
+            Surge<br>Locked
+          </button>
+
           <div>
             <button class="chaosGem gem-clear" id="chaosGem" onclick="activateGem()" title="Chaos Gem">
               <img src="gem.png" alt="Chaos Gem">
             </button>
             <div class="gemMessage" id="gemMessage"></div>
           </div>
+
+          <button class="infoButton skillButton" id="freeForgeButton" onclick="activateEmberSkill('freeForge')">
+            Free<br>Locked
+          </button>
         </div>
 
         <div class="selectorStack">
@@ -1375,8 +1499,8 @@
             </div>
           </div>
 
-          <div class="themeSelectorRow inGameThemeSelector soundSelectorPlaceholder" title="Music and sound pack selector placeholder">
-            <div class="themeControl musicSelectorControl">
+          <div class="themeSelectorRow inGameThemeSelector" title="Music and sound pack selector">
+            <div class="themeControl musicSelectorControl soundSelectorPlaceholder">
               <span class="themeLabel">Music</span>
               <button class="arrowButton" disabled>‹</button>
               <span class="themeValue">Default</span>
@@ -1385,11 +1509,11 @@
 
             <span class="themeDivider">|</span>
 
-            <div class="themeControl soundSelectorControl">
+            <div class="themeControl soundSelectorControl soundPackActive">
               <span class="themeLabel">Sounds</span>
-              <button class="arrowButton" disabled>‹</button>
-              <span class="themeValue">Forge</span>
-              <button class="arrowButton" disabled>›</button>
+              <button class="arrowButton" onclick="changeSoundPack(-1)">‹</button>
+              <span class="themeValue" id="soundPackDisplay">Forge</span>
+              <button class="arrowButton" onclick="changeSoundPack(1)">›</button>
             </div>
           </div>
         </div>
@@ -1401,42 +1525,38 @@
         <div class="specialTitle">Special Settings</div>
 
         <div class="infoButtonRow">
-          <button class="infoButton" id="statsButton" onclick="setInfoMode('stats')">
-            Statistics
+          <button class="infoButton" id="storeButton" onclick="setInfoMode('store')">
+            Theme Store
           </button>
 
-          <button class="infoButton" id="breakdownButton" onclick="setInfoMode('breakdown')">
-            Win Breakdown
-          </button>
-        </div>
-
-        <div class="infoButtonRow">
-          <button class="infoButton" id="notationButton" onclick="setInfoMode('notation')">
-            Notation
-          </button>
-
-          <button class="infoButton" id="themePeekButton" onclick="startThemePeek()">
-            Theme Peek
-          </button>
-        </div>
-           
-        <div class="infoButtonRow">
-          <button class="infoButton" id="oddsButton" onclick="setInfoMode('odds')">
-            Odds
-          </button>
-
-          <button class="infoButton" id="soundButton" onclick="toggleSound()">
-            Sound: On
+          <button class="infoButton" id="emberStoreButton" onclick="setInfoMode('emberStore')">
+            Ember Store
           </button>
         </div>
 
         <div class="infoButtonRow">
           <button class="infoButton" id="codesButton" onclick="setInfoMode('codes')">
-            Codes Unlocked
+            Codes
           </button>
 
-          <button class="infoButton" id="storeButton" onclick="setInfoMode('store')">
-            Theme Store
+          <button class="infoButton" id="statsButton" onclick="setInfoMode('stats')">
+            Stats
+          </button>
+        </div>
+
+        <div class="infoButtonRow singleButtonRow">
+          <button class="infoButton" id="gameInfoButton" onclick="setInfoMode('gameInfo')">
+            Game Info
+          </button>
+        </div>
+
+        <button class="infoButton hiddenUtilityButton" id="breakdownButton" onclick="setInfoMode('breakdown')">Win Breakdown</button>
+        <button class="infoButton hiddenUtilityButton" id="themePeekButton" onclick="startThemePeek()">Theme Peek</button>
+        <button class="infoButton hiddenUtilityButton" id="linePreviewButton" onclick="startLinePreview()">Show Lines</button>
+
+        <div class="soundButtonRow">
+          <button class="infoButton" id="rebornButton" onclick="openRebornConfirm()">
+            Reborn Locked
           </button>
         </div>
 
@@ -1472,6 +1592,37 @@
   </div>
 
 
+
+
+  <div class="winkyOverlay" id="rebornIntroOverlay">
+    <div class="winkyPopup">
+      <div class="winkyPopupTitle">Reborn Forge Unlocked</div>
+      <div class="winkyPopupText">
+        You can now reborn at 1Qi Forge Tokens or higher.<br><br>
+        Reborning resets your current run, but keeps permanent unlocks and earns Embers for future upgrades.
+        Push higher before rebirthing for larger rewards.
+      </div>
+
+      <div class="winkyButtonRow">
+        <button class="infoButton" onclick="closeRebornIntro(true)">View Reborn</button>
+        <button class="infoButton" onclick="closeRebornIntro(false)">Later</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="winkyOverlay" id="rebornOverlay">
+    <div class="winkyPopup">
+      <div class="winkyPopupTitle">Reborn Forge</div>
+      <div class="winkyPopupText" id="rebornPopupText"></div>
+
+      <div class="winkyButtonRow">
+        <button class="infoButton" id="confirmRebornButton" onclick="confirmReborn()">Yes, Reborn</button>
+        <button class="infoButton" onclick="closeRebornConfirm()">No, Keep Pushing</button>
+      </div>
+
+      <div class="winkyPopupMessage" id="rebornPopupMessage"></div>
+    </div>
+  </div>
   <div class="winkyOverlay" id="resetOverlay">
     <div class="winkyPopup">
       <div class="winkyPopupTitle">Are you sure?</div>
@@ -1609,6 +1760,9 @@
     // =========================
 
     let soundEnabled = localStorage.getItem("soundEnabled") !== "false";
+
+    const soundPackOptions = ["Off", "Forge"];
+    let soundPackIndex = soundEnabled ? 1 : 0;
 
     const soundFiles = {
       click: "button-click.mp3",
@@ -2197,6 +2351,73 @@
     // Dev/demo auto-spin timing. Spins normally using current bet settings.
     const AUTO_SPIN_DELAY = 1000;
 
+
+    // =========================
+    // REBORN / EMBER SETTINGS
+    // =========================
+
+    const REBORN_CURRENCY_NAME = "Embers";
+    const REBORN_UNLOCK_AT = 1000000000000000000n; // 1Qi
+
+    const REBORN_REWARD_TIERS = [
+      [1000000000000000000n, 1n],       // 1Qi
+      [10000000000000000000n, 12n],     // 10Qi
+      [20000000000000000000n, 25n],     // 20Qi
+      [50000000000000000000n, 70n],     // 50Qi
+      [100000000000000000000n, 150n],   // 100Qi
+      [250000000000000000000n, 400n],   // 250Qi
+      [500000000000000000000n, 900n],   // 500Qi
+      [1000000000000000000000n, 2000n]  // 1Sx
+    ];
+
+    const EMBER_UPGRADES = {
+      axeMastery: {
+        name: "Axe Mastery",
+        type: "Passive",
+        description: "+1% Axe value per level.",
+        maxLevel: 25,
+        baseCost: 3n
+      },
+      gemAffinity: {
+        name: "Gem Affinity",
+        type: "Passive",
+        description: "+1% Gem value per level.",
+        maxLevel: 25,
+        baseCost: 5n
+      },
+      wildSpark: {
+        name: "Wild Spark",
+        type: "Passive",
+        description: "+1% Wild value per level.",
+        maxLevel: 25,
+        baseCost: 8n
+      },
+      idleForge: {
+        name: "Idle Forge",
+        type: "Passive",
+        description: "+0.5% idle reward per level for the first 8 hours. Idle claim logic comes later.",
+        maxLevel: 25,
+        baseCost: 10n
+      },
+      forgeSurge: {
+        name: "Forge Surge",
+        type: "Active",
+        description: "+1% winnings per level for 10 minutes. 60 minute cooldown.",
+        maxLevel: 25,
+        baseCost: 15n,
+        durationMs: 10 * 60 * 1000,
+        cooldownMs: 60 * 60 * 1000
+      },
+      freeForge: {
+        name: "Free Forge",
+        type: "Rare",
+        description: "Next paid spins cost 0. Level 1–3 gives 1–3 charges. 24 hour cooldown.",
+        maxLevel: 3,
+        baseCost: 100n,
+        cooldownMs: 24 * 60 * 60 * 1000
+      }
+    };
+
     // =========================
     // LEADERBOARD SETTINGS
     // =========================
@@ -2375,6 +2596,13 @@
     // =========================
 
     let tokens = getStoredBigInt("forgeTokens", 0n);
+    let rebornCurrency = getStoredBigInt("rebornCurrency", 0n);
+    let rebornCount = Number(localStorage.getItem("rebornCount")) || 0;
+    let rebornIntroSeen = localStorage.getItem("rebornIntroSeen") === "true";
+    let rebornEverUnlocked = localStorage.getItem("rebornEverUnlocked") === "true";
+    let currentGameHighestTokens = getStoredBigInt("currentGameHighestTokens", tokens);
+    let emberUpgrades = JSON.parse(localStorage.getItem("emberUpgrades")) || {};
+    let emberSkillState = JSON.parse(localStorage.getItem("emberSkillState")) || {};
 
     let totalSpins = Number(localStorage.getItem("forgeTotalSpins")) || 0;
 
@@ -2411,6 +2639,12 @@
     // =========================
 
     const tokenBalance = document.getElementById("tokenBalance");
+    const rebornCurrencyBalance = document.getElementById("rebornCurrencyBalance");
+    const rebornCurrencyLabel = document.getElementById("rebornCurrencyLabel");
+    const rebornButton = document.getElementById("rebornButton");
+    const forgeSurgeButton = document.getElementById("forgeSurgeButton");
+    const freeForgeButton = document.getElementById("freeForgeButton");
+    const soundPackDisplay = document.getElementById("soundPackDisplay");
     const spinCount = document.getElementById("spinCount");
     const baseBetDisplay = document.getElementById("baseBetDisplay");
     const multiplierDisplay = document.getElementById("multiplierDisplay");
@@ -2451,6 +2685,8 @@
     updateDisplay();
     updateDevToolsVisibility();
     updateSoundButton();
+    updateActiveSkillButtons();
+    setInterval(updateActiveSkillButtons, 1000);
     startLinePreview();
     maybeShowLeaderboardPrompt();
 
@@ -2485,19 +2721,44 @@
       ["smallWin", "bigWin", "bonus", "unlock", "winky"].forEach(stopSound);
     }
 
-    function toggleSound() {
-      soundEnabled = !soundEnabled;
+    function setSoundPack(index) {
+      const safeIndex = Math.max(0, Math.min(index, soundPackOptions.length - 1));
+      soundPackIndex = safeIndex;
+      soundEnabled = soundPackOptions[soundPackIndex] !== "Off";
       localStorage.setItem("soundEnabled", soundEnabled ? "true" : "false");
-      updateSoundButton();
+      updateSoundSelector();
+    }
+
+    function changeSoundPack(direction) {
+      const nextIndex = soundPackIndex + direction;
+
+      if (nextIndex < 0 || nextIndex >= soundPackOptions.length) {
+        updateSoundSelector();
+        return;
+      }
+
+      const wasEnabled = soundEnabled;
+      setSoundPack(nextIndex);
+
+      if (soundEnabled || wasEnabled) {
+        playSound("click");
+      }
+    }
+
+    function toggleSound() {
+      setSoundPack(soundEnabled ? 0 : 1);
       playSound("click");
     }
 
-    function updateSoundButton() {
-      const soundButton = document.getElementById("soundButton");
-      if (!soundButton) return;
+    function updateSoundSelector() {
+      if (!soundPackDisplay) return;
 
-      soundButton.textContent = soundEnabled ? "Sound: On" : "Sound: Off";
-      soundButton.classList.toggle("active", soundEnabled);
+      soundPackDisplay.textContent = soundPackOptions[soundPackIndex] || "Forge";
+      soundPackDisplay.classList.toggle("active", soundEnabled);
+    }
+
+    function updateSoundButton() {
+      updateSoundSelector();
     }
 
     // =========================
@@ -3157,9 +3418,8 @@
       }
 
       saveBetSettings();
-
-      saveBetSettings();
       updateDisplay();
+      startLinePreview();
     }
 
     function changeMultiplier(direction) {
@@ -3184,6 +3444,7 @@
 
       saveBetSettings();
       updateDisplay();
+      startLinePreview();
     }
 
     function getBaseBet() {
@@ -3225,6 +3486,421 @@
       return lineBet * activeLines;
     }
 
+
+    function calculateRebornCurrency(balance) {
+      let reward = 0n;
+
+      REBORN_REWARD_TIERS.forEach(([requiredBalance, currencyReward]) => {
+        if (balance >= requiredBalance) {
+          reward = currencyReward;
+        }
+      });
+
+      return reward;
+    }
+
+    function getEmberUpgradeLevel(upgradeKey) {
+      return Number(emberUpgrades[upgradeKey] || 0);
+    }
+
+    function getEmberUpgradeCost(upgradeKey) {
+      const upgrade = EMBER_UPGRADES[upgradeKey];
+      if (!upgrade) return 0n;
+      const level = getEmberUpgradeLevel(upgradeKey);
+      return upgrade.baseCost * BigInt(level + 1);
+    }
+
+    function getEmberSymbolBonusPercent(symbolName) {
+      if (symbolName === "Axe") return getEmberUpgradeLevel("axeMastery");
+      if (symbolName === "Gem") return getEmberUpgradeLevel("gemAffinity");
+      if (symbolName === "Wild") return getEmberUpgradeLevel("wildSpark");
+      return 0;
+    }
+
+    function applyEmberSymbolBonus(symbolName, payout) {
+      const bonusPercent = getEmberSymbolBonusPercent(symbolName);
+      if (!bonusPercent || payout <= 0n) return payout;
+      return payout + (payout * BigInt(bonusPercent)) / 100n;
+    }
+
+    function saveEmberSkillState() {
+      localStorage.setItem("emberSkillState", JSON.stringify(emberSkillState));
+    }
+
+    function saveRebornState() {
+      saveBigInt("rebornCurrency", rebornCurrency);
+      localStorage.setItem("rebornCount", String(rebornCount));
+      localStorage.setItem("rebornIntroSeen", rebornIntroSeen ? "true" : "false");
+      localStorage.setItem("rebornEverUnlocked", rebornEverUnlocked ? "true" : "false");
+      saveBigInt("currentGameHighestTokens", currentGameHighestTokens);
+      localStorage.setItem("emberUpgrades", JSON.stringify(emberUpgrades));
+      saveEmberSkillState();
+    }
+
+    function buyEmberUpgrade(upgradeKey) {
+      playSound("click");
+
+      const upgrade = EMBER_UPGRADES[upgradeKey];
+      if (!upgrade) return;
+
+      const level = getEmberUpgradeLevel(upgradeKey);
+
+      if (level >= upgrade.maxLevel) {
+        codeMessage.textContent = `${upgrade.name} is already max level.`;
+        return;
+      }
+
+      const cost = getEmberUpgradeCost(upgradeKey);
+
+      if (rebornCurrency < cost) {
+        codeMessage.textContent = `Not enough ${REBORN_CURRENCY_NAME}.`;
+        return;
+      }
+
+      rebornCurrency -= cost;
+      emberUpgrades[upgradeKey] = level + 1;
+      saveRebornState();
+      updateDisplay();
+      updateActiveSkillButtons();
+      activePanel = "emberStore";
+      updateWinInfo();
+
+      codeMessage.textContent = `${upgrade.name} upgraded to Lv ${level + 1}.`;
+    }
+
+    function getRemainingMs(timestamp) {
+      return Math.max(0, Number(timestamp || 0) - Date.now());
+    }
+
+    function formatDurationShort(ms) {
+      const totalSeconds = Math.ceil(ms / 1000);
+      if (totalSeconds <= 0) return "Ready";
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      if (hours > 0) return `${hours}h ${minutes}m`;
+      if (minutes > 0) return `${minutes}m ${seconds}s`;
+      return `${seconds}s`;
+    }
+
+    function isEmberSkillActive(skillKey) {
+      const state = emberSkillState[skillKey] || {};
+      return getRemainingMs(state.activeUntil) > 0;
+    }
+
+    function getForgeSurgeBonusPercent() {
+      if (!isEmberSkillActive("forgeSurge")) return 0;
+      return getEmberUpgradeLevel("forgeSurge");
+    }
+
+    function applyForgeSurgeBonus(payout) {
+      const bonusPercent = getForgeSurgeBonusPercent();
+      if (!bonusPercent || payout <= 0n) return payout;
+      return payout + (payout * BigInt(bonusPercent)) / 100n;
+    }
+
+    function getFreeForgeCharges() {
+      const state = emberSkillState.freeForge || {};
+      return Math.max(0, Number(state.charges || 0));
+    }
+
+    function useFreeForgeCharge() {
+      const charges = getFreeForgeCharges();
+      if (charges <= 0) return false;
+      emberSkillState.freeForge = emberSkillState.freeForge || {};
+      emberSkillState.freeForge.charges = charges - 1;
+      saveEmberSkillState();
+      updateActiveSkillButtons();
+      return true;
+    }
+
+    function getEmberSkillButtonText(skillKey) {
+      const level = getEmberUpgradeLevel(skillKey);
+      const upgrade = EMBER_UPGRADES[skillKey];
+      const state = emberSkillState[skillKey] || {};
+
+      if (!upgrade || level <= 0) {
+        return skillKey === "forgeSurge" ? "Surge<br>Locked" : "Free<br>Locked";
+      }
+
+      if (skillKey === "forgeSurge") {
+        const activeMs = getRemainingMs(state.activeUntil);
+        const cooldownMs = getRemainingMs(state.cooldownUntil);
+
+        if (activeMs > 0) return `Surge<br>${formatDurationShort(activeMs)}`;
+        if (cooldownMs > 0) return `Surge CD<br>${formatDurationShort(cooldownMs)}`;
+        return `Surge<br>Ready`;
+      }
+
+      if (skillKey === "freeForge") {
+        const charges = getFreeForgeCharges();
+        const cooldownMs = getRemainingMs(state.cooldownUntil);
+
+        if (charges > 0) return `Free x${charges}<br>Ready`;
+        if (cooldownMs > 0) return `Free CD<br>${formatDurationShort(cooldownMs)}`;
+        return `Free<br>Ready`;
+      }
+
+      return "Skill";
+    }
+
+    function updateSkillButtonState(button, skillKey) {
+      if (!button) return;
+
+      const level = getEmberUpgradeLevel(skillKey);
+      const state = emberSkillState[skillKey] || {};
+      const cooldownMs = getRemainingMs(state.cooldownUntil);
+      const active = isEmberSkillActive(skillKey);
+      const charges = skillKey === "freeForge" ? getFreeForgeCharges() : 0;
+
+      button.innerHTML = getEmberSkillButtonText(skillKey);
+      button.disabled = controlsLocked || level <= 0 || (cooldownMs > 0 && !active && charges <= 0);
+      button.classList.toggle("ready", level > 0 && cooldownMs <= 0 && !active);
+      button.classList.toggle("activeSkill", active || charges > 0);
+    }
+
+    function updateActiveSkillButtons() {
+      updateSkillButtonState(forgeSurgeButton, "forgeSurge");
+      updateSkillButtonState(freeForgeButton, "freeForge");
+    }
+
+    function getEmberSkillStatus(skillKey) {
+      const level = getEmberUpgradeLevel(skillKey);
+      const state = emberSkillState[skillKey] || {};
+
+      if (level <= 0) return "Locked";
+
+      if (skillKey === "forgeSurge") {
+        const activeMs = getRemainingMs(state.activeUntil);
+        const cooldownMs = getRemainingMs(state.cooldownUntil);
+        if (activeMs > 0) return `Active: ${formatDurationShort(activeMs)}`;
+        if (cooldownMs > 0) return `Cooldown: ${formatDurationShort(cooldownMs)}`;
+        return "Ready";
+      }
+
+      if (skillKey === "freeForge") {
+        const charges = getFreeForgeCharges();
+        const cooldownMs = getRemainingMs(state.cooldownUntil);
+        if (charges > 0) return `${charges} free paid spin${charges === 1 ? "" : "s"} ready`;
+        if (cooldownMs > 0) return `Cooldown: ${formatDurationShort(cooldownMs)}`;
+        return "Ready";
+      }
+
+      return "Passive";
+    }
+
+    function activateEmberSkill(skillKey) {
+      playSound("click");
+
+      const upgrade = EMBER_UPGRADES[skillKey];
+      const level = getEmberUpgradeLevel(skillKey);
+      if (!upgrade || level <= 0) {
+        codeMessage.textContent = "Upgrade this skill in the Ember Store first.";
+        return;
+      }
+
+      const state = emberSkillState[skillKey] || {};
+      const now = Date.now();
+
+      if (skillKey === "forgeSurge") {
+        if (getRemainingMs(state.activeUntil) > 0) {
+          codeMessage.textContent = "Forge Surge is already active.";
+          return;
+        }
+        if (getRemainingMs(state.cooldownUntil) > 0) {
+          codeMessage.textContent = `Forge Surge cooldown: ${formatDurationShort(getRemainingMs(state.cooldownUntil))}.`;
+          return;
+        }
+
+        emberSkillState.forgeSurge = {
+          activeUntil: now + upgrade.durationMs,
+          cooldownUntil: now + upgrade.cooldownMs
+        };
+        saveEmberSkillState();
+        updateActiveSkillButtons();
+        codeMessage.textContent = `Forge Surge active: +${level}% winnings for 10 minutes.`;
+        return;
+      }
+
+      if (skillKey === "freeForge") {
+        if (getFreeForgeCharges() > 0) {
+          codeMessage.textContent = `Free Forge already has ${getFreeForgeCharges()} charge(s).`;
+          return;
+        }
+        if (getRemainingMs(state.cooldownUntil) > 0) {
+          codeMessage.textContent = `Free Forge cooldown: ${formatDurationShort(getRemainingMs(state.cooldownUntil))}.`;
+          return;
+        }
+
+        emberSkillState.freeForge = {
+          charges: Math.max(1, Math.min(level, 3)),
+          cooldownUntil: now + upgrade.cooldownMs
+        };
+        saveEmberSkillState();
+        updateActiveSkillButtons();
+        codeMessage.textContent = `Free Forge ready: next ${Math.max(1, Math.min(level, 3))} paid spin(s) cost 0.`;
+      }
+    }
+
+    function isRebornAvailable() {
+      return tokens >= REBORN_UNLOCK_AT;
+    }
+
+    function maybeShowRebornIntro() {
+      if (!isRebornAvailable()) return;
+
+      rebornEverUnlocked = true;
+      localStorage.setItem("rebornEverUnlocked", "true");
+
+      if (rebornIntroSeen) return;
+
+      rebornIntroSeen = true;
+      localStorage.setItem("rebornIntroSeen", "true");
+
+      const overlay = document.getElementById("rebornIntroOverlay");
+      if (overlay) {
+        overlay.classList.add("show");
+      }
+    }
+
+    function closeRebornIntro(openConfirm = false) {
+      playSound("click");
+
+      const overlay = document.getElementById("rebornIntroOverlay");
+      if (overlay) {
+        overlay.classList.remove("show");
+      }
+
+      if (openConfirm) {
+        openRebornConfirm();
+      }
+    }
+
+    function getNextRebornTierText(balance) {
+      const nextTier = REBORN_REWARD_TIERS.find(([requiredBalance]) => balance < requiredBalance);
+
+      if (!nextTier) {
+        return "Top test tier reached.";
+      }
+
+      return `Next tier: ${formatGameNumber(nextTier[0])} = ${nextTier[1].toString()} ${REBORN_CURRENCY_NAME}`;
+    }
+
+    function openRebornConfirm() {
+      playSound("click");
+
+      const overlay = document.getElementById("rebornOverlay");
+      const popupText = document.getElementById("rebornPopupText");
+      const popupMessage = document.getElementById("rebornPopupMessage");
+      const confirmButton = document.getElementById("confirmRebornButton");
+      const reward = calculateRebornCurrency(tokens);
+
+      if (popupMessage) popupMessage.textContent = "";
+
+      if (!isRebornAvailable()) {
+        if (popupText) {
+          popupText.innerHTML = `
+            Reborn unlocks at <strong>${formatGameNumber(REBORN_UNLOCK_AT)}</strong> Forge Tokens.<br><br>
+            Current Forge Tokens: <strong>${formatGameNumber(tokens)}</strong><br>
+            Keep forging until Valhalla notices.
+          `;
+        }
+
+        if (confirmButton) confirmButton.disabled = true;
+        if (overlay) overlay.classList.add("show");
+        return;
+      }
+
+      if (popupText) {
+        popupText.innerHTML = `
+          Current Forge Tokens: <strong>${formatGameNumber(tokens)}</strong><br>
+          You will gain: <strong>${reward.toString()} ${REBORN_CURRENCY_NAME}</strong><br>
+          ${getNextRebornTierText(tokens)}<br><br>
+          Reborn will reset your current run and current Forge Tokens.
+          Themes, codes, lifetime stats, Player ID, and ${REBORN_CURRENCY_NAME} stay saved.<br><br>
+          Push higher before rebirthing for larger rewards.
+        `;
+      }
+
+      if (confirmButton) confirmButton.disabled = false;
+      if (overlay) overlay.classList.add("show");
+    }
+
+    function closeRebornConfirm() {
+      playSound("click");
+
+      const overlay = document.getElementById("rebornOverlay");
+      if (overlay) {
+        overlay.classList.remove("show");
+      }
+    }
+
+    function confirmReborn() {
+      playSound("unlock");
+
+      if (!isRebornAvailable()) {
+        const popupMessage = document.getElementById("rebornPopupMessage");
+        if (popupMessage) popupMessage.textContent = "You are not ready.";
+        return;
+      }
+
+      const reward = calculateRebornCurrency(tokens);
+
+      rebornCurrency += reward;
+      rebornCount += 1;
+
+      tokens = 0n;
+      currentGameHighestTokens = 0n;
+
+      bonusSpinQueue = 0;
+      bonusSpinLineBet = 0n;
+      bonusSpinFinalBet = 0n;
+      bonusSpinSource = "";
+      bonusSessionTotal = 0;
+      bonusSessionPlayed = 0;
+      bonusSessionWon = 0n;
+      lastWinBreakdown = [];
+
+      saveBigInt("forgeTokens", tokens);
+      saveRebornState();
+      saveStats();
+
+      const overlay = document.getElementById("rebornOverlay");
+      if (overlay) {
+        overlay.classList.remove("show");
+      }
+
+      clearWinningHighlights();
+      clearWinPopup();
+      hideLineOverlay();
+      updateDisplay();
+
+      showUnlockPopup(`Valhalla spits you back out.<br>You are not ready.<br>Use your new skills to forge faster and further than ever before.<br><br>+${reward.toString()} ${REBORN_CURRENCY_NAME}`);
+      codeMessage.textContent = `Reborn complete. +${reward.toString()} ${REBORN_CURRENCY_NAME} earned.`;
+    }
+
+    function updateRebornButton() {
+      if (!rebornButton) return;
+
+      const available = isRebornAvailable();
+
+      rebornButton.disabled = controlsLocked ? true : false;
+      rebornButton.classList.toggle("rebornButtonAvailable", available);
+
+      if (available) {
+        rebornButton.textContent = "Reborn Available";
+        return;
+      }
+
+      if (rebornEverUnlocked || rebornCount > 0) {
+        rebornButton.textContent = "Reborn";
+        return;
+      }
+
+      rebornButton.textContent = "Reborn Locked";
+    }
+
     function updateDisplay() {
       if (getBaseBet() === 0n) {
         multiplierIndex = 0;
@@ -3235,6 +3911,15 @@
       const finalBet = getFinalBet();
 
       tokenBalance.textContent = formatGameNumber(tokens);
+
+      if (rebornCurrencyBalance) {
+        rebornCurrencyBalance.textContent = rebornCurrency.toString();
+      }
+
+      if (rebornCurrencyLabel) {
+        rebornCurrencyLabel.textContent = REBORN_CURRENCY_NAME;
+      }
+
       spinCount.textContent = totalSpins.toLocaleString();
 
       baseBetDisplay.textContent = baseBet === 0n ? "Free" : formatGameNumber(baseBet);
@@ -3267,6 +3952,9 @@
       updateUnlockPanel();
       updateSoundButton();
       updateControlBoundaryStates();
+      updateRebornButton();
+      updateActiveSkillButtons();
+      maybeShowRebornIntro();
     }
 
     // =========================
@@ -3284,36 +3972,21 @@
     }
 
     function updateInfoButtons() {
-      const statsButton = document.getElementById("statsButton");
-      const breakdownButton = document.getElementById("breakdownButton");
-      const notationButton = document.getElementById("notationButton");
-      const oddsButton = document.getElementById("oddsButton");
-      const codesButton = document.getElementById("codesButton");
-      const storeButton = document.getElementById("storeButton");
+      const buttonModes = {
+        statsButton: "stats",
+        breakdownButton: "breakdown",
+        gameInfoButton: "gameInfo",
+        codesButton: "codes",
+        storeButton: "store",
+        emberStoreButton: "emberStore"
+      };
 
-      if (statsButton) {
-        statsButton.classList.toggle("active", activePanel === "stats");
-      }
-
-      if (breakdownButton) {
-        breakdownButton.classList.toggle("active", activePanel === "breakdown");
-      }
-
-      if (notationButton) {
-        notationButton.classList.toggle("active", activePanel === "notation");
-      }
-
-      if (oddsButton) {
-        oddsButton.classList.toggle("active", activePanel === "odds");
-      }
-
-      if (codesButton) {
-        codesButton.classList.toggle("active", activePanel === "codes");
-      }
-
-      if (storeButton) {
-        storeButton.classList.toggle("active", activePanel === "store");
-      }
+      Object.entries(buttonModes).forEach(([buttonId, mode]) => {
+        const button = document.getElementById(buttonId);
+        if (button) {
+          button.classList.toggle("active", activePanel === mode);
+        }
+      });
     }
 
     function updateAllPanels() {
@@ -3491,11 +4164,15 @@
     }
 
     function payoutForWin(win, finalBet, lineBet) {
+      let payout = 0n;
+
       if (finalBet === 0n) {
-        return freePayoutForMatch(win.matchCount, win.symbol);
+        payout = freePayoutForMatch(win.matchCount, win.symbol);
+      } else {
+        payout = paidPayoutForMatch(win.matchCount, win.symbol, lineBet);
       }
 
-      return paidPayoutForMatch(win.matchCount, win.symbol, lineBet);
+      return applyEmberSymbolBonus(win.symbol, payout);
     }
 
     // =========================
@@ -3850,6 +4527,7 @@
     function setControlsDisabled(disabled) {
       controlsLocked = disabled;
       spinButton.disabled = disabled;
+      updateActiveSkillButtons();
 
       document.querySelectorAll(".arrowButton").forEach(button => {
         button.disabled = disabled;
@@ -3884,30 +4562,39 @@
         payout += payoutForWin(win, finalBet, lineBet);
       });
 
-      return payout;
+      return applyForgeSurgeBonus(payout);
     }
 
     function spin() {
       const finalBet = getFinalBet();
       const lineBet = getLineBet();
       const tokensBeforeSpin = tokens;
+      let actualCost = finalBet;
 
+      // Free Forge only removes the cost after the player can afford the selected paid spin.
+      // This prevents using a free charge to spin far above the current token balance.
       if (finalBet > tokens) {
         codeMessage.textContent = "Not enough Forge Tokens.";
         playSound("click");
         return;
       }
 
-      if (finalBet > 0n) {
-        tokens -= finalBet;
+      if (finalBet > 0n && getFreeForgeCharges() > 0) {
+        actualCost = 0n;
+        useFreeForgeCharge();
+        codeMessage.textContent = "Free Forge used. This paid spin costs 0.";
+      }
+
+      if (actualCost > 0n) {
+        tokens -= actualCost;
         saveBigInt("forgeTokens", tokens);
         updateDisplay();
       }
 
-      animateSpin(finalBet, lineBet, "normal", tokensBeforeSpin);
+      animateSpin(finalBet, lineBet, "normal", tokensBeforeSpin, actualCost);
     }
 
-    function animateSpin(finalBet, lineBet, spinType = "normal", tokensBeforeSpin = null) {
+    function animateSpin(finalBet, lineBet, spinType = "normal", tokensBeforeSpin = null, actualCost = finalBet) {
       stopResultSounds();
       playSound("spin");
       hideLineOverlay();
@@ -3943,13 +4630,13 @@
           }
 
           if (col === COLS - 1) {
-            finishSpin(finalGrid, finalBet, lineBet, spinType, tokensBeforeSpin);
+            finishSpin(finalGrid, finalBet, lineBet, spinType, tokensBeforeSpin, actualCost);
           }
         }, FIRST_REEL_STOP_DELAY + col * REEL_STOP_SPACING);
       }
     }
 
-    function finishSpin(finalGrid, finalBet, lineBet, spinType = "normal", tokensBeforeSpin = null) {
+    function finishSpin(finalGrid, finalBet, lineBet, spinType = "normal", tokensBeforeSpin = null, actualCost = finalBet) {
       const wins = evaluatePaylines(finalGrid);
       const payout = calculateSpinPayout(wins, finalBet, lineBet);
 
@@ -3964,22 +4651,30 @@
       lastWinBreakdown = buildWinBreakdown(wins, finalBet, lineBet);
 
       tokens += payout;
+
+      if (tokens > currentGameHighestTokens) {
+        currentGameHighestTokens = tokens;
+      }
+
       totalSpins += 1;
       updateThemeRotationIfNeeded();
       lifetimeTokensEarned += payout;
 
 
       if (spinType === "normal") {
-        lifetimeTokensWagered += finalBet;
+        lifetimeTokensWagered += actualCost;
 
         if (finalBet === 0n) {
           lifetimeFreeGames += 1;
           lifetimeFreeWinnings += payout;
         } else {
           lifetimePaidGames += 1;
-          lifetimePaidWagered += finalBet;
+          lifetimePaidWagered += actualCost;
           lifetimePaidWinnings += payout;
-          recordPaidSpinAdvancedStats(finalBet, payout, tokensBeforeSpin);
+
+          if (actualCost > 0n) {
+            recordPaidSpinAdvancedStats(actualCost, payout, tokensBeforeSpin);
+          }
         }
       }
 
@@ -4214,6 +4909,12 @@
       if (tokens > highestBalance) {
         highestBalance = tokens;
       }
+
+      if (tokens > currentGameHighestTokens) {
+        currentGameHighestTokens = tokens;
+      }
+
+      saveRebornState();
 
       saveBigInt("lifetimeTokensEarned", lifetimeTokensEarned);
       saveBigInt("lifetimeTokensWagered", lifetimeTokensWagered);
@@ -4552,6 +5253,64 @@
 
       codeMessage.textContent = "Theme purchased.";
     }
+
+    function renderGameInfo() {
+      return `
+        <div class="winCard">
+          <strong>Game Info</strong>
+
+          <div class="statGroup">
+            <div class="statGroupTitle">Paylines / Odds</div>
+            ${renderOddsInfo().replace('<div class="winCard">', '<div>').replace('</div>', '</div>')}
+          </div>
+
+          <div class="statGroup">
+            <div class="statGroupTitle">Notation</div>
+            ${renderNotationInfo().replace('<div class="winCard">', '<div>').replace('</div>', '</div>')}
+          </div>
+
+          <div class="codeMessage">All spins use 15 paylines. Changing Bet or Multiplier temporarily previews the active lines.</div>
+          <button class="infoButton smallStatButton" onclick="startLinePreview()">Preview Lines</button>
+        </div>
+      `;
+    }
+
+    function renderEmberStoreInfo() {
+      const rows = Object.entries(EMBER_UPGRADES).map(([upgradeKey, upgrade]) => {
+        const level = getEmberUpgradeLevel(upgradeKey);
+        const maxed = level >= upgrade.maxLevel;
+        const cost = getEmberUpgradeCost(upgradeKey);
+        const buttonText = maxed ? "Max" : `${cost.toString()} ${REBORN_CURRENCY_NAME}`;
+        const disabled = maxed || rebornCurrency < cost;
+        const canActivate = upgrade.type === "Active" || upgrade.type === "Rare";
+        const activationButton = canActivate
+          ? `<div class="emberStoreActionRow"><span class="emberStatusText">${getEmberSkillStatus(upgradeKey)}</span><button class="infoButton storeButton" onclick="activateEmberSkill('${upgradeKey}')" ${level <= 0 ? "disabled" : ""}>Activate</button></div>`
+          : "";
+
+        return `
+          <div class="emberStoreItem ${disabled ? "locked" : ""}">
+            <div class="emberStoreTopRow">
+              <div>
+                <div class="emberStoreName">${upgrade.name}</div>
+                <div class="emberStoreDetails">Lv ${level}/${upgrade.maxLevel} — ${upgrade.type}</div>
+              </div>
+              <button class="infoButton storeButton" onclick="buyEmberUpgrade('${upgradeKey}')" ${disabled ? "disabled" : ""}>${buttonText}</button>
+            </div>
+            <div class="emberStoreDescription">${upgrade.description}</div>
+            ${activationButton}
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <div class="winCard">
+          <strong>Ember Store</strong>
+          <div class="codeMessage">Spend ${REBORN_CURRENCY_NAME} earned from Reborn. Passives apply immediately. Active and rare skills can also be used from the gem buttons.</div>
+          <div class="emberStoreGrid">${rows}</div>
+        </div>
+      `;
+    }
+
     function renderBreakdownInfo() {
       if (!lastWinBreakdown.length) {
         return `
@@ -4696,13 +5455,8 @@
         return;
       }
 
-      if (activePanel === "notation") {
-        winInfo.innerHTML = renderNotationInfo();
-        return;
-      }
-
-      if (activePanel === "odds") {
-        winInfo.innerHTML = renderOddsInfo();
+      if (activePanel === "gameInfo") {
+        winInfo.innerHTML = renderGameInfo();
         return;
       }
 
@@ -4713,6 +5467,11 @@
 
       if (activePanel === "store") {
         winInfo.innerHTML = renderThemeStoreInfo();
+        return;
+      }
+
+      if (activePanel === "emberStore") {
+        winInfo.innerHTML = renderEmberStoreInfo();
         return;
       }
 
@@ -5143,6 +5902,7 @@
 
     function resetGameConfirmed() {
       tokens = 0n;
+      currentGameHighestTokens = 0n;
 
       bonusSpinQueue = 0;
       bonusSpinLineBet = 0n;

@@ -1363,9 +1363,21 @@
     .emberStoreTopRow,
     .emberStoreActionRow {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
       gap: 8px;
       align-items: center;
+    }
+
+    .emberStoreTopRow {
+      grid-template-columns: minmax(0, 1fr) auto auto;
+    }
+
+    .emberStoreActionRow {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .emberStoreTopRow .storeButton {
+      width: auto;
+      min-width: 76px;
     }
 
     .emberStoreName {
@@ -1384,6 +1396,28 @@
       color: var(--text-main);
       font-size: 12px;
       line-height: 1.3;
+    }
+
+    .emberStoreCurrentBonus {
+      color: var(--text-accent);
+      font-size: 12px;
+      font-weight: bold;
+      line-height: 1.3;
+    }
+
+    .emberStoreNote {
+      color: var(--text-muted);
+      font-size: 10px;
+      line-height: 1.25;
+      font-style: italic;
+    }
+
+    .idleRewardAmount {
+      margin: 10px 0;
+      color: var(--text-accent);
+      font-size: 22px;
+      font-weight: bold;
+      text-shadow: 0 0 10px var(--accent);
     }
 
     .emberStatusText {
@@ -1672,6 +1706,18 @@
       </div>
 
       <div class="winkyPopupMessage" id="leaderboardMessage"></div>
+    </div>
+  </div>
+
+
+  <div class="winkyOverlay" id="idleRewardOverlay">
+    <div class="winkyPopup">
+      <div class="winkyPopupTitle">The Forge Worked While You Were Away</div>
+      <div class="winkyPopupText" id="idleRewardDetails"></div>
+      <div class="idleRewardAmount" id="idleRewardAmount">0</div>
+      <button class="infoButton" id="collectIdleRewardButton" onclick="collectIdleReward()">
+        Collect
+      </button>
     </div>
   </div>
 
@@ -2351,6 +2397,11 @@
     // Dev/demo auto-spin timing. Spins normally using current bet settings.
     const AUTO_SPIN_DELAY = 1000;
 
+    // Idle Forge uses the same completed-spin timestamp sent to Sheets.
+    const IDLE_MIN_MINUTES = 10;
+    const IDLE_FULL_RATE_END_MINUTES = 8 * 60;
+    const IDLE_REDUCED_RATE_END_MINUTES = 24 * 60;
+
 
     // =========================
     // REBORN / EMBER SETTINGS
@@ -2395,7 +2446,7 @@
       idleForge: {
         name: "Idle Forge",
         type: "Passive",
-        description: "+0.5% idle reward per level for the first 8 hours. Idle claim logic comes later.",
+        description: "+0.5% of current-run highest balance per level, per hour while inactive.",
         maxLevel: 25,
         baseCost: 10n
       },
@@ -2603,6 +2654,16 @@
     let currentGameHighestTokens = getStoredBigInt("currentGameHighestTokens", tokens);
     let emberUpgrades = JSON.parse(localStorage.getItem("emberUpgrades")) || {};
     let emberSkillState = JSON.parse(localStorage.getItem("emberSkillState")) || {};
+
+    let lastUpdatedAt = Number(localStorage.getItem("lastUpdated"));
+    if (!Number.isFinite(lastUpdatedAt) || lastUpdatedAt <= 0) {
+      lastUpdatedAt = Date.now();
+      localStorage.setItem("lastUpdated", String(lastUpdatedAt));
+    }
+
+    let pendingIdleReward = getStoredBigInt("pendingIdleReward", 0n);
+    let pendingIdleMinutes = Number(localStorage.getItem("pendingIdleMinutes")) || 0;
+    let idleResumeContext = null;
 
     let totalSpins = Number(localStorage.getItem("forgeTotalSpins")) || 0;
 
@@ -3743,6 +3804,133 @@
       }
     }
 
+    function calculateIdleReward(minutesAway, highestRunTokens, idleForgeLevel) {
+      if (minutesAway < IDLE_MIN_MINUTES || idleForgeLevel <= 0 || highestRunTokens <= 0n) {
+        return 0n;
+      }
+
+      const fullRateMinutes = Math.min(minutesAway, IDLE_FULL_RATE_END_MINUTES);
+      const reducedRateMinutes = Math.min(
+        Math.max(minutesAway - IDLE_FULL_RATE_END_MINUTES, 0),
+        IDLE_REDUCED_RATE_END_MINUTES - IDLE_FULL_RATE_END_MINUTES
+      );
+      const longTermMinutes = Math.max(minutesAway - IDLE_REDUCED_RATE_END_MINUTES, 0);
+      const level = BigInt(idleForgeLevel);
+
+      // 0.5% per level per hour = 1 / 12,000 per minute.
+      const fullReward = highestRunTokens * level * BigInt(fullRateMinutes) / 12000n;
+      const reducedReward = highestRunTokens * level * BigInt(reducedRateMinutes) / 48000n;
+      const longTermReward = highestRunTokens * level * BigInt(longTermMinutes) / 240000n;
+
+      return fullReward + reducedReward + longTermReward;
+    }
+
+    function getIdleTenMinuteEstimate(level = getEmberUpgradeLevel("idleForge")) {
+      if (level <= 0 || currentGameHighestTokens <= 0n) return 0n;
+      return currentGameHighestTokens * BigInt(level) / 1200n;
+    }
+
+    function formatIdleDuration(totalMinutes) {
+      const minutes = Math.max(0, Math.floor(totalMinutes));
+      const days = Math.floor(minutes / 1440);
+      const hours = Math.floor((minutes % 1440) / 60);
+      const remainingMinutes = minutes % 60;
+      const parts = [];
+
+      if (days > 0) parts.push(`${days}d`);
+      if (hours > 0) parts.push(`${hours}h`);
+      if (remainingMinutes > 0 || parts.length === 0) parts.push(`${remainingMinutes}m`);
+
+      return parts.join(" ");
+    }
+
+    function processCompletedSpinTimestamp(completedAt, highestRunSnapshot) {
+      const previousUpdatedAt = lastUpdatedAt;
+      const elapsedMs = Math.max(0, completedAt - previousUpdatedAt);
+      const minutesAway = Math.floor(elapsedMs / 60000);
+      const idleLevel = getEmberUpgradeLevel("idleForge");
+      const reward = calculateIdleReward(minutesAway, highestRunSnapshot, idleLevel);
+
+      if (reward > 0n) {
+        pendingIdleReward += reward;
+        pendingIdleMinutes += minutesAway;
+        saveBigInt("pendingIdleReward", pendingIdleReward);
+        localStorage.setItem("pendingIdleMinutes", String(pendingIdleMinutes));
+      }
+
+      lastUpdatedAt = completedAt;
+      localStorage.setItem("lastUpdated", String(lastUpdatedAt));
+    }
+
+    function maybeShowIdleRewardOverlay(finalBet, spinType) {
+      if (pendingIdleReward <= 0n) return false;
+
+      const overlay = document.getElementById("idleRewardOverlay");
+      const details = document.getElementById("idleRewardDetails");
+      const amount = document.getElementById("idleRewardAmount");
+      const collectButton = document.getElementById("collectIdleRewardButton");
+
+      if (!overlay) return false;
+
+      idleResumeContext = { finalBet, spinType };
+
+      if (details) {
+        details.innerHTML = `
+          Away: <strong>${formatIdleDuration(pendingIdleMinutes)}</strong><br>
+          Idle Forge: <strong>Lv ${getEmberUpgradeLevel("idleForge")}</strong>
+        `;
+      }
+
+      if (amount) {
+        amount.textContent = `+${formatGameNumber(pendingIdleReward)} Forge Tokens`;
+      }
+
+      if (collectButton) collectButton.disabled = false;
+      overlay.classList.add("show");
+      return true;
+    }
+
+    function collectIdleReward() {
+      const overlay = document.getElementById("idleRewardOverlay");
+      const collectButton = document.getElementById("collectIdleRewardButton");
+      const reward = pendingIdleReward;
+
+      if (collectButton) collectButton.disabled = true;
+
+      pendingIdleReward = 0n;
+      pendingIdleMinutes = 0;
+      localStorage.removeItem("pendingIdleReward");
+      localStorage.removeItem("pendingIdleMinutes");
+
+      if (reward > 0n) {
+        tokens += reward;
+
+        if (tokens > currentGameHighestTokens) {
+          currentGameHighestTokens = tokens;
+        }
+
+        saveBigInt("forgeTokens", tokens);
+        saveStats();
+        updateDisplay();
+        showUnlockPopup(`Idle Forge Collected<br>+${formatGameNumber(reward)}`);
+
+        if (leaderboardOptedIn) {
+          submitLeaderboardScore("auto", false);
+        }
+      }
+
+      if (overlay) overlay.classList.remove("show");
+
+      const resumeContext = idleResumeContext;
+      idleResumeContext = null;
+
+      if (resumeContext) {
+        maybeTriggerWinkyIntervention(resumeContext.finalBet, resumeContext.spinType);
+      }
+
+      scheduleAutoSpin();
+    }
+
     function isRebornAvailable() {
       return tokens >= REBORN_UNLOCK_AT;
     }
@@ -4637,6 +4825,8 @@
     }
 
     function finishSpin(finalGrid, finalBet, lineBet, spinType = "normal", tokensBeforeSpin = null, actualCost = finalBet) {
+      const spinCompletedAt = Date.now();
+      const idleHighestSnapshot = currentGameHighestTokens;
       const wins = evaluatePaylines(finalGrid);
       const payout = calculateSpinPayout(wins, finalBet, lineBet);
 
@@ -4649,6 +4839,7 @@
       checkThemeUnlocks(wins);
 
       lastWinBreakdown = buildWinBreakdown(wins, finalBet, lineBet);
+      processCompletedSpinTimestamp(spinCompletedAt, idleHighestSnapshot);
 
       tokens += payout;
 
@@ -4732,6 +4923,11 @@
         }
 
         setControlsDisabled(false);
+
+        if (maybeShowIdleRewardOverlay(finalBet, spinType)) {
+          return;
+        }
+
         maybeTriggerWinkyIntervention(finalBet, spinType);
         scheduleAutoSpin();
       }
@@ -5275,6 +5471,35 @@
       `;
     }
 
+    function getEmberUpgradeCurrentBonusText(upgradeKey, level) {
+      if (upgradeKey === "axeMastery") return `Current Bonus: +${level}% Axe value`;
+      if (upgradeKey === "gemAffinity") return `Current Bonus: +${level}% Gem value`;
+      if (upgradeKey === "wildSpark") return `Current Bonus: +${level}% Wild value`;
+
+      if (upgradeKey === "idleForge") {
+        return `Current Bonus: ${formatGameNumber(getIdleTenMinuteEstimate(level))} every 10 minutes idle`;
+      }
+
+      if (upgradeKey === "forgeSurge") {
+        return `Current Bonus: +${level}% winnings while active`;
+      }
+
+      if (upgradeKey === "freeForge") {
+        const charges = Math.max(0, Math.min(level, 3));
+        return `Current Bonus: ${charges} paid spin${charges === 1 ? "" : "s"} cost 0 per activation`;
+      }
+
+      return "Current Bonus: None";
+    }
+
+    function getEmberUpgradeNote(upgradeKey) {
+      if (upgradeKey === "idleForge") {
+        return "Diminishing returns apply after 8 hours; the rate decreases again after 24 hours.";
+      }
+
+      return "";
+    }
+
     function renderEmberStoreInfo() {
       const rows = Object.entries(EMBER_UPGRADES).map(([upgradeKey, upgrade]) => {
         const level = getEmberUpgradeLevel(upgradeKey);
@@ -5286,17 +5511,18 @@
         const activationButton = canActivate
           ? `<div class="emberStoreActionRow"><span class="emberStatusText">${getEmberSkillStatus(upgradeKey)}</span><button class="infoButton storeButton" onclick="activateEmberSkill('${upgradeKey}')" ${level <= 0 ? "disabled" : ""}>Activate</button></div>`
           : "";
+        const note = getEmberUpgradeNote(upgradeKey);
 
         return `
           <div class="emberStoreItem ${disabled ? "locked" : ""}">
             <div class="emberStoreTopRow">
-              <div>
-                <div class="emberStoreName">${upgrade.name}</div>
-                <div class="emberStoreDetails">Lv ${level}/${upgrade.maxLevel} — ${upgrade.type}</div>
-              </div>
+              <div class="emberStoreName">${upgrade.name}</div>
+              <div class="emberStoreDetails">Lv ${level}/${upgrade.maxLevel} — ${upgrade.type}</div>
               <button class="infoButton storeButton" onclick="buyEmberUpgrade('${upgradeKey}')" ${disabled ? "disabled" : ""}>${buttonText}</button>
             </div>
             <div class="emberStoreDescription">${upgrade.description}</div>
+            <div class="emberStoreCurrentBonus">${getEmberUpgradeCurrentBonusText(upgradeKey, level)}</div>
+            ${note ? `<div class="emberStoreNote">${note}</div>` : ""}
             ${activationButton}
           </div>
         `;
@@ -5591,7 +5817,8 @@
         winkyCansFed: winkyCansFed,
         winkyHungryNights: winkyHungryNights,
         devToolsUsed: devToolsUsed,
-        judgement: judgement.text
+        judgement: judgement.text,
+        lastUpdated: new Date(lastUpdatedAt).toISOString()
       };
     }
 
@@ -5734,7 +5961,6 @@
     function maybeAutoSubmitLeaderboard() {
       if (!leaderboardOptedIn) return;
       if (totalSpins <= 0) return;
-      if (totalSpins % 10 !== 0) return;
       if (lastLeaderboardAutoSpin === totalSpins) return;
 
       lastLeaderboardAutoSpin = totalSpins;

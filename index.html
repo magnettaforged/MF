@@ -1,0 +1,6196 @@
+
+
+<!-- =========================
+     SECTION 1: HEAD + CSS
+     ========================= -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>MagnettaForged</title>
+
+  <style>
+    :root {
+      --accent: #d6a84f;
+      --accent-soft: rgba(214,168,79,0.25);
+
+      --page-bg: url("background.png");
+      --game-bg: none;
+
+      --text-main: #ffffff;
+      --text-muted: #d8d0bd;
+      --text-accent: var(--accent);
+      --button-text: var(--accent);
+
+      --ui-bg: rgba(0,0,0,0.54);
+      --ui-bg-soft: rgba(0,0,0,0.42);
+      --ui-border: 1px solid rgba(255,255,255,0.12);
+      --ui-radius: 10px;
+      --ui-shadow: inset 0 0 8px rgba(0,0,0,0.58);
+
+      --button-bg: rgba(0,0,0,0.58);
+      --button-border: 1px solid #7a5a22;
+      --button-radius: 8px;
+
+      --slot-bg: rgba(0,0,0,0);
+      --cell-bg: rgba(0,0,0,0.1);
+
+      /* =========================
+         MASTER LAYOUT SETTINGS
+         Change these to resize the entire game layout.
+         ========================= */
+      --app-width: 390px;
+      --panel-padding: 8px;
+      --panel-radius: 16px;
+      --game-min-height: 450px;
+      --slot-frame-min-height: 218px;
+      --slot-gap: clamp(4px, 1.4vw, 8px);
+      --slot-lift: 0px;
+      --slot-font-size: clamp(22px, 7vw, 30px);
+    }
+
+        * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: #050505;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding-top: 12px;
+      background-color: #050505;
+      background-image:
+        linear-gradient(rgba(0,0,0,0.18), rgba(0,0,0,0.42)),
+        var(--page-bg);
+      background-position: center top;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: scroll;
+      overflow-x: hidden;
+    }
+
+    .pageShell {
+      width: min(var(--app-width), 96vw);
+      margin-left: auto;
+      margin-right: auto;
+      box-sizing: border-box;
+    }
+
+    .gamePanel,
+    .settingsPanel,
+    .infoPanel,
+    .devPanel {
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+      border: 2px solid var(--accent);
+      border-radius: 18px;
+      padding: var(--panel-padding);
+      text-align: center;
+      box-sizing: border-box;
+      box-shadow: 0 0 25px rgba(0,0,0,0.82);
+    }
+
+    .gamePanel {
+      position: relative;
+      background-color: rgba(0,0,0,0.10);
+      background-image:
+        linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0)),
+        var(--game-bg);
+      background-position: center top;
+      background-size: cover;
+      background-repeat: no-repeat;
+      backdrop-filter: none;
+      min-height: 520px;
+    }
+
+    .settingsPanel,
+    .infoPanel,
+    .devPanel {
+      margin-top: 12px;
+      background: var(--ui-bg);
+      border-color: var(--accent);
+      box-shadow: var(--ui-shadow);
+      backdrop-filter: none;
+    }
+
+    .devPanel {
+      display: none;
+    }
+
+    .devPanel.visible {
+      display: block;
+    }
+
+    .logoText {
+      display: block;
+      color: var(--text-accent);
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      text-decoration: none;
+      text-shadow: 0 0 10px rgba(0,0,0,0.85);
+    }
+
+    .logoText:hover {
+      color: var(--text-accent);
+      text-decoration: none;
+    }
+
+    .uiPanel,
+    .specialSettings,
+    .winCard,
+    .statsPanel {
+      background: var(--ui-bg);
+      border: var(--ui-border);
+      border-radius: var(--ui-radius);
+      box-shadow: var(--ui-shadow);
+    }
+
+    .uiCell,
+    .readout,
+    .tokenReadout {
+      background: var(--ui-bg);
+      border: var(--ui-border);
+      border-radius: 8px;
+      box-shadow: var(--ui-shadow);
+    }
+
+    .uiButton,
+    .arrowButton,
+    .infoButton,
+    .codeButton,
+    .devButton,
+    .resetButton {
+      background: var(--button-bg);
+      border: var(--button-border);
+      border-radius: var(--button-radius);
+      color: var(--button-text);
+      cursor: pointer;
+    }
+
+    .slotFrame {
+      position: relative;
+      margin: 8px auto 12px;
+      width: fit-content;
+      height: 390px;
+      overflow: hidden;
+      padding: 8px;
+      border-radius: 18px;
+      background: var(--slot-bg);
+      border: var(--ui-border);
+      box-shadow: inset 0 0 18px rgba(0,0,0,0.78);
+      box-sizing: border-box;
+      transition: opacity 0.35s ease;
+    }
+
+    .slotGrid {
+      display: grid;
+      grid-template-columns: repeat(5, 80px);
+      grid-template-rows: repeat(5, 80px);
+      justify-content: center;
+      gap: 8px;
+      position: relative;
+      z-index: 2;
+      transform: translateY(-18px);
+    }
+
+    .cell {
+      width: 80px;
+      height: 80px;
+      border-radius: 12px;
+      background: var(--cell-bg);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: inset 0 0 8px rgba(0,0,0,0.68);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      overflow: hidden;
+    }
+
+    .cell img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+
+    .teaserCell {
+      opacity: 0.12;
+      filter: grayscale(1) brightness(0.45);
+      transform: scaleY(0.5) scaleX(0.92);
+    }
+
+    .activeCell {
+      opacity: 1;
+      filter: none;
+    }
+
+    .spinning {
+      animation: shake 0.08s linear infinite;
+      filter: none;
+    }
+
+    .teaserCell.spinning {
+      opacity: 0.12;
+      filter: grayscale(1) brightness(0.45);
+    }
+
+    .winningCell {
+      border: 3px solid var(--accent);
+      box-shadow:
+        inset 0 0 10px rgba(255,255,255,0.28),
+        0 0 10px var(--accent),
+        0 0 20px var(--accent),
+        0 0 30px var(--accent-soft);
+      animation: winPulse 0.9s ease-in-out infinite alternate;
+      z-index: 3;
+    }
+
+    .wildCell {
+      border: 3px solid #ffffff;
+      box-shadow:
+        inset 0 0 10px rgba(255,255,255,0.35),
+        0 0 12px rgba(255,255,255,0.85),
+        0 0 24px var(--accent),
+        0 0 36px var(--accent-soft);
+      animation: winPulse 0.75s ease-in-out infinite alternate;
+      z-index: 3;
+    }
+
+    @keyframes winPulse {
+      from { filter: brightness(1); }
+      to { filter: brightness(1.28); }
+    }
+
+    @keyframes shake {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+      100% { transform: translateY(6px); }
+    }
+
+    .lineOverlay {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 6;
+      display: block;
+      opacity: 0.95;
+    }
+
+    .lineOverlay svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .lineOverlay polyline {
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter:
+        drop-shadow(0 0 2px black)
+        drop-shadow(0 0 3px currentColor);
+      opacity: 0.65;
+    }
+
+    .lineOverlay polygon {
+      filter:
+        drop-shadow(0 0 2px black)
+        drop-shadow(0 0 3px currentColor);
+      opacity: 0.75;
+    }
+
+    .lineOverlay .lineLabel {
+      font-size: 15px;
+      font-weight: bold;
+      filter: drop-shadow(0 0 3px black);
+    }
+
+    .winPopup,
+    .unlockPopup {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 8;
+      padding: 8px 18px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.76);
+      border: 1px solid var(--accent);
+      color: var(--text-accent);
+      font-weight: bold;
+      text-shadow: 0 0 10px var(--accent);
+      box-shadow: 0 0 16px var(--accent-soft);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      white-space: normal;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .winPopup {
+      bottom: 18px;
+      font-size: 24px;
+      width: auto;
+      max-width: 82%;
+    }
+
+    .unlockPopup {
+      top: 44%;
+      font-size: 20px;
+      width: 82%;
+      max-width: 360px;
+    }
+
+    .winPopup.show,
+    .unlockPopup.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-4px);
+    }
+
+    .controlPanel {
+      margin-top: 8px;
+      padding: 6px;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      transition: opacity 0.35s ease;
+    }
+
+    .controlTopRow,
+    .controlBottomRow {
+      display: grid;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .controlTopRow {
+      grid-template-columns: 1fr 1.4fr;
+      margin-bottom: 5px;
+    }
+
+    .controlBottomRow {
+      grid-template-columns: 1fr 1fr 1.25fr;
+    }
+
+    .gemRow {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 42px;
+      margin-top: 0;
+    }
+
+    .readout {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 34px;
+      padding: 4px 6px;
+      color: var(--text-main);
+    }
+
+    .readoutLabel {
+      color: var(--text-muted);
+      font-size: 13px;
+      min-width: 34px;
+      text-align: right;
+    }
+
+    .readoutValue {
+      color: var(--text-accent);
+      font-size: 16px;
+      font-weight: bold;
+      min-width: 48px;
+      text-align: center;
+    }
+
+    .tokenReadout {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 34px;
+      padding: 4px 6px;
+      line-height: 1.1;
+      color: var(--text-accent);
+      font-weight: bold;
+    }
+
+    .tokenReadout span:first-child {
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: normal;
+    }
+
+    #tokenBalance {
+      font-family: monospace;
+      font-size: 14px;
+      letter-spacing: 0.4px;
+    }
+
+    .arrowButton {
+      width: 22px;
+      height: 24px;
+      padding: 0;
+      margin: 0;
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    .spinButton {
+      width: 100%;
+      height: 42px;
+      padding: 0;
+      margin: 0;
+      border: none;
+      border-radius: 12px;
+      background: var(--accent);
+      color: #111;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--accent-soft);
+    }
+
+    .infoButton {
+      min-height: 34px;
+      padding: 7px 10px;
+      font-size: 13px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .infoButton.active {
+      background: var(--accent);
+      color: #111;
+      border-color: var(--accent);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .chaosGem {
+      width: 42px;
+      height: 42px;
+      margin: 0 auto;
+      padding: 0;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chaosGem img {
+      width: 34px;
+      height: 34px;
+      object-fit: contain;
+      pointer-events: none;
+      transition: filter 0.2s ease, transform 0.2s ease;
+    }
+
+    .chaosGem:hover img {
+      transform: scale(1.08);
+    }
+
+    .gemMessage {
+      min-height: 16px;
+      font-size: 12px;
+      font-weight: bold;
+      text-align: center;
+      opacity: 0.95;
+      color: var(--text-accent);
+    }
+
+    .gem-clear img {
+      filter: brightness(1.15) saturate(0.45)
+        drop-shadow(0 0 6px rgba(190,230,255,0.45));
+    }
+
+    .gem-ruby img,
+    .reelGem.gem-ruby {
+      filter: sepia(1) saturate(5) hue-rotate(310deg) brightness(1.15)
+        drop-shadow(0 0 12px #e31b4f);
+    }
+
+    .gem-emerald img,
+    .reelGem.gem-emerald {
+      filter: sepia(1) saturate(4) hue-rotate(85deg) brightness(1.15)
+        drop-shadow(0 0 12px #20c56b);
+    }
+
+    .gem-amethyst img,
+    .reelGem.gem-amethyst {
+      filter: sepia(1) saturate(4) hue-rotate(235deg) brightness(1.2)
+        drop-shadow(0 0 12px #9b5de5);
+    }
+
+    .gem-sapphire img,
+    .reelGem.gem-sapphire {
+      filter: sepia(1) saturate(4) hue-rotate(185deg) brightness(1.15)
+        drop-shadow(0 0 12px #2f6fff);
+    }
+
+    .gem-topaz img,
+    .reelGem.gem-topaz {
+      filter: sepia(1) saturate(4) hue-rotate(350deg) brightness(1.25)
+        drop-shadow(0 0 12px #f5b642);
+    }
+
+    .gem-skull {
+      font-size: 31px;
+      color: #d8d8d8;
+      text-shadow: 0 0 14px rgba(255,255,255,0.95);
+    }
+
+    .reelGem.gem-skull {
+      filter: grayscale(1) brightness(1.4)
+        drop-shadow(0 0 12px #ffffff);
+    }
+
+    .specialSettings {
+      text-align: left;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+
+    .specialTitle,
+    .panelTitle,
+    .devSectionTitle,
+    .statGroupTitle,
+    .winCard strong {
+      color: var(--text-accent);
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .specialTitle {
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .themeSelectorRow {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .themeControl {
+      display: grid;
+      grid-template-columns: auto 24px 1fr 24px;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      margin-top: 0;
+    }
+
+    .themeLabel {
+      color: var(--text-muted);
+      font-size: 12px;
+      min-width: auto;
+      text-align: right;
+    }
+
+    .themeValue {
+      color: var(--text-accent);
+      width: auto;
+      min-width: 54px;
+      text-align: center;
+      font-weight: bold;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .infoButtonRow {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .soundButtonRow {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .lastSpin {
+      margin-top: 8px;
+      color: var(--text-muted);
+      font-size: 13px;
+      text-align: center;
+      line-height: 1.35;
+      min-height: 0;
+      display: none;
+    }
+
+    .statGroup {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid var(--accent-soft);
+    }
+
+    .statGroup:first-child {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .statGroupTitle {
+      margin-bottom: 5px;
+      font-size: 12px;
+    }
+
+    .statRow,
+    .breakdownRow,
+    .unlockRow {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      padding: 3px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .statRow:last-child,
+    .breakdownRow:last-child,
+    .unlockRow:last-child {
+      border-bottom: none;
+    }
+
+    .judgementGood {
+      color: #39ff88;
+      font-weight: bold;
+    }
+
+    .judgementSuspicious {
+      color: #f5b642;
+      font-weight: bold;
+    }
+
+    .judgementVoid {
+      color: #ff4444;
+      font-weight: bold;
+    }
+
+    .devTools {
+      display: none;
+    }
+
+    .devTools.visible {
+      display: none;
+    }
+
+    .devButtonGrid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .devButton {
+      color: var(--button-text);
+      padding: 7px 5px;
+      font-size: 11px;
+    }
+
+    .devButton:hover,
+    .arrowButton:hover,
+    .infoButton:hover,
+    .codeButton:hover,
+    .resetButton:hover {
+      color: var(--text-accent);
+      border-color: var(--accent);
+    }
+
+    .winInfo {
+      margin: 0;
+      border-top: none;
+      padding-top: 0;
+      text-align: left;
+      font-size: 13px;
+      color: var(--text-main);
+    }
+
+    .winCard {
+      padding: 10px;
+      line-height: 1.5;
+    }
+
+    .winCard strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .winRow {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding: 3px 0;
+    }
+
+    .winRow:last-child {
+      border-bottom: none;
+    }
+
+    .winGap {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--accent-soft);
+    }
+
+    .bottomStats {
+      display: none;
+      margin-top: 12px;
+      color: var(--text-muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .codeArea {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 6px;
+    }
+
+    .codeInput {
+      background: var(--button-bg);
+      color: var(--text-main);
+      border: var(--ui-border);
+      border-radius: 8px;
+      padding: 8px;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .codeInput:focus {
+      border-color: var(--accent);
+    }
+
+    .codeButton {
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+
+    .codeMessage {
+      margin-top: 6px;
+      color: var(--text-muted);
+      font-size: 12px;
+      min-height: 16px;
+      text-align: center;
+    }
+
+    .resetButton {
+      margin-top: 10px;
+      width: 100%;
+      color: var(--button-text);
+      font-size: 12px;
+      padding: 8px;
+    }
+
+    /* =========================
+       THEME PEEK
+       ========================= */
+
+    .themePeekActive .slotFrame,
+    .themePeekActive .controlPanel,
+    .themePeekActive .winPopup,
+    .themePeekActive .unlockPopup {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .themePeekNotice {
+      position: absolute;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      z-index: 10;
+      padding: 8px 18px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.72);
+      border: 1px solid var(--accent);
+      color: var(--text-accent);
+      font-size: 14px;
+      font-weight: bold;
+      text-shadow: 0 0 8px var(--accent);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .themePeekActive .themePeekNotice {
+      opacity: 1;
+    }
+
+    /* =========================
+       WINKY POPUP
+       ========================= */
+
+    .winkyOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.72);
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .winkyOverlay.show {
+      display: flex;
+    }
+
+    .winkyPopup {
+      width: min(340px, 92vw);
+      background: rgba(0,0,0,0.96);
+      border: 2px solid var(--accent);
+      border-radius: 18px;
+      box-shadow: 0 0 24px var(--accent-soft);
+      padding: 16px;
+      text-align: center;
+      color: var(--text-main);
+    }
+
+    .winkyPopupTitle {
+      color: var(--text-accent);
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      text-shadow: 0 0 8px var(--accent);
+    }
+
+    .winkyPopupText {
+      color: var(--text-main);
+      font-size: 15px;
+      margin-bottom: 12px;
+    }
+
+    .winkyButtonRow {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .winkyPopupMessage {
+      margin-top: 10px;
+      min-height: 18px;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .leaderboardField {
+      margin-top: 10px;
+      text-align: left;
+    }
+
+    .leaderboardField label {
+      display: block;
+      color: var(--text-muted);
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .leaderboardField input {
+      width: 100%;
+      background: var(--button-bg);
+      color: var(--text-main);
+      border: var(--ui-border);
+      border-radius: 8px;
+      padding: 8px;
+      font-size: 13px;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    .leaderboardField input:focus {
+      border-color: var(--accent);
+    }
+
+    .leaderboardPlayerId {
+      margin-top: 8px;
+      padding: 7px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.35);
+      border: var(--ui-border);
+      color: var(--text-muted);
+      font-size: 11px;
+      overflow-wrap: anywhere;
+      text-align: left;
+    }
+
+    .smallStatButton {
+      min-height: 24px;
+      padding: 4px 8px;
+      font-size: 11px;
+    }
+
+
+    /* =========================
+       TEMP HIDDEN SOUND + MULTIPLIER LOCK
+       ========================= */
+
+
+    .multiplierLocked {
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
+
+
+
+
+    /* =========================
+       SINGLE MASTER LAYOUT
+       Desktop and mobile use the same centered layout.
+       ========================= */
+
+    body {
+      padding-top: 0;
+    }
+
+    .pageShell {
+      width: min(var(--app-width), 96vw);
+    }
+
+    .gamePanel,
+    .settingsPanel,
+    .infoPanel,
+    .devPanel {
+      padding: var(--panel-padding);
+      border-radius: var(--panel-radius);
+    }
+
+    .gamePanel {
+      min-height: var(--game-min-height);
+    }
+
+    .logoText {
+      font-size: 28px;
+      margin-bottom: 6px;
+    }
+
+    .slotFrame {
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      min-height: var(--slot-frame-min-height);
+      overflow: hidden;
+    }
+
+    .lineOverlay {
+      transform: none;
+    }
+
+    .slotGrid {
+      width: 100%;
+      max-width: 100%;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-rows: repeat(3, auto);
+      gap: var(--slot-gap);
+      transform: translateY(var(--slot-lift));
+    }
+
+    .cell {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      height: auto;
+      font-size: var(--slot-font-size);
+    }
+
+    .controlTopRow,
+    .controlBottomRow {
+      grid-template-columns: 1fr;
+      gap: 5px;
+    }
+
+    .readout,
+    .tokenReadout {
+      min-height: 30px;
+      padding: 3px 5px;
+    }
+
+    #tokenBalance {
+      font-size: 12px;
+      letter-spacing: 0;
+    }
+
+    .spinButton {
+      height: 38px;
+    }
+
+    .winPopup {
+      font-size: 20px;
+      bottom: 16px;
+    }
+
+    .unlockPopup {
+      font-size: 16px;
+      width: 82%;
+      max-width: 320px;
+    }
+
+    .lineSelectorHidden,
+    .settingsPanel .themeSelectorRow.movedUnderGem,
+    .slotFrameTitle {
+      display: none !important;
+    }
+
+    .teaserCell {
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
+    /* =========================
+       STACKED IN-GAME THEME / SOUND SELECTOR
+       ========================= */
+
+    .selectorStack {
+      width: 100%;
+      max-width: 100%;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 5px;
+      margin: 7px auto 8px;
+      padding: 6px;
+      border: var(--ui-border);
+      border-radius: 10px;
+      background: var(--ui-bg);
+      box-shadow: var(--ui-shadow);
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    .themeSelectorRow.inGameThemeSelector {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      align-items: center !important;
+      justify-content: stretch !important;
+      gap: 5px !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .themeSelectorRow.inGameThemeSelector .themeControl {
+      display: grid !important;
+      grid-template-columns: 72px 24px minmax(0, 1fr) 24px !important;
+      align-items: center !important;
+      gap: 5px !important;
+      width: 100%;
+      min-width: 0 !important;
+      margin: 0 !important;
+      padding: 2px 0 !important;
+      box-sizing: border-box;
+    }
+
+    .themeSelectorRow.inGameThemeSelector .themeLabel {
+      min-width: 0 !important;
+      font-size: 11px !important;
+      line-height: 1 !important;
+      text-align: right !important;
+      white-space: nowrap !important;
+      color: var(--text-muted);
+    }
+
+    .themeSelectorRow.inGameThemeSelector .themeValue {
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: none !important;
+      font-size: 13px !important;
+      line-height: 1 !important;
+      text-align: center !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      color: var(--text-accent);
+      font-weight: bold;
+    }
+
+    .themeSelectorRow.inGameThemeSelector .arrowButton {
+      width: 24px !important;
+      height: 22px !important;
+      min-width: 24px !important;
+    }
+
+    .soundSelectorPlaceholder {
+      opacity: 0.42;
+      pointer-events: none;
+    }
+
+    .themeDivider {
+      display: none !important;
+    }
+
+    /* =========================
+       STATISTICS / STORE / CODES
+       ========================= */
+
+    .statsGrid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      align-items: start;
+    }
+
+    .statsGrid .statGroup {
+      margin-top: 0;
+      padding: 8px;
+      border: 1px solid var(--accent-soft);
+      border-radius: 8px;
+      min-width: 0;
+      background: rgba(0,0,0,0.14);
+    }
+
+    .statsGrid .statGroup.fullSpan,
+    .statsGrid .currentGameGroup {
+      grid-column: 1 / -1;
+    }
+
+    .statsGrid .statGroupInner {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+
+    .statsGrid .currentGameGroup .statGroupInner {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .statsGrid .statRow,
+    .storeGrid .statRow,
+    .codesGrid .statRow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      gap: 3px;
+      padding: 6px 4px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px;
+      background: rgba(0,0,0,0.18);
+    }
+
+    .statsGrid .statRow span,
+    .storeGrid .statRow span,
+    .codesGrid .statRow span {
+      width: 100%;
+      text-align: center !important;
+      overflow-wrap: anywhere;
+    }
+
+    .statsGrid .statRow span:first-child,
+    .storeGrid .statRow span:first-child,
+    .codesGrid .statRow span:first-child {
+      color: var(--text-muted);
+      font-size: 11px;
+      line-height: 1.15;
+    }
+
+    .statsGrid .statRow span:last-child,
+    .storeGrid .statRow span:last-child,
+    .codesGrid .statRow span:last-child {
+      color: var(--text-accent);
+      font-size: 12px;
+      font-weight: bold;
+      line-height: 1.2;
+    }
+
+    .storeGrid,
+    .codesGrid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+      align-items: start;
+    }
+
+    .storeItem,
+    .codeItem {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      padding: 7px 8px;
+      border: 1px solid var(--accent-soft);
+      border-radius: 8px;
+      background: rgba(0,0,0,0.22);
+      min-width: 0;
+      text-align: left;
+    }
+
+    .storeItemName,
+    .codeItemName {
+      color: var(--text-muted);
+      font-size: 13px;
+      margin-bottom: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .storeItemPrice,
+    .codeItemStatus {
+      color: var(--text-accent);
+      font-size: 13px;
+      font-weight: bold;
+      overflow-wrap: anywhere;
+    }
+
+    .storeItem.locked,
+    .codeItem.used {
+      opacity: 0.68;
+    }
+
+    .storeButton,
+    .codeApplyButton,
+    .smallStatButton {
+      width: 100%;
+      min-height: 28px;
+      padding: 5px 6px;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+
+
+    .infoButtonRow.singleButtonRow {
+      grid-template-columns: 1fr;
+    }
+
+    .hiddenUtilityButton {
+      display: none !important;
+    }
+
+    .currencyGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .rebornButtonAvailable {
+      animation: rebornPulse 1.35s ease-in-out infinite alternate;
+    }
+
+    @keyframes rebornPulse {
+      0% { border-color: #d6a84f; color: #d6a84f; box-shadow: 0 0 6px rgba(214,168,79,0.25); }
+      50% { border-color: #ff4fd8; color: #ff4fd8; box-shadow: 0 0 12px rgba(255,79,216,0.42); }
+      100% { border-color: #39ff88; color: #39ff88; box-shadow: 0 0 14px rgba(57,255,136,0.42); }
+    }
+
+    .gemSkillRow {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 8px;
+      align-items: center;
+      margin: 7px auto 6px;
+      width: 100%;
+    }
+
+    .skillButton {
+      min-height: 38px;
+      padding: 5px 6px;
+      font-size: 11px;
+      line-height: 1.1;
+      white-space: normal;
+    }
+
+    .skillButton.ready {
+      border-color: #39ff88;
+      color: #39ff88;
+      box-shadow: 0 0 8px rgba(57,255,136,0.22);
+    }
+
+    .skillButton.activeSkill {
+      border-color: #ff4fd8;
+      color: #ff4fd8;
+      box-shadow: 0 0 10px rgba(255,79,216,0.28);
+    }
+
+    .emberStoreGrid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      align-items: start;
+    }
+
+    .emberStoreItem {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 7px;
+      padding: 9px 10px;
+      border: 1px solid var(--accent-soft);
+      border-radius: 10px;
+      background: rgba(0,0,0,0.22);
+      text-align: left;
+    }
+
+    .emberStoreTopRow,
+    .emberStoreActionRow {
+      display: grid;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .emberStoreTopRow {
+      grid-template-columns: minmax(0, 1fr) auto auto;
+    }
+
+    .emberStoreActionRow {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .emberStoreTopRow .storeButton {
+      width: auto;
+      min-width: 76px;
+    }
+
+    .emberStoreName {
+      color: var(--text-accent);
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .emberStoreDetails {
+      color: var(--text-muted);
+      font-size: 11px;
+      line-height: 1.25;
+    }
+
+    .emberStoreDescription {
+      color: var(--text-main);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .emberStoreCurrentBonus {
+      color: var(--text-accent);
+      font-size: 12px;
+      font-weight: bold;
+      line-height: 1.3;
+    }
+
+    .emberStoreNote {
+      color: var(--text-muted);
+      font-size: 10px;
+      line-height: 1.25;
+      font-style: italic;
+    }
+
+    .idleRewardAmount {
+      margin: 10px 0;
+      color: var(--text-accent);
+      font-size: 22px;
+      font-weight: bold;
+      text-shadow: 0 0 10px var(--accent);
+    }
+
+    .emberStatusText {
+      color: var(--text-muted);
+      font-size: 11px;
+      text-align: right;
+    }
+
+    .soundPackActive .themeValue.active {
+      color: #39ff88;
+    }
+  </style>
+
+
+<!-- =========================
+     SECTION 2: HTML BODY
+     ========================= -->
+
+</head>
+
+<body>
+  <div class="pageShell">
+
+    <div class="gamePanel" id="gamePanel">
+      <a class="logoText" href="https://magnettaforged.square.site" target="_blank" rel="noopener">
+        MagnettaForged
+      </a>
+
+      <div class="themePeekNotice" id="themePeekNotice">
+        Theme Preview
+      </div>
+
+      <div class="slotFrame">
+        <div class="lineOverlay" id="lineOverlay"></div>
+        <div class="slotGrid" id="slotGrid"></div>
+        <div class="winPopup" id="winPopup"></div>
+        <div class="unlockPopup" id="unlockPopup"></div>
+      </div>
+
+      <div class="controlPanel">
+        <div class="controlTopRow">
+          <div class="readout lineSelectorHidden" id="lineSelectorRow">
+            <span class="readoutLabel">Lines</span>
+            <button class="arrowButton" onclick="changeLineCount(-1)">‹</button>
+            <span class="readoutValue" id="lineCountDisplay">15</span>
+            <button class="arrowButton" onclick="changeLineCount(1)">›</button>
+          </div>
+
+          <div class="currencyGrid">
+            <div class="tokenReadout">
+              <span id="rebornCurrencyLabel">Embers</span>
+              <span id="rebornCurrencyBalance">0</span>
+            </div>
+
+            <div class="tokenReadout">
+              <span>Forge Tokens</span>
+              <span id="tokenBalance">0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="controlBottomRow">
+          <div class="readout">
+            <span class="readoutLabel">Bet per Line</span>
+            <button class="arrowButton" id="baseBetDownButton" onclick="changeBaseBet(-1)">‹</button>
+            <span class="readoutValue" id="baseBetDisplay">Free</span>
+            <button class="arrowButton" id="baseBetUpButton" onclick="changeBaseBet(1)">›</button>
+          </div>
+
+          <div class="readout" id="multiplierRow">
+            <span class="readoutLabel">Multiplier</span>
+            <button class="arrowButton" id="multiplierDownButton" onclick="changeMultiplier(-1)">‹</button>
+            <span class="readoutValue" id="multiplierDisplay">1</span>
+            <button class="arrowButton" id="multiplierUpButton" onclick="changeMultiplier(1)">›</button>
+          </div>
+
+          <button class="spinButton" id="spinButton" onclick="spin()">FREE</button>
+        </div>
+
+        <div class="gemSkillRow">
+          <button class="infoButton skillButton" id="forgeSurgeButton" onclick="activateEmberSkill('forgeSurge')">
+            Surge<br>Locked
+          </button>
+
+          <div>
+            <button class="chaosGem gem-clear" id="chaosGem" onclick="activateGem()" title="Chaos Gem">
+              <img src="gem.png" alt="Chaos Gem">
+            </button>
+            <div class="gemMessage" id="gemMessage"></div>
+          </div>
+
+          <button class="infoButton skillButton" id="freeForgeButton" onclick="activateEmberSkill('freeForge')">
+            Free<br>Locked
+          </button>
+        </div>
+
+        <div class="selectorStack">
+          <div class="themeSelectorRow inGameThemeSelector">
+            <div class="themeControl characterSelectorControl">
+              <span class="themeLabel">Character</span>
+              <button class="arrowButton" onclick="changeThemeCharacter(-1)">‹</button>
+              <span class="themeValue" id="themeCharacterDisplay">Default</span>
+              <button class="arrowButton" onclick="changeThemeCharacter(1)">›</button>
+            </div>
+
+            <span class="themeDivider">|</span>
+
+            <div class="themeControl themeSelectorControl">
+              <span class="themeLabel">Theme</span>
+              <button class="arrowButton" onclick="changeThemeVariant(-1)">‹</button>
+              <span class="themeValue" id="themeVariantDisplay">1</span>
+              <button class="arrowButton" onclick="changeThemeVariant(1)">›</button>
+            </div>
+          </div>
+
+          <div class="themeSelectorRow inGameThemeSelector" title="Music and sound pack selector">
+            <div class="themeControl musicSelectorControl soundSelectorPlaceholder">
+              <span class="themeLabel">Music</span>
+              <button class="arrowButton" disabled>‹</button>
+              <span class="themeValue">Default</span>
+              <button class="arrowButton" disabled>›</button>
+            </div>
+
+            <span class="themeDivider">|</span>
+
+            <div class="themeControl soundSelectorControl soundPackActive">
+              <span class="themeLabel">Sounds</span>
+              <button class="arrowButton" onclick="changeSoundPack(-1)">‹</button>
+              <span class="themeValue" id="soundPackDisplay">Forge</span>
+              <button class="arrowButton" onclick="changeSoundPack(1)">›</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settingsPanel">
+      <div class="specialSettings">
+        <div class="specialTitle">Special Settings</div>
+
+        <div class="infoButtonRow">
+          <button class="infoButton" id="storeButton" onclick="setInfoMode('store')">
+            Theme Store
+          </button>
+
+          <button class="infoButton" id="emberStoreButton" onclick="setInfoMode('emberStore')">
+            Ember Store
+          </button>
+        </div>
+
+        <div class="infoButtonRow">
+          <button class="infoButton" id="codesButton" onclick="setInfoMode('codes')">
+            Codes
+          </button>
+
+          <button class="infoButton" id="statsButton" onclick="setInfoMode('stats')">
+            Stats
+          </button>
+        </div>
+
+        <div class="infoButtonRow singleButtonRow">
+          <button class="infoButton" id="gameInfoButton" onclick="setInfoMode('gameInfo')">
+            Game Info
+          </button>
+        </div>
+
+        <button class="infoButton hiddenUtilityButton" id="breakdownButton" onclick="setInfoMode('breakdown')">Win Breakdown</button>
+        <button class="infoButton hiddenUtilityButton" id="themePeekButton" onclick="startThemePeek()">Theme Peek</button>
+        <button class="infoButton hiddenUtilityButton" id="linePreviewButton" onclick="startLinePreview()">Show Lines</button>
+
+        <div class="soundButtonRow">
+          <button class="infoButton" id="rebornButton" onclick="openRebornConfirm()">
+            Reborn Locked
+          </button>
+        </div>
+
+        <div class="codeArea">
+          <input class="codeInput" id="codeInput" placeholder="Enter code" autocomplete="off">
+          <button class="codeButton" onclick="applyCode()">Apply</button>
+        </div>
+
+        <div class="codeMessage" id="codeMessage"></div>
+
+        <button class="resetButton" onclick="resetGame()">Reset Game</button>
+
+        <div class="lastSpin" id="lastSpin">No spin yet.</div>
+
+        <div class="devTools" id="devTools">
+          <div id="unlockContent"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="infoPanel">
+      <div class="winInfo" id="winInfo"></div>
+
+      <div class="bottomStats">
+        Total Spins: <span id="spinCount">0</span>
+      </div>
+    </div>
+
+    <div class="devPanel" id="devPanel">
+      <div id="devPanelContent"></div>
+    </div>
+
+  </div>
+
+
+
+
+  <div class="winkyOverlay" id="rebornIntroOverlay">
+    <div class="winkyPopup">
+      <div class="winkyPopupTitle">Reborn Forge Unlocked</div>
+      <div class="winkyPopupText">
+        You can now reborn at 1Qi Forge Tokens or higher.<br><br>
+        Reborning resets your current run, but keeps permanent unlocks and earns Embers for future upgrades.
+        Push higher before rebirthing for larger rewards.
+      </div>
+
+      <div class="winkyButtonRow">
+        <button class="infoButton" onclick="closeRebornIntro(true)">View Reborn</button>
+        <button class="infoButton" onclick="closeRebornIntro(false)">Later</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="winkyOverlay" id="rebornOverlay">
+    <div class="winkyPopup">
+      <div class="winkyPopupTitle">Reborn Forge</div>
+      <div class="winkyPopupText" id="rebornPopupText"></div>
+
+      <div class="winkyButtonRow">
+        <button class="infoButton" id="confirmRebornButton" onclick="confirmReborn()">Yes, Reborn</button>
+        <button class="infoButton" onclick="closeRebornConfirm()">No, Keep Pushing</button>
+      </div>
+
+      <div class="winkyPopupMessage" id="rebornPopupMessage"></div>
+    </div>
+  </div>
+  <div class="winkyOverlay" id="resetOverlay">
+    <div class="winkyPopup">
+      <div class="winkyPopupTitle">Are you sure?</div>
+      <div class="winkyPopupText">This will reset current tokens and code redemptions. Themes, lifetime stats, and Player ID stay saved.</div>
+
+      <div class="winkyButtonRow">
+        <button class="infoButton" onclick="confirmResetGame()">Yes</button>
+        <button class="infoButton" onclick="closeResetConfirm()">No</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="winkyOverlay" id="winkyOverlay">
+    <div class="winkyPopup">
+      <div class="winkyPopupTitle">Winky Intervention</div>
+      <div class="winkyPopupText">Did you feed Winky?</div>
+
+      <div class="winkyButtonRow">
+        <button class="infoButton" onclick="answerWinky(true)">Yes</button>
+        <button class="infoButton" onclick="answerWinky(false)">No</button>
+      </div>
+
+      <div class="winkyPopupMessage" id="winkyPopupMessage"></div>
+    </div>
+  </div>
+
+  <div class="winkyOverlay" id="leaderboardOverlay">
+    <div class="winkyPopup">
+      <div class="winkyPopupTitle">Optional Leaderboard</div>
+      <div class="winkyPopupText">Submit your score to the leaderboard?</div>
+
+      <div class="leaderboardPlayerId" id="leaderboardPlayerIdDisplay"></div>
+
+      <div class="leaderboardField">
+        <label for="leaderboardUsernameInput">Username</label>
+        <input id="leaderboardUsernameInput" placeholder="Example: WinkyFan22" maxlength="30" autocomplete="off">
+      </div>
+
+      <div class="leaderboardField">
+        <label for="leaderboardDeviceInput">Device Info</label>
+        <input id="leaderboardDeviceInput" placeholder="Example: Galaxy S22 / Chrome" maxlength="60" autocomplete="off">
+      </div>
+
+      <div class="winkyButtonRow">
+        <button class="infoButton" onclick="submitLeaderboardFromPrompt()">Submit</button>
+        <button class="infoButton" onclick="declineLeaderboardPrompt()">No Thanks</button>
+      </div>
+
+      <div class="winkyPopupMessage" id="leaderboardMessage"></div>
+    </div>
+  </div>
+
+
+  <div class="winkyOverlay" id="idleRewardOverlay">
+    <div class="winkyPopup">
+      <div class="winkyPopupTitle">The Forge Worked While You Were Away</div>
+      <div class="winkyPopupText" id="idleRewardDetails"></div>
+      <div class="idleRewardAmount" id="idleRewardAmount">0</div>
+      <button class="infoButton" id="collectIdleRewardButton" onclick="collectIdleReward()">
+        Collect
+      </button>
+    </div>
+  </div>
+
+
+  <script>
+    // =========================
+    // SECTION 3: SETTINGS / SYMBOLS / STATE
+    // =========================
+
+    // =========================
+    // CORE SETTINGS
+    // =========================
+
+    const VISIBLE_ROWS = 3;
+    const COLS = 5;
+
+    // Main adjustable economy controls.
+    // baseBetOptions controls Bet per Line. 0n = Free.
+    // allMultiplierOptions controls the full open multiplier ladder.
+    const baseBetOptions = [0n, 1n, 5n, 10n, 25n, 50n, 75n, 100n];
+
+    const allMultiplierOptions = [
+      1n,
+      10n,
+      100n,
+      1000n,
+      1000000n,
+      1000000000n,
+      1000000000000n,
+      1000000000000000n,
+      1000000000000000000n,
+      1000000000000000000000n,
+      1000000000000000000000000n,
+      1000000000000000000000000000n,
+      1000000000000000000000000000000n,
+      1000000000000000000000000000000000n,
+      1000000000000000000000000000000000000n,
+      1000000000000000000000000000000000000000n
+    ];
+
+
+    const lineCountOptions = [5, 10, 15];
+
+    const characterSymbols = ["Maya", "Reign", "Kyra", "Nadia"];
+    const variantGemKeys = ["ruby", "emerald", "sapphire", "amethyst", "topaz", "skull"];
+
+    const skippedVariantThemes = [
+      "KyraSapphire",
+      "MayaRuby",
+      "NadiaAmethyst",
+      "ReignTopaz"
+    ];
+
+    const defaultLineColors = [
+      "#f0c35a", "#55d6ff", "#ff4fd8", "#60ff7a", "#ff7a32",
+      "#ffffff", "#a855ff", "#00ffd5", "#ff4444", "#99ff33",
+      "#ffd166", "#4cc9f0", "#f72585", "#80ffdb", "#f8961e"
+    ];
+
+    let lineColors = [...defaultLineColors];
+
+    // =========================
+    // BIGINT HELPERS
+    // =========================
+
+    function getStoredBigInt(key, fallback = 0n) {
+      const value = localStorage.getItem(key);
+
+      if (value === null || value === undefined || value === "") {
+        return fallback;
+      }
+
+      try {
+        return BigInt(value);
+      } catch {
+        return fallback;
+      }
+    }
+
+    function saveBigInt(key, value) {
+      localStorage.setItem(key, value.toString());
+    }
+
+    // =========================
+    // AUDIO SETTINGS
+    // =========================
+
+    let soundEnabled = localStorage.getItem("soundEnabled") !== "false";
+
+    const soundPackOptions = ["Off", "Forge"];
+    let soundPackIndex = soundEnabled ? 1 : 0;
+
+    const soundFiles = {
+      click: "button-click.mp3",
+      spin: "spin-start.mp3",
+      stop: "reel-stop.mp3",
+      smallWin: "small-win.mp3",
+      bigWin: "big-win.mp3",
+      bonus: "bonus-spin.mp3",
+      unlock: "theme-unlock.mp3",
+      winky: "winky-intervention.mp3"
+    };
+
+    const sounds = {};
+
+    Object.keys(soundFiles).forEach(soundKey => {
+      sounds[soundKey] = new Audio(soundFiles[soundKey]);
+      sounds[soundKey].preload = "auto";
+      sounds[soundKey].volume = 0.55;
+    });
+
+    // =========================
+    // THEME SETTINGS
+    // =========================
+
+    const themes = {
+      Default: {
+        label: "Default 1",
+        accent: "#d6a84f",
+        textMain: "#ffffff",
+        textMuted: "#d8d0bd",
+        textAccent: "#d6a84f",
+        buttonText: "#d6a84f",
+        pageImage: 'url("background.png")',
+        gameImage: "none",
+        lineColors: defaultLineColors,
+        unlockType: "base",
+        characterGroup: "Default",
+        variantLabel: "1"
+      },
+
+      Maya: {
+        label: "Maya 1",
+        accent: "#D13A2F",
+        textMain: "#ffffff",
+        textMuted: "#ffd0c8",
+        textAccent: "#FF4438",
+        buttonText: "#FF4438",
+        pageImage: 'url("background.png")',
+        gameImage: 'url("mayatheme.png")',
+        lineColors: [
+          "#D13A2F", "#ffffff", "#ff7a4f", "#f0c35a", "#ff4444",
+          "#ff9b66", "#d6a84f", "#ffb199", "#c62828", "#ffd166",
+          "#ff6b35", "#e76f51", "#f4a261", "#ffcc66", "#ffffff"
+        ],
+        unlockType: "base",
+        characterGroup: "Maya",
+        variantLabel: "1"
+      },
+
+      Reign: {
+        label: "Reign 1",
+        accent: "#8A4A2A",
+        textMain: "#ffffff",
+        textMuted: "#d8c2b3",
+        textAccent: "#B86A3C",
+        buttonText: "#B86A3C",
+        pageImage: 'url("background.png")',
+        gameImage: 'url("reigntheme.png")',
+        lineColors: [
+          "#c46a35", "#ff9b4f", "#f0c35a", "#ffffff", "#9b4a22",
+          "#ff6b35", "#d97941", "#ffaa66", "#ffd166", "#b4532a",
+          "#f8961e", "#e76f51", "#f4a261", "#ffb703", "#ffffff"
+        ],
+        unlockType: "base",
+        characterGroup: "Reign",
+        variantLabel: "1"
+      },
+
+      Kyra: {
+        label: "Kyra 1",
+        accent: "#36A3FF",
+        textMain: "#ffffff",
+        textMuted: "#d7eaff",
+        textAccent: "#36A3FF",
+        buttonText: "#36A3FF",
+        pageImage: 'url("background.png")',
+        gameImage: 'url("kyratheme.png")',
+        lineColors: [
+          "#36A3FF", "#4cc9f0", "#00ffd5", "#ffffff", "#2f8cff",
+          "#55d6ff", "#80ffdb", "#0096ff", "#a8e6ff", "#3a86ff",
+          "#00b4d8", "#caf0f8", "#48cae4", "#90e0ef", "#ffffff"
+        ],
+        unlockType: "base",
+        characterGroup: "Kyra",
+        variantLabel: "1"
+      },
+
+      Nadia: {
+        label: "Nadia 1",
+        accent: "#9B5DE5",
+        textMain: "#ffffff",
+        textMuted: "#ead8ff",
+        textAccent: "#B66CFF",
+        buttonText: "#B66CFF",
+        pageImage: 'url("background.png")',
+        gameImage: 'url("nadiatheme.png")',
+        lineColors: [
+          "#9B5DE5", "#d6a84f", "#f0c35a", "#ffffff", "#c77dff",
+          "#7b2cbf", "#ffd166", "#e0aaff", "#b8860b", "#ffcc66",
+          "#a855ff", "#f5d76e", "#7209b7", "#ffe29a", "#ffffff"
+        ],
+        unlockType: "base",
+        characterGroup: "Nadia",
+        variantLabel: "1"
+      },
+
+      Winky: {
+        label: "Winky 1",
+        accent: "#39ff88",
+        textMain: "#ffffff",
+        textMuted: "#d6ffe5",
+        textAccent: "#39ff88",
+        buttonText: "#39ff88",
+        pageImage: 'url("background.png")',
+        gameImage: 'url("winkytheme.png")',
+        lineColors: [
+          "#39ff88", "#ffffff", "#ff4fd8", "#f5b642", "#00ffd5",
+          "#99ff33", "#ff4444", "#a855ff", "#55d6ff", "#f0c35a",
+          "#80ffdb", "#ff7a32", "#c77dff", "#eaff00", "#ffffff"
+        ],
+        unlockType: "special",
+        characterGroup: "Winky",
+        variantLabel: "1"
+      }
+    };
+
+    // =========================
+    // AUTO-GENERATED GEM VARIANT THEMES
+    // =========================
+
+    const gemVariantAccents = {
+      ruby: "#D13A2F",
+      emerald: "#20C56B",
+      sapphire: "#36A3FF",
+      amethyst: "#9B5DE5",
+      topaz: "#F5B642",
+      skull: "#D8D8D8"
+    };
+
+    const gemVariantTextMuted = {
+      ruby: "#ffd0c8",
+      emerald: "#d6ffe5",
+      sapphire: "#d7eaff",
+      amethyst: "#ead8ff",
+      topaz: "#fff0c7",
+      skull: "#eeeeee"
+    };
+
+    const gemVariantLineColors = {
+      ruby: ["#D13A2F", "#ff4444", "#ffffff", "#ff7a4f", "#f0c35a", "#c62828", "#ff9b66", "#ffd166", "#e76f51", "#ff6b35", "#f4a261", "#ffb199", "#d6a84f", "#ffcc66", "#ffffff"],
+      emerald: ["#20C56B", "#39ff88", "#ffffff", "#80ffdb", "#99ff33", "#00ffd5", "#60ff7a", "#2ecc71", "#a7ff83", "#1dd1a1", "#55efc4", "#b8ffcc", "#16a085", "#d6a84f", "#ffffff"],
+      sapphire: ["#36A3FF", "#2f8cff", "#ffffff", "#4cc9f0", "#00b4d8", "#80ffdb", "#55d6ff", "#0096ff", "#90e0ef", "#caf0f8", "#3a86ff", "#48cae4", "#00ffd5", "#f0c35a", "#ffffff"],
+      amethyst: ["#9B5DE5", "#a855ff", "#ffffff", "#c77dff", "#f72585", "#7209b7", "#e0aaff", "#ff4fd8", "#b5179e", "#560bad", "#80ffdb", "#d6a84f", "#3a0ca3", "#f0c35a", "#ffffff"],
+      topaz: ["#F5B642", "#ffd166", "#ffffff", "#f0c35a", "#ffb703", "#ffcc66", "#f8961e", "#d6a84f", "#ffe29a", "#f4a261", "#ff9b4f", "#b8860b", "#ffaa66", "#9b5de5", "#ffffff"],
+      skull: ["#D8D8D8", "#ffffff", "#8a8a8a", "#ff4444", "#39ff88", "#bdbdbd", "#f5b642", "#a855ff", "#777777", "#00ffd5", "#cfcfcf", "#ff4fd8", "#999999", "#f0c35a", "#ffffff"]
+    };
+
+    function capitalize(text) {
+      if (!text) return "";
+      return text.charAt(0).toUpperCase() + text.slice(1);
+    }
+
+    function addVariantThemes() {
+      const publicThemeNumbers = {};
+
+      characterSymbols.forEach(characterName => {
+        publicThemeNumbers[characterName] = 2;
+
+        variantGemKeys.forEach(gemKey => {
+          const themeKey = `${characterName}${capitalize(gemKey)}`;
+
+          if (skippedVariantThemes.includes(themeKey)) {
+            return;
+          }
+
+          const fileName = `${characterName.toLowerCase()}${gemKey}.png`;
+          const accent = gemVariantAccents[gemKey] || themes[characterName].accent;
+          const publicNumber = publicThemeNumbers[characterName]++;
+
+          themes[themeKey] = {
+            label: `${characterName} ${publicNumber}`,
+            accent,
+            textMain: "#ffffff",
+            textMuted: gemVariantTextMuted[gemKey] || themes[characterName].textMuted,
+            textAccent: accent,
+            buttonText: accent,
+            pageImage: 'url("background.png")',
+            gameImage: `url("${fileName}")`,
+            lineColors: gemVariantLineColors[gemKey] || themes[characterName].lineColors,
+            unlockType: "variant",
+            characterGroup: characterName,
+            variantLabel: String(publicNumber),
+            baseCharacter: characterName,
+            gemKey,
+            iconOverrides: {},
+            rotationInterval: 10,
+            rotationFrames: []
+          };
+        });
+      });
+    }
+
+    addVariantThemes();
+
+
+    // =========================
+    // =========================
+    // ADD NEW THEMES HERE
+    // =========================
+    // One block = one theme/store entry. Normal future theme format:
+    //
+    // ThemeKey: { group: "Pet Warrior", theme: "1", bg: "petwarrior1.png", store: [true, 100000n] }
+    //
+    // Optional fields:
+    // - soon: true                 -> store shows Coming Soon / ? / locked
+    // - accent: "#39ff88"          -> overrides UI accent while theme is active
+    // - icons: "default"           -> uses normal icons; this can be omitted
+    // - icons: { Animal:"dog.png" } -> replaces only listed icons
+    // - rotateEvery: 10            -> rotation interval in spins
+    // - rotate: [{ bg:"a.png", icons:{ Animal:"dog.png" } }, ...]
+    //
+    // Store format:
+    // store: [active, priceMultiplier]
+    // price = THEME_STORE_BASE_COST * priceMultiplier
+    // =========================
+
+    const ADD_ON_THEMES = {
+      WarriorPets1: {
+        group: "Warrior Pets",
+        theme: "1",
+        bg: "pwpocketbk.png",
+        store: [true, 5000n],
+
+        rotateEvery: 10,
+        rotate: [
+          {
+            bg: "pwpocketbk.png",
+            icons: {
+              Maya: "pwpocketicon.png",
+              Reign: "pwziggyicon.png",
+              Kyra: "pwhagasicon.png",
+              Nadia: "pweddieicon.png"
+            }
+          },
+          {
+            bg: "pweddiebk.png",
+            icons: {
+              Maya: "pwpocketicon.png",
+              Reign: "pwziggyicon.png",
+              Kyra: "pwhagasicon.png",
+              Nadia: "pweddieicon.png"
+            }
+          },
+          {
+            bg: "pwziggybk.png",
+            icons: {
+              Maya: "pwpocketicon.png",
+              Reign: "pwziggyicon.png",
+              Kyra: "pwhagasicon.png",
+              Nadia: "pweddieicon.png"
+            }
+          },
+          {
+            bg: "pwhagasbk.png",
+            icons: {
+              Maya: "pwpocketicon.png",
+              Reign: "pwziggyicon.png",
+              Kyra: "pwhagasicon.png",
+              Nadia: "pweddieicon.png"
+            }
+          }
+        ]
+      },
+    
+      WarriorPets2: {
+        group: "Warrior Pets",
+        theme: "2",
+        bg: "pwlouiebk.png",
+        store: [true, 5000n],
+
+        rotateEvery: 10,
+        rotate: [
+          {
+            bg: "pwlouiebk.png",
+            icons: {
+              Maya: "pwlouieicon.png",
+              Reign: "pwpoppyicon.png",
+              Kyra: "pwharryicon.png",
+              Nadia: "pwhenryicon.png"
+            }
+          },
+          {
+            bg: "pwpoppybk.png",
+            icons: {
+              Maya: "pwlouieicon.png",
+              Reign: "pwpoppyicon.png",
+              Kyra: "pwharryicon.png",
+              Nadia: "pwhenryicon.png"
+            }
+          },
+          {
+            bg: "pwharrybk.png",
+            icons: {
+              Maya: "pwlouieicon.png",
+              Reign: "pwpoppyicon.png",
+              Kyra: "pwharryicon.png",
+              Nadia: "pwhenryicon.png"
+            }
+          },
+          {
+            bg: "pwhenrybk.png",
+            icons: {
+              Maya: "pwlouieicon.png",
+              Reign: "pwpoppyicon.png",
+              Kyra: "pwharryicon.png",
+              Nadia: "pwhenryicon.png"
+            }
+          }
+        ]
+      },
+       
+      WarriorPets3: { group: "Warrior Pets", theme: "3", bg: "warriorpets3.png", store: [false, 100n], soon: true },
+      WarriorPets4: { group: "Warrior Pets", theme: "4", bg: "warriorpets4.png", store: [false, 100n], soon: true },
+      WarriorPets5: { group: "Warrior Pets", theme: "5", bg: "warriorpets5.png", store: [false, 100n], soon: true },
+
+      Cryptid1: { group: "Cryptids", theme: "1", bg: "cryptid1.png", accent: "#39ff88", store: [false, 250n], soon: true },
+      Cryptid2: { group: "Cryptids", theme: "2", bg: "cryptid2.png", accent: "#39ff88", store: [false, 250n], soon: true },
+      Cryptid3: { group: "Cryptids", theme: "3", bg: "cryptid3.png", accent: "#39ff88", store: [false, 250n], soon: true },
+      Cryptid4: { group: "Cryptids", theme: "4", bg: "cryptid4.png", accent: "#39ff88", store: [false, 250n], soon: true },
+      Cryptid5: { group: "Cryptids", theme: "5", bg: "cryptid5.png", accent: "#39ff88", store: [false, 250n], soon: true },
+
+      YsAzzz: { group: "Secret", theme: "1", bg: "ysazzz.png", accent: "#ff4fd8", store: [false, 1000n], soon: true }
+    };
+
+    function getAddOnThemeLabel(def, themeKey) {
+      const group = def.group || "Extra";
+      const variant = def.theme || "1";
+      return def.label || `${group} ${variant}`;
+    }
+
+    function getAddOnThemeStoreConfig(def, themeKey) {
+      const store = Array.isArray(def.store) ? def.store : [false, 1n];
+
+      return {
+        active: Boolean(store[0]),
+        comingSoon: Boolean(def.soon),
+        multiplier: BigInt(store[1] || 1n),
+        label: getAddOnThemeLabel(def, themeKey)
+      };
+    }
+
+    function registerAddOnThemes() {
+      Object.entries(ADD_ON_THEMES).forEach(([themeKey, def]) => {
+        const storeConfig = getAddOnThemeStoreConfig(def, themeKey);
+
+        // Coming Soon items stay in the store but are not selectable themes yet.
+        if (storeConfig.comingSoon) return;
+
+        const accent = def.accent || "#d6a84f";
+        const icons = def.icons && def.icons !== "default" ? def.icons : {};
+        const rotationFrames = Array.isArray(def.rotate) ? def.rotate.map(frame => ({
+          image: frame.bg || frame.background || frame.image,
+          icons: frame.icons || frame.iconOverrides || {}
+        })) : [];
+
+        themes[themeKey] = {
+          label: getAddOnThemeLabel(def, themeKey),
+          accent,
+          textMain: "#ffffff",
+          textMuted: def.textMuted || "#d8d0bd",
+          textAccent: def.textAccent || accent,
+          buttonText: def.buttonText || accent,
+          pageImage: 'url("background.png")',
+          gameImage: asCssUrl(def.bg || def.background || "comingsoon.png"),
+          lineColors: def.lineColors || defaultLineColors,
+          unlockType: def.unlockType || "storeOnly",
+          characterGroup: def.group || "Extra",
+          variantLabel: String(def.theme || "1"),
+          iconOverrides: icons,
+          rotationInterval: Number(def.rotateEvery || def.rotationInterval || 10),
+          rotationFrames,
+          storeOnly: true
+        };
+      });
+    }
+
+    registerAddOnThemes();
+
+    let themeCharacterGroups = ["Default", "Maya", "Reign", "Kyra", "Nadia", "Winky"];
+    let themeCharacterIndex = 0;
+    let themeVariantIndex = 0;
+
+    function buildThemeGroupMap() {
+      const groupMap = {};
+
+      Object.keys(themes).forEach(themeKey => {
+        const theme = themes[themeKey];
+        const group = theme.characterGroup || themeKey;
+
+        if (!groupMap[group]) {
+          groupMap[group] = [];
+        }
+
+        groupMap[group].push(themeKey);
+      });
+
+      Object.keys(groupMap).forEach(group => {
+        if (!themeCharacterGroups.includes(group)) {
+          themeCharacterGroups.push(group);
+        }
+      });
+
+      themeCharacterGroups.forEach(group => {
+        if (!groupMap[group]) {
+          groupMap[group] = [];
+        }
+      });
+
+      return groupMap;
+    }
+
+    let themeGroupMap = buildThemeGroupMap();
+
+
+    // =========================
+    // THEME STORE CONFIG
+    // Edit this block later to change availability/prices.
+    // active = can buy; comingSoon = visible but locked; multiplier × base cost = price.
+    // =========================
+
+    const THEME_STORE_BASE_COST = 1000000000000n; // 1T
+
+    let themeStoreConfig = {
+      Maya: { active: true, multiplier: 1n },
+      Reign: { active: true, multiplier: 1n },
+      Kyra: { active: true, multiplier: 1n },
+      Nadia: { active: true, multiplier: 1n },
+      Winky: { active: false, multiplier: 10n },
+
+      MayaEmerald: { active: true, multiplier: 200n },
+      MayaSapphire: { active: true, multiplier: 5n },
+      MayaAmethyst: { active: false, comingSoon: true, multiplier: 1n },
+      MayaTopaz: { active: true, multiplier: 1n },
+      MayaSkull: { active: true, multiplier: 300n },
+
+      ReignRuby: { active: true, multiplier: 10n },
+      ReignEmerald: { active: false, comingSoon: true, multiplier: 1n },
+      ReignSapphire: { active: false, comingSoon: true, multiplier: 1n },
+      ReignAmethyst: { active: false, comingSoon: true, multiplier: 1n },
+      ReignSkull: { active: false, comingSoon: true, multiplier: 1n },
+
+      KyraRuby: { active: true, multiplier: 20n },
+      KyraEmerald: { active: true, multiplier: 5n },
+      KyraAmethyst: { active: false, comingSoon: true, multiplier: 1n },
+      KyraTopaz: { active: true, multiplier: 10n },
+      KyraSkull: { active: true, multiplier: 300n },
+
+      NadiaRuby: { active: true, multiplier: 10n },
+      NadiaEmerald: { active: true, multiplier: 50n },
+      NadiaSapphire: { active: false, comingSoon: true, multiplier: 1n },
+      NadiaTopaz: { active: false, comingSoon: true, multiplier: 1n },
+      NadiaSkull: { active: true, multiplier: 300n }
+    };
+
+    function applyAddOnThemeStoreConfig() {
+      Object.entries(ADD_ON_THEMES).forEach(([themeKey, def]) => {
+        themeStoreConfig[themeKey] = getAddOnThemeStoreConfig(def, themeKey);
+      });
+    }
+
+    applyAddOnThemeStoreConfig();
+
+    // =========================
+    // SAVED THEME / DEV STATE
+    // =========================
+
+    let unlockedThemes = JSON.parse(localStorage.getItem("unlockedThemes")) || {
+      Default: true,
+      Maya: false,
+      Reign: false,
+      Kyra: false,
+      Nadia: false,
+      Winky: false
+    };
+
+    Object.keys(themes).forEach(themeKey => {
+      if (typeof unlockedThemes[themeKey] !== "boolean") {
+        unlockedThemes[themeKey] = themeKey === "Default";
+      }
+    });
+
+    skippedVariantThemes.forEach(themeKey => {
+      delete unlockedThemes[themeKey];
+    });
+
+    localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+
+    let devToolsUnlocked = localStorage.getItem("devToolsUnlocked") === "true";
+
+    let activeTheme = localStorage.getItem("activeTheme") || "Default";
+
+    if (!themes[activeTheme]) {
+      activeTheme = "Default";
+      localStorage.setItem("activeTheme", activeTheme);
+    }
+
+    let themeIndex = 0;
+
+    // =========================
+    // MULTIPLIER OPTIONS
+    // Multipliers are intentionally open from the start.
+    // Edit allMultiplierOptions above to change the ladder.
+    // =========================
+
+    function getUnlockedMultiplierOptions() {
+      return allMultiplierOptions;
+    }
+
+
+    // =========================
+    // CONTROL STATE
+    // =========================
+
+    function getStoredIndex(key, fallback, maxExclusive) {
+      const value = Number(localStorage.getItem(key));
+
+      if (!Number.isInteger(value) || value < 0 || value >= maxExclusive) {
+        return fallback;
+      }
+
+      return value;
+    }
+
+    function saveBetSettings() {
+      localStorage.setItem("baseBetIndex", String(baseBetIndex));
+      localStorage.setItem("multiplierIndex", String(multiplierIndex));
+    }
+
+    let baseBetIndex = getStoredIndex("baseBetIndex", 0, baseBetOptions.length);
+    let multiplierIndex = getStoredIndex("multiplierIndex", 0, allMultiplierOptions.length);
+    let lineCountIndex = 2; // locked to 15 lines
+
+    let controlsLocked = false;
+    let autoSpinEnabled = false;
+    let autoSpinTimer = null;
+
+    let gemActive = false;
+    let currentGem = "clear";
+
+    let lineOverlayVisible = true;
+    let linePreviewIndex = 0;
+    let linePreviewTimer = null;
+    let lineAutoHideTimer = null;
+    let winPopupTimer = null;
+    let unlockPopupTimer = null;
+
+    let activePanel = null;
+    let lastWinBreakdown = [];
+
+    let bonusSpinQueue = 0;
+    let bonusSpinLineBet = 0n;
+    let bonusSpinFinalBet = 0n;
+    let bonusSpinSource = "";
+
+    let bonusSessionTotal = 0;
+    let bonusSessionPlayed = 0;
+    let bonusSessionWon = 0n;
+    let devUnlockInfoVisible = false;
+
+    const BONUS_SPIN_DELAY = 1500;
+
+    // Reel timing. These values are tuned for short anvil-style stop sounds.
+    const FIRST_REEL_STOP_DELAY = 900;
+    const REEL_STOP_SPACING = 600;
+
+    // Dev/demo auto-spin timing. Spins normally using current bet settings.
+    const AUTO_SPIN_DELAY = 1000;
+
+    // Idle Forge uses the same completed-spin timestamp sent to Sheets.
+    const IDLE_MIN_MINUTES = 10;
+    const IDLE_FULL_RATE_END_MINUTES = 8 * 60;
+    const IDLE_REDUCED_RATE_END_MINUTES = 24 * 60;
+
+
+    // =========================
+    // REBORN / EMBER SETTINGS
+    // =========================
+
+    const REBORN_CURRENCY_NAME = "Embers";
+    const REBORN_UNLOCK_AT = 1000000000000000000n; // 1Qi
+
+    const REBORN_REWARD_TIERS = [
+      [1000000000000000000n, 1n],       // 1Qi
+      [10000000000000000000n, 12n],     // 10Qi
+      [20000000000000000000n, 25n],     // 20Qi
+      [50000000000000000000n, 70n],     // 50Qi
+      [100000000000000000000n, 150n],   // 100Qi
+      [250000000000000000000n, 400n],   // 250Qi
+      [500000000000000000000n, 900n],   // 500Qi
+      [1000000000000000000000n, 2000n]  // 1Sx
+    ];
+
+    const EMBER_UPGRADES = {
+      axeMastery: {
+        name: "Axe Mastery",
+        type: "Passive",
+        description: "+1% Axe value per level.",
+        maxLevel: 25,
+        baseCost: 3n
+      },
+      gemAffinity: {
+        name: "Gem Affinity",
+        type: "Passive",
+        description: "+1% Gem value per level.",
+        maxLevel: 25,
+        baseCost: 5n
+      },
+      wildSpark: {
+        name: "Wild Spark",
+        type: "Passive",
+        description: "+1% Wild value per level.",
+        maxLevel: 25,
+        baseCost: 8n
+      },
+      idleForge: {
+        name: "Idle Forge",
+        type: "Passive",
+        description: "+0.5% of current-run highest balance per level, per hour while inactive.",
+        maxLevel: 25,
+        baseCost: 10n
+      },
+      forgeSurge: {
+        name: "Forge Surge",
+        type: "Active",
+        description: "+1% winnings per level for 10 minutes. 60 minute cooldown.",
+        maxLevel: 25,
+        baseCost: 15n,
+        durationMs: 10 * 60 * 1000,
+        cooldownMs: 60 * 60 * 1000
+      },
+      freeForge: {
+        name: "Free Forge",
+        type: "Rare",
+        description: "Next paid spins cost 0. Level 1–3 gives 1–3 charges. 24 hour cooldown.",
+        maxLevel: 3,
+        baseCost: 100n,
+        cooldownMs: 24 * 60 * 60 * 1000
+      }
+    };
+
+    // =========================
+    // LEADERBOARD SETTINGS
+    // =========================
+
+    const LEADERBOARD_URL = "https://script.google.com/macros/s/AKfycby0gs4pBMKVwDEXpD3RgnhILqZTfvUwIiAO5Q8JCprWY7AcAovO7T13uVDDKTKbVqFZag/exec";
+
+    function createPlayerId() {
+      if (window.crypto && typeof window.crypto.randomUUID === "function") {
+        return window.crypto.randomUUID();
+      }
+
+      return "fs-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 12);
+    }
+
+    let playerId = localStorage.getItem("forgePlayerId");
+
+    if (!playerId) {
+      playerId = createPlayerId();
+      localStorage.setItem("forgePlayerId", playerId);
+    }
+
+    let leaderboardUsername = localStorage.getItem("leaderboardUsername") || "";
+    let leaderboardDeviceInfo = localStorage.getItem("leaderboardDeviceInfo") || "";
+    let leaderboardPromptAnswered = localStorage.getItem("leaderboardPromptAnswered") === "true";
+    let leaderboardOptedIn = localStorage.getItem("leaderboardOptedIn") === "true";
+    let lastLeaderboardAutoSpin = Number(localStorage.getItem("lastLeaderboardAutoSpin")) || 0;
+
+
+    let unlockedCodes = JSON.parse(localStorage.getItem("unlockedCodes")) || [];
+
+    function saveUnlockedCodes() {
+      localStorage.setItem("unlockedCodes", JSON.stringify(unlockedCodes));
+    }
+
+    function rememberUnlockedCode(code) {
+      if (!unlockedCodes.includes(code)) {
+        unlockedCodes.push(code);
+        unlockedCodes.sort();
+        saveUnlockedCodes();
+      }
+    }
+
+    // =========================
+    // THEME ASSET OVERRIDES / ROTATION
+    // =========================
+
+    function asCssUrl(fileNameOrCss) {
+      if (!fileNameOrCss) return "";
+      if (String(fileNameOrCss).startsWith("url(")) return fileNameOrCss;
+      return `url("${fileNameOrCss}")`;
+    }
+
+    function getThemeRotationFrame(themeName = activeTheme) {
+      const theme = themes[themeName];
+
+      if (!theme || !Array.isArray(theme.rotationFrames) || theme.rotationFrames.length === 0) {
+        return null;
+      }
+
+      const interval = Math.max(1, Number(theme.rotationInterval || 10));
+
+      let spinCountForRotation = 0;
+
+      if (typeof window !== "undefined") {
+        spinCountForRotation = Number(localStorage.getItem("forgeTotalSpins")) || 0;
+      }
+
+      if (typeof totalSpins !== "undefined") {
+        spinCountForRotation = totalSpins;
+      }
+
+      const frameIndex = Math.floor(spinCountForRotation / interval) % theme.rotationFrames.length;
+
+      return theme.rotationFrames[frameIndex] || null;
+    }
+
+    function getThemeIconOverride(symbolName, fallback) {
+      const theme = themes[activeTheme] || {};
+      const frame = getThemeRotationFrame(activeTheme);
+      const baseIcons = theme.iconOverrides || {};
+      const frameIcons = (frame && (frame.icons || frame.iconOverrides)) || {};
+      const mergedIcons = { ...baseIcons, ...frameIcons };
+
+      return mergedIcons[symbolName] || mergedIcons[symbolName.toLowerCase()] || fallback;
+    }
+
+    function updateThemeRotationIfNeeded() {
+      const theme = themes[activeTheme];
+      if (!theme || !Array.isArray(theme.rotationFrames) || theme.rotationFrames.length === 0) return;
+
+      applyTheme(activeTheme);
+      symbolPool = buildSymbolPool();
+    }
+
+    // =========================
+    // SYMBOL IMAGES
+    // =========================
+
+    function getThemeSymbolImage() {
+      let fallback = "axe.png";
+
+      if (activeTheme.includes("Kyra")) fallback = "scythe.png";
+      if (activeTheme.includes("Nadia")) fallback = "ankh.png";
+      if (activeTheme.includes("Winky")) fallback = "chaosaxe.png";
+
+      return getThemeIconOverride("Axe", fallback);
+    }
+
+    function getAnimalImage() {
+      let fallback = "animal.png";
+
+      if (activeTheme.includes("Maya")) fallback = "fox.png";
+      if (activeTheme.includes("Reign")) fallback = "bear.png";
+      if (activeTheme.includes("Kyra")) fallback = "wing.png";
+      if (activeTheme.includes("Nadia")) fallback = "purplemagic.png";
+      if (activeTheme.includes("Winky")) fallback = "chaosanimal.png";
+
+      return getThemeIconOverride("Animal", fallback);
+    }
+
+    function buildSymbolPool() {
+      const symbolConfig = [
+        ["Axe", 3, () => getThemeSymbolImage()],
+        ["Animal", 3, () => getAnimalImage()],
+        ["Maya", 3, () => getThemeIconOverride("Maya", "maya.png")],
+        ["Reign", 3, () => getThemeIconOverride("Reign", "reign.png")],
+        ["Kyra", 3, () => getThemeIconOverride("Kyra", "kyra.png")],
+        ["Nadia", 3, () => getThemeIconOverride("Nadia", "nadia.png")],
+        ["Gem", 2, () => getThemeIconOverride("Gem", "gem.png")],
+        ["Wild", 1, () => getThemeIconOverride("Wild", "wild.png")]
+      ];
+
+      const pool = [];
+
+      symbolConfig.forEach(([name, count, getImage]) => {
+        for (let i = 0; i < count; i++) {
+          pool.push({
+            name,
+            type: "image",
+            value: getImage()
+          });
+        }
+      });
+
+      return pool;
+    }
+
+    let symbolPool = [];
+
+    // =========================
+    // PAYLINES
+    // =========================
+
+    const paylines = [
+      { name: "Line 1", rows: [2, 2, 2, 2, 2] },
+      { name: "Line 2", rows: [1, 1, 1, 1, 1] },
+      { name: "Line 3", rows: [3, 3, 3, 3, 3] },
+      { name: "Line 4", rows: [1, 2, 3, 2, 1] },
+      { name: "Line 5", rows: [3, 2, 1, 2, 3] },
+
+      { name: "Line 6", rows: [2, 1, 1, 1, 2] },
+      { name: "Line 7", rows: [2, 3, 3, 3, 2] },
+      { name: "Line 8", rows: [1, 1, 2, 3, 3] },
+      { name: "Line 9", rows: [3, 3, 2, 1, 1] },
+      { name: "Line 10", rows: [1, 2, 2, 2, 3] },
+
+      { name: "Line 11", rows: [3, 2, 2, 2, 1] },
+      { name: "Line 12", rows: [1, 2, 1, 2, 1] },
+      { name: "Line 13", rows: [3, 2, 3, 2, 3] },
+      { name: "Line 14", rows: [2, 1, 2, 1, 2] },
+      { name: "Line 15", rows: [2, 3, 2, 3, 2] }
+    ];
+
+    // =========================
+    // SAVED VALUES / STATS
+    // =========================
+
+    let tokens = getStoredBigInt("forgeTokens", 0n);
+    let rebornCurrency = getStoredBigInt("rebornCurrency", 0n);
+    let rebornCount = Number(localStorage.getItem("rebornCount")) || 0;
+    let rebornIntroSeen = localStorage.getItem("rebornIntroSeen") === "true";
+    let rebornEverUnlocked = localStorage.getItem("rebornEverUnlocked") === "true";
+    let currentGameHighestTokens = getStoredBigInt("currentGameHighestTokens", tokens);
+    let emberUpgrades = JSON.parse(localStorage.getItem("emberUpgrades")) || {};
+    let emberSkillState = JSON.parse(localStorage.getItem("emberSkillState")) || {};
+
+    let lastUpdatedAt = Number(localStorage.getItem("lastUpdated"));
+    if (!Number.isFinite(lastUpdatedAt) || lastUpdatedAt <= 0) {
+      lastUpdatedAt = Date.now();
+      localStorage.setItem("lastUpdated", String(lastUpdatedAt));
+    }
+
+    let pendingIdleReward = getStoredBigInt("pendingIdleReward", 0n);
+    let pendingIdleMinutes = Number(localStorage.getItem("pendingIdleMinutes")) || 0;
+    let idleResumeContext = null;
+
+    let totalSpins = Number(localStorage.getItem("forgeTotalSpins")) || 0;
+
+    symbolPool = buildSymbolPool();
+
+    let lifetimeTokensEarned = getStoredBigInt("lifetimeTokensEarned", 0n);
+    let lifetimeTokensWagered = getStoredBigInt("lifetimeTokensWagered", 0n);
+    let biggestSingleWin = getStoredBigInt("biggestSingleWin", 0n);
+    let highestBalance = getStoredBigInt("highestBalance", tokens);
+    let devToolsUsed = localStorage.getItem("devToolsUsed") === "true";
+    let promoTokensRedeemed = getStoredBigInt("promoTokensRedeemed", 0n);
+
+    let lifetimeFreeGames = Number(localStorage.getItem("lifetimeFreeGames")) || 0;
+    let lifetimeFreeWinnings = getStoredBigInt("lifetimeFreeWinnings", 0n);
+
+    let lifetimePaidGames = Number(localStorage.getItem("lifetimePaidGames")) || 0;
+    let lifetimePaidWagered = getStoredBigInt("lifetimePaidWagered", 0n);
+    let lifetimePaidWinnings = getStoredBigInt("lifetimePaidWinnings", 0n);
+
+    let lifetimeBonusSpinsEarned = Number(localStorage.getItem("lifetimeBonusSpinsEarned")) || 0;
+    let lifetimeBonusSpinsPlayed = Number(localStorage.getItem("lifetimeBonusSpinsPlayed")) || 0;
+    let lifetimeBonusSpinWinnings = getStoredBigInt("lifetimeBonusSpinWinnings", 0n);
+
+    let winkyCansFed = Number(localStorage.getItem("winkyCansFed")) || 0;
+    let winkyHungryNights = Number(localStorage.getItem("winkyHungryNights")) || 0;
+
+    let lifetimePaidRoiTotal = getStoredBigInt("lifetimePaidRoiTotal", 0n);
+    let lifetimeBetRiskTotal = getStoredBigInt("lifetimeBetRiskTotal", 0n);
+    let highestBetRisk = getStoredBigInt("highestBetRisk", 0n);
+    let gemPresses = Number(localStorage.getItem("gemPresses")) || 0;
+
+    // =========================
+    // DOM REFERENCES
+    // =========================
+
+    const tokenBalance = document.getElementById("tokenBalance");
+    const rebornCurrencyBalance = document.getElementById("rebornCurrencyBalance");
+    const rebornCurrencyLabel = document.getElementById("rebornCurrencyLabel");
+    const rebornButton = document.getElementById("rebornButton");
+    const forgeSurgeButton = document.getElementById("forgeSurgeButton");
+    const freeForgeButton = document.getElementById("freeForgeButton");
+    const soundPackDisplay = document.getElementById("soundPackDisplay");
+    const spinCount = document.getElementById("spinCount");
+    const baseBetDisplay = document.getElementById("baseBetDisplay");
+    const multiplierDisplay = document.getElementById("multiplierDisplay");
+    const multiplierRow = document.getElementById("multiplierRow");
+    const baseBetDownButton = document.getElementById("baseBetDownButton");
+    const baseBetUpButton = document.getElementById("baseBetUpButton");
+    const multiplierDownButton = document.getElementById("multiplierDownButton");
+    const multiplierUpButton = document.getElementById("multiplierUpButton");
+    const lineCountDisplay = document.getElementById("lineCountDisplay");
+    const themeCharacterDisplay = document.getElementById("themeCharacterDisplay");
+    const themeVariantDisplay = document.getElementById("themeVariantDisplay");
+    const slotGrid = document.getElementById("slotGrid");
+    const lineOverlay = document.getElementById("lineOverlay");
+    const winPopup = document.getElementById("winPopup");
+    const unlockPopup = document.getElementById("unlockPopup");
+    const lastSpin = document.getElementById("lastSpin");
+    const spinButton = document.getElementById("spinButton");
+    const devTools = document.getElementById("devTools");
+    const devPanel = document.getElementById("devPanel");
+    const devPanelContent = document.getElementById("devPanelContent");
+    const codeInput = document.getElementById("codeInput");
+    const codeMessage = document.getElementById("codeMessage");
+    const unlockContent = document.getElementById("unlockContent");
+
+
+    // =========================
+    // SECTION 4: INIT / THEME / DISPLAY / GRID / AUDIO
+    // =========================
+
+    // =========================
+    // INITIALIZE GAME
+    // =========================
+
+    createGrid();
+    syncThemeIndex();
+    syncThemeSelectors();
+    applyTheme(activeTheme);
+    updateDisplay();
+    updateDevToolsVisibility();
+    updateSoundButton();
+    updateActiveSkillButtons();
+    setInterval(updateActiveSkillButtons, 1000);
+    startLinePreview();
+    maybeShowLeaderboardPrompt();
+
+    // =========================
+    // AUDIO
+    // =========================
+
+    function stopSound(soundName) {
+      const sound = sounds[soundName];
+      if (!sound) return;
+
+      sound.pause();
+      sound.currentTime = 0;
+    }
+
+    function playSound(soundName) {
+      if (!soundEnabled) return;
+
+      const sound = sounds[soundName];
+      if (!sound) return;
+
+      sound.currentTime = 0;
+      sound.play().catch(() => {});
+    }
+
+    function playSingleSound(soundName) {
+      stopSound(soundName);
+      playSound(soundName);
+    }
+
+    function stopResultSounds() {
+      ["smallWin", "bigWin", "bonus", "unlock", "winky"].forEach(stopSound);
+    }
+
+    function setSoundPack(index) {
+      const safeIndex = Math.max(0, Math.min(index, soundPackOptions.length - 1));
+      soundPackIndex = safeIndex;
+      soundEnabled = soundPackOptions[soundPackIndex] !== "Off";
+      localStorage.setItem("soundEnabled", soundEnabled ? "true" : "false");
+      updateSoundSelector();
+    }
+
+    function changeSoundPack(direction) {
+      const nextIndex = soundPackIndex + direction;
+
+      if (nextIndex < 0 || nextIndex >= soundPackOptions.length) {
+        updateSoundSelector();
+        return;
+      }
+
+      const wasEnabled = soundEnabled;
+      setSoundPack(nextIndex);
+
+      if (soundEnabled || wasEnabled) {
+        playSound("click");
+      }
+    }
+
+    function toggleSound() {
+      setSoundPack(soundEnabled ? 0 : 1);
+      playSound("click");
+    }
+
+    function updateSoundSelector() {
+      if (!soundPackDisplay) return;
+
+      soundPackDisplay.textContent = soundPackOptions[soundPackIndex] || "Forge";
+      soundPackDisplay.classList.toggle("active", soundEnabled);
+    }
+
+    function updateSoundButton() {
+      updateSoundSelector();
+    }
+
+    // =========================
+    // NUMBER FORMATTING
+    // =========================
+
+    function formatGameNumber(amount) {
+      amount = BigInt(amount);
+
+      const units = [
+        { value: 1000000000000000000000000000000000000000n, suffix: "Dd" },
+        { value: 1000000000000000000000000000000000000n, suffix: "Ud" },
+        { value: 1000000000000000000000000000000000n, suffix: "Dc" },
+        { value: 1000000000000000000000000000000n, suffix: "No" },
+        { value: 1000000000000000000000000000n, suffix: "Oc" },
+        { value: 1000000000000000000000000n, suffix: "Sp" },
+        { value: 1000000000000000000000n, suffix: "S" },
+        { value: 1000000000000000000n, suffix: "Qi" },
+        { value: 1000000000000000n, suffix: "Q" },
+        { value: 1000000000000n, suffix: "T" },
+        { value: 1000000000n, suffix: "B" },
+        { value: 1000000n, suffix: "M" },
+        { value: 1000n, suffix: "K" }
+      ];
+
+      for (const unit of units) {
+        if (amount >= unit.value) {
+          const whole = amount / unit.value;
+          const decimal = ((amount % unit.value) * 100n) / unit.value;
+
+          if (whole < 1000n && decimal > 0n) {
+            return `${whole}.${decimal.toString().padStart(2, "0")}${unit.suffix}`;
+          }
+
+          return `${whole.toLocaleString()}${unit.suffix}`;
+        }
+      }
+
+      return amount.toLocaleString();
+    }
+
+    function formatFullNumber(amount) {
+      return BigInt(amount).toLocaleString();
+    }
+
+    function formatPreciseGameNumber(amount, decimals = 10) {
+      amount = BigInt(amount);
+
+      const units = [
+        { value: 1000000000000000000000000000000000000000n, suffix: "Dd" },
+        { value: 1000000000000000000000000000000000000n, suffix: "Ud" },
+        { value: 1000000000000000000000000000000000n, suffix: "Dc" },
+        { value: 1000000000000000000000000000000n, suffix: "No" },
+        { value: 1000000000000000000000000000n, suffix: "Oc" },
+        { value: 1000000000000000000000000n, suffix: "Sp" },
+        { value: 1000000000000000000000n, suffix: "S" },
+        { value: 1000000000000000000n, suffix: "Qi" },
+        { value: 1000000000000000n, suffix: "Q" },
+        { value: 1000000000000n, suffix: "T" },
+        { value: 1000000000n, suffix: "B" }
+      ];
+
+      for (const unit of units) {
+        if (amount >= unit.value) {
+          const whole = amount / unit.value;
+          const scale = 10n ** BigInt(decimals);
+          const fraction = ((amount % unit.value) * scale) / unit.value;
+          return `${whole.toLocaleString()}.${fraction.toString().padStart(decimals, "0")}${unit.suffix}`;
+        }
+      }
+
+      return amount.toLocaleString();
+    }
+
+    function formatBasisPoints(value) {
+      value = BigInt(value);
+      const sign = value < 0n ? "-" : "";
+      const absolute = value < 0n ? -value : value;
+      const whole = absolute / 100n;
+      const decimal = absolute % 100n;
+      return `${sign}${whole.toLocaleString()}.${decimal.toString().padStart(2, "0")}`;
+    }
+
+
+    function formatMultiplier(amount) {
+      amount = BigInt(amount);
+
+      const units = [
+        { value: 1000000000000000000000000000000000000000n, suffix: "Dd" },
+        { value: 1000000000000000000000000000000000000n, suffix: "Ud" },
+        { value: 1000000000000000000000000000000000n, suffix: "Dc" },
+        { value: 1000000000000000000000000000000n, suffix: "No" },
+        { value: 1000000000000000000000000000n, suffix: "Oc" },
+        { value: 1000000000000000000000000n, suffix: "Sp" },
+        { value: 1000000000000000000000n, suffix: "S" },
+        { value: 1000000000000000000n, suffix: "Qi" },
+        { value: 1000000000000000n, suffix: "Q" },
+        { value: 1000000000000n, suffix: "T" },
+        { value: 1000000000n, suffix: "B" },
+        { value: 1000000n, suffix: "M" },
+        { value: 1000n, suffix: "K" }
+      ];
+
+      for (const unit of units) {
+        if (amount >= unit.value) {
+          const whole = amount / unit.value;
+          const decimal = ((amount % unit.value) * 100n) / unit.value;
+
+          if (decimal > 0n && whole < 1000n) {
+            return `${whole}.${decimal.toString().padStart(2, "0")}${unit.suffix}`;
+          }
+
+          return `${whole.toLocaleString()}${unit.suffix}`;
+        }
+      }
+
+      return amount.toLocaleString();
+    }
+
+    function formatPercent(numerator, denominator) {
+      numerator = BigInt(numerator);
+      denominator = BigInt(denominator);
+
+      if (denominator <= 0n) return "0.00";
+
+      const scaled = (numerator * 10000n) / denominator;
+      const whole = scaled / 100n;
+      const decimal = scaled % 100n;
+
+      return `${whole.toLocaleString()}.${decimal.toString().padStart(2, "0")}`;
+    }
+
+    // =========================
+    // LINE COUNT / ACTIVE PAYLINES
+    // =========================
+
+    function getLineCount() {
+      lineCountIndex = lineCountOptions.length - 1;
+      return 15;
+    }
+
+    function getActivePaylines() {
+      return paylines.slice(0, getLineCount());
+    }
+
+    function changeLineCount(direction) {
+      lineCountIndex = lineCountOptions.length - 1;
+      updateDisplay();
+      startLinePreview();
+    }
+
+    // =========================
+    // LINE PREVIEW / WINNING LINE OVERLAY
+    // Uses live cell positions so the 3-row reel layout stays aligned.
+    // =========================
+
+    function getGridMetrics() {
+      const frame = document.querySelector(".slotFrame");
+      const rect = frame ? frame.getBoundingClientRect() : { width: 360, height: 220 };
+
+      return {
+        viewW: Math.max(1, rect.width),
+        viewH: Math.max(1, rect.height)
+      };
+    }
+
+    function getLinePoints(line) {
+      const frame = document.querySelector(".slotFrame");
+      const frameRect = frame ? frame.getBoundingClientRect() : { left: 0, top: 0 };
+
+      return line.rows.map((paylineRow, col) => {
+        const rowIndex = paylineRow - 1;
+        const cell = getCell(rowIndex, col);
+
+        if (!cell) {
+          return { x: 0, y: 0 };
+        }
+
+        const cellRect = cell.getBoundingClientRect();
+
+        return {
+          x: cellRect.left - frameRect.left + cellRect.width / 2,
+          y: cellRect.top - frameRect.top + cellRect.height / 2
+        };
+      });
+    }
+
+    function drawSingleLinePreview() {
+      if (!lineOverlayVisible) return;
+
+      const activeLines = getActivePaylines();
+      if (activeLines.length === 0) return;
+
+      const line = activeLines[linePreviewIndex % activeLines.length];
+      const color = lineColors[linePreviewIndex % lineColors.length];
+      const points = getLinePoints(line);
+      const m = getGridMetrics();
+
+      const pointString = points.map(p => `${p.x},${p.y}`).join(" ");
+      const last = points[points.length - 1];
+      const prev = points[points.length - 2];
+
+      const angle = Math.atan2(last.y - prev.y, last.x - prev.x);
+      const arrowSize = 10;
+
+      const arrowP1 = {
+        x: last.x - arrowSize * Math.cos(angle - Math.PI / 6),
+        y: last.y - arrowSize * Math.sin(angle - Math.PI / 6)
+      };
+
+      const arrowP2 = {
+        x: last.x - arrowSize * Math.cos(angle + Math.PI / 6),
+        y: last.y - arrowSize * Math.sin(angle + Math.PI / 6)
+      };
+
+      lineOverlay.style.display = "block";
+      lineOverlay.innerHTML = `
+        <svg viewBox="0 0 ${m.viewW} ${m.viewH}" preserveAspectRatio="none" style="color:${color}">
+          <text class="lineLabel" x="18" y="32" fill="${color}">${line.name}</text>
+          <polyline points="${pointString}" stroke="${color}" />
+          <polygon points="${last.x},${last.y} ${arrowP1.x},${arrowP1.y} ${arrowP2.x},${arrowP2.y}" fill="${color}" />
+        </svg>
+      `;
+
+      linePreviewIndex++;
+    }
+
+    function drawWinningLines(wins) {
+      if (!wins.length) {
+        hideLineOverlay();
+        return;
+      }
+
+      stopLinePreview();
+
+      const m = getGridMetrics();
+
+      const lineSvgs = wins.map((win, index) => {
+        const color = lineColors[index % lineColors.length];
+        const line = paylines.find(payline => payline.name === win.lineName);
+
+        if (!line) return "";
+
+        const points = getLinePoints(line);
+        const pointString = points.map(p => `${p.x},${p.y}`).join(" ");
+
+        return `<polyline points="${pointString}" stroke="${color}" />`;
+      }).join("");
+
+      lineOverlayVisible = true;
+      lineOverlay.style.display = "block";
+      lineOverlay.innerHTML = `
+        <svg viewBox="0 0 ${m.viewW} ${m.viewH}" preserveAspectRatio="none">
+          ${lineSvgs}
+        </svg>
+      `;
+    }
+
+    function startLinePreview() {
+      stopLinePreview();
+
+      lineOverlayVisible = true;
+      linePreviewIndex = 0;
+      drawSingleLinePreview();
+
+      linePreviewTimer = setInterval(drawSingleLinePreview, 500);
+
+      lineAutoHideTimer = setTimeout(() => {
+        hideLineOverlay();
+      }, 5000);
+    }
+
+    function stopLinePreview() {
+      if (linePreviewTimer) {
+        clearInterval(linePreviewTimer);
+        linePreviewTimer = null;
+      }
+
+      if (lineAutoHideTimer) {
+        clearTimeout(lineAutoHideTimer);
+        lineAutoHideTimer = null;
+      }
+    }
+
+    function hideLineOverlay() {
+      stopLinePreview();
+      lineOverlayVisible = false;
+      lineOverlay.style.display = "none";
+      lineOverlay.innerHTML = "";
+    }
+
+    // =========================
+    // THEME LOGIC
+    // =========================
+
+    function getAvailableThemes() {
+      return Object.keys(themes).filter(theme => unlockedThemes[theme]);
+    }
+
+    function getAvailableThemeCharacters() {
+      return themeCharacterGroups.filter(group => {
+        const groupThemes = themeGroupMap[group] || [];
+        return groupThemes.some(themeKey => unlockedThemes[themeKey]);
+      });
+    }
+
+    function getUnlockedThemesForCharacter(characterName) {
+      const groupThemes = themeGroupMap[characterName] || [];
+      return groupThemes.filter(themeKey => unlockedThemes[themeKey] && themes[themeKey]);
+    }
+
+    function syncThemeIndex() {
+      const availableThemes = getAvailableThemes();
+
+      if (!availableThemes.includes(activeTheme)) {
+        activeTheme = "Default";
+        localStorage.setItem("activeTheme", activeTheme);
+      }
+
+      themeIndex = availableThemes.indexOf(activeTheme);
+    }
+
+    function syncThemeSelectors() {
+      const activeGroup = themes[activeTheme]?.characterGroup || "Default";
+      const availableCharacters = getAvailableThemeCharacters();
+
+      themeCharacterIndex = availableCharacters.indexOf(activeGroup);
+      if (themeCharacterIndex < 0) themeCharacterIndex = 0;
+
+      const characterName = availableCharacters[themeCharacterIndex] || "Default";
+      const unlockedGroupThemes = getUnlockedThemesForCharacter(characterName);
+
+      themeVariantIndex = unlockedGroupThemes.indexOf(activeTheme);
+      if (themeVariantIndex < 0) themeVariantIndex = 0;
+    }
+
+    function changeThemeCharacter(direction) {
+      playSound("click");
+
+      const availableCharacters = getAvailableThemeCharacters();
+      if (!availableCharacters.length) return;
+
+      themeCharacterIndex += direction;
+
+      if (themeCharacterIndex < 0) themeCharacterIndex = availableCharacters.length - 1;
+      if (themeCharacterIndex >= availableCharacters.length) themeCharacterIndex = 0;
+
+      const characterName = availableCharacters[themeCharacterIndex];
+      const unlockedGroupThemes = getUnlockedThemesForCharacter(characterName);
+
+      themeVariantIndex = 0;
+      activeTheme = unlockedGroupThemes[0] || "Default";
+
+      localStorage.setItem("activeTheme", activeTheme);
+
+      symbolPool = buildSymbolPool();
+      applyTheme(activeTheme);
+      createGrid();
+      updateDisplay();
+      refreshReelGemGlow();
+    }
+
+    function changeThemeVariant(direction) {
+      playSound("click");
+
+      const availableCharacters = getAvailableThemeCharacters();
+      const characterName = availableCharacters[themeCharacterIndex] || "Default";
+      const unlockedGroupThemes = getUnlockedThemesForCharacter(characterName);
+
+      if (!unlockedGroupThemes.length) return;
+
+      themeVariantIndex += direction;
+
+      if (themeVariantIndex < 0) themeVariantIndex = unlockedGroupThemes.length - 1;
+      if (themeVariantIndex >= unlockedGroupThemes.length) themeVariantIndex = 0;
+
+      activeTheme = unlockedGroupThemes[themeVariantIndex];
+
+      localStorage.setItem("activeTheme", activeTheme);
+
+      symbolPool = buildSymbolPool();
+      applyTheme(activeTheme);
+      createGrid();
+      updateDisplay();
+      refreshReelGemGlow();
+    }
+
+    function changeTheme(direction) {
+      changeThemeCharacter(direction);
+    }
+
+    function unlockTheme(themeName) {
+      if (!themes[themeName]) return false;
+
+      if (unlockedThemes[themeName]) {
+        return false;
+      }
+
+      unlockedThemes[themeName] = true;
+      localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+      return true;
+    }
+
+    function applyTheme(themeName) {
+      const theme = themes[themeName] || themes.Default;
+
+      lineColors = theme.lineColors || defaultLineColors;
+
+      const rotationFrame = getThemeRotationFrame(themeName);
+      const rotationGameImage = rotationFrame && (rotationFrame.gameImage || rotationFrame.background || rotationFrame.image);
+      const gameImage = rotationGameImage ? asCssUrl(rotationGameImage) : (theme.gameImage || "none");
+      const pageImage = rotationFrame && rotationFrame.pageImage ? asCssUrl(rotationFrame.pageImage) : (theme.pageImage || 'url("background.png")');
+
+      document.documentElement.style.setProperty("--accent", theme.accent);
+      document.documentElement.style.setProperty("--accent-soft", theme.accent + "40");
+      document.documentElement.style.setProperty("--page-bg", pageImage);
+      document.documentElement.style.setProperty("--game-bg", gameImage);
+
+      document.documentElement.style.setProperty("--text-main", theme.textMain || "#ffffff");
+      document.documentElement.style.setProperty("--text-muted", theme.textMuted || "#c9c9c9");
+      document.documentElement.style.setProperty("--text-accent", theme.textAccent || theme.accent);
+      document.documentElement.style.setProperty("--button-text", theme.buttonText || theme.accent);
+    }
+
+    function applyUnlockedTheme(themeName) {
+      if (!themes[themeName]) return;
+
+      activeTheme = themeName;
+      localStorage.setItem("activeTheme", activeTheme);
+
+      syncThemeIndex();
+      syncThemeSelectors();
+
+      symbolPool = buildSymbolPool();
+      applyTheme(activeTheme);
+
+      updateDisplay();
+      refreshReelGemGlow();
+    }
+
+    function getUnlockGemKey() {
+      if (!gemActive || currentGem === "clear") return "diamond";
+      return currentGem;
+    }
+
+    function handleCharacterThemeUnlock(characterName) {
+      const baseUnlocked = unlockTheme(characterName);
+
+      const gemKey = getUnlockGemKey();
+
+      let themeToApply = characterName;
+      let variantUnlocked = false;
+
+      if (gemKey !== "diamond") {
+        const variantTheme = `${characterName}${capitalize(gemKey)}`;
+
+        if (themes[variantTheme]) {
+          variantUnlocked = unlockTheme(variantTheme);
+
+          if (variantUnlocked) {
+            themeToApply = variantTheme;
+          }
+        }
+      }
+
+      if (!baseUnlocked && !variantUnlocked) {
+        return false;
+      }
+
+      applyUnlockedTheme(themeToApply);
+
+      const themeLabel = themes[themeToApply]?.label || themeToApply;
+      showUnlockPopup(`${themeLabel} Unlocked`);
+
+      playSound("unlock");
+      return true;
+    }
+
+    function showUnlockPopup(message) {
+      if (!unlockPopup) return;
+
+      if (unlockPopupTimer) {
+        clearTimeout(unlockPopupTimer);
+        unlockPopupTimer = null;
+      }
+
+      unlockPopup.innerHTML = message;
+      unlockPopup.classList.add("show");
+
+      unlockPopupTimer = setTimeout(() => {
+        unlockPopup.classList.remove("show");
+      }, 3000);
+    }
+
+    // =========================
+    // GEM LOGIC
+    // =========================
+
+    function setGemImage(gem) {
+      gem.innerHTML = '<img src="gem.png" alt="Chaos Gem">';
+    }
+
+    function getGemGlowClass() {
+      if (!gemActive || currentGem === "clear") return "";
+      return `gem-${currentGem}`;
+    }
+
+    function refreshReelGemGlow() {
+      document.querySelectorAll(".reelGem").forEach(img => {
+        img.classList.remove(
+          "gem-ruby",
+          "gem-emerald",
+          "gem-amethyst",
+          "gem-sapphire",
+          "gem-topaz",
+          "gem-skull"
+        );
+
+        const glowClass = getGemGlowClass();
+
+        if (glowClass) {
+          img.classList.add(glowClass);
+        }
+      });
+    }
+
+    function activateGem() {
+      playSound("click");
+
+      gemPresses += 1;
+      localStorage.setItem("gemPresses", gemPresses);
+
+      const gem = document.getElementById("chaosGem");
+      const message = document.getElementById("gemMessage");
+
+      if (gemActive) {
+        gemActive = false;
+        currentGem = "clear";
+
+        gem.className = "chaosGem gem-clear";
+        setGemImage(gem);
+
+        message.textContent = "";
+        message.style.color = "";
+
+        refreshReelGemGlow();
+        return;
+      }
+
+      gemActive = true;
+
+      const roll = Math.random() * 100;
+      let outcome;
+
+      if (roll < 19.2) {
+        outcome = { name: "ruby", className: "gem-ruby", color: "#e31b4f" };
+      } else if (roll < 38.4) {
+        outcome = { name: "emerald", className: "gem-emerald", color: "#20c56b" };
+      } else if (roll < 57.6) {
+        outcome = { name: "amethyst", className: "gem-amethyst", color: "#9b5de5" };
+      } else if (roll < 76.8) {
+        outcome = { name: "sapphire", className: "gem-sapphire", color: "#2f6fff" };
+      } else if (roll < 96) {
+        outcome = { name: "topaz", className: "gem-topaz", color: "#f5b642" };
+      } else {
+        outcome = { name: "skull", className: "gem-skull", color: "#d8d8d8" };
+      }
+
+      currentGem = outcome.name;
+      gem.className = `chaosGem ${outcome.className}`;
+
+      if (outcome.name === "skull") {
+        gem.textContent = "☠";
+        message.textContent = "Stay awhile and Listen";
+        unlockTheme("Winky");
+        syncThemeSelectors();
+        updateUnlockPanel();
+        playSound("winky");
+      } else {
+        setGemImage(gem);
+        message.textContent = `${capitalize(outcome.name)} Gem Active`;
+      }
+
+      message.style.color = outcome.color;
+      refreshReelGemGlow();
+    }
+
+    // =========================
+    // SYMBOL DISPLAY
+    // =========================
+
+    function randomSymbol() {
+      return symbolPool[Math.floor(Math.random() * symbolPool.length)];
+    }
+
+    function showSymbol(cell, symbol) {
+      cell.innerHTML = "";
+
+      if (symbol.type === "image") {
+        const img = document.createElement("img");
+        img.src = symbol.value;
+        img.alt = symbol.name;
+
+        if (symbol.name === "Gem") {
+          img.classList.add("reelGem");
+
+          const glowClass = getGemGlowClass();
+          if (glowClass) {
+            img.classList.add(glowClass);
+          }
+        }
+
+        cell.appendChild(img);
+      } else {
+        cell.textContent = symbol.value;
+      }
+    }
+
+    function createGrid() {
+      slotGrid.innerHTML = "";
+
+      for (let row = 0; row < VISIBLE_ROWS; row++) {
+        for (let col = 0; col < COLS; col++) {
+          const cell = document.createElement("div");
+
+          cell.className = "cell activeCell";
+          cell.id = `cell-${row}-${col}`;
+
+          showSymbol(cell, randomSymbol());
+          slotGrid.appendChild(cell);
+        }
+      }
+    }
+
+    function getCell(row, col) {
+      return document.getElementById(`cell-${row}-${col}`);
+    }
+
+    // =========================
+    // CONTROL DISPLAY
+    // =========================
+
+    function changeBaseBet(direction) {
+      playSound("click");
+
+      const nextIndex = baseBetIndex + direction;
+
+      if (nextIndex < 0 || nextIndex >= baseBetOptions.length) {
+        updateControlBoundaryStates();
+        return;
+      }
+
+      baseBetIndex = nextIndex;
+
+      if (getBaseBet() === 0n) {
+        multiplierIndex = 0;
+      }
+
+      saveBetSettings();
+      updateDisplay();
+      startLinePreview();
+    }
+
+    function changeMultiplier(direction) {
+      playSound("click");
+
+      if (getBaseBet() === 0n) {
+        multiplierIndex = 0;
+        saveBetSettings();
+        updateDisplay();
+        return;
+      }
+
+      const availableMultipliers = getUnlockedMultiplierOptions();
+      const nextIndex = multiplierIndex + direction;
+
+      if (nextIndex < 0 || nextIndex >= availableMultipliers.length) {
+        updateControlBoundaryStates();
+        return;
+      }
+
+      multiplierIndex = nextIndex;
+
+      saveBetSettings();
+      updateDisplay();
+      startLinePreview();
+    }
+
+    function getBaseBet() {
+      return baseBetOptions[baseBetIndex];
+    }
+
+    function getMultiplier() {
+      if (getBaseBet() === 0n) {
+        multiplierIndex = 0;
+        return 1n;
+      }
+
+      const availableMultipliers = getUnlockedMultiplierOptions();
+
+      if (multiplierIndex >= availableMultipliers.length) {
+        multiplierIndex = availableMultipliers.length - 1;
+      }
+
+      if (multiplierIndex < 0) {
+        multiplierIndex = 0;
+      }
+
+      return availableMultipliers[multiplierIndex] || 1n;
+    }
+
+    function getLineBet() {
+      const baseBet = getBaseBet();
+      const multiplier = getMultiplier();
+
+      if (baseBet === 0n) return 0n;
+
+      return baseBet * multiplier;
+    }
+
+    function getFinalBet() {
+      const lineBet = getLineBet();
+      const activeLines = BigInt(getActivePaylines().length);
+
+      return lineBet * activeLines;
+    }
+
+
+    function calculateRebornCurrency(balance) {
+      let reward = 0n;
+
+      REBORN_REWARD_TIERS.forEach(([requiredBalance, currencyReward]) => {
+        if (balance >= requiredBalance) {
+          reward = currencyReward;
+        }
+      });
+
+      return reward;
+    }
+
+    function getEmberUpgradeLevel(upgradeKey) {
+      return Number(emberUpgrades[upgradeKey] || 0);
+    }
+
+    function getEmberUpgradeCost(upgradeKey) {
+      const upgrade = EMBER_UPGRADES[upgradeKey];
+      if (!upgrade) return 0n;
+      const level = getEmberUpgradeLevel(upgradeKey);
+      return upgrade.baseCost * BigInt(level + 1);
+    }
+
+    function getEmberSymbolBonusPercent(symbolName) {
+      if (symbolName === "Axe") return getEmberUpgradeLevel("axeMastery");
+      if (symbolName === "Gem") return getEmberUpgradeLevel("gemAffinity");
+      if (symbolName === "Wild") return getEmberUpgradeLevel("wildSpark");
+      return 0;
+    }
+
+    function applyEmberSymbolBonus(symbolName, payout) {
+      const bonusPercent = getEmberSymbolBonusPercent(symbolName);
+      if (!bonusPercent || payout <= 0n) return payout;
+      return payout + (payout * BigInt(bonusPercent)) / 100n;
+    }
+
+    function saveEmberSkillState() {
+      localStorage.setItem("emberSkillState", JSON.stringify(emberSkillState));
+    }
+
+    function saveRebornState() {
+      saveBigInt("rebornCurrency", rebornCurrency);
+      localStorage.setItem("rebornCount", String(rebornCount));
+      localStorage.setItem("rebornIntroSeen", rebornIntroSeen ? "true" : "false");
+      localStorage.setItem("rebornEverUnlocked", rebornEverUnlocked ? "true" : "false");
+      saveBigInt("currentGameHighestTokens", currentGameHighestTokens);
+      localStorage.setItem("emberUpgrades", JSON.stringify(emberUpgrades));
+      saveEmberSkillState();
+    }
+
+    function buyEmberUpgrade(upgradeKey) {
+      playSound("click");
+
+      const upgrade = EMBER_UPGRADES[upgradeKey];
+      if (!upgrade) return;
+
+      const level = getEmberUpgradeLevel(upgradeKey);
+
+      if (level >= upgrade.maxLevel) {
+        codeMessage.textContent = `${upgrade.name} is already max level.`;
+        return;
+      }
+
+      const cost = getEmberUpgradeCost(upgradeKey);
+
+      if (rebornCurrency < cost) {
+        codeMessage.textContent = `Not enough ${REBORN_CURRENCY_NAME}.`;
+        return;
+      }
+
+      rebornCurrency -= cost;
+      emberUpgrades[upgradeKey] = level + 1;
+      saveRebornState();
+      updateDisplay();
+      updateActiveSkillButtons();
+      activePanel = "emberStore";
+      updateWinInfo();
+
+      codeMessage.textContent = `${upgrade.name} upgraded to Lv ${level + 1}.`;
+    }
+
+    function getRemainingMs(timestamp) {
+      return Math.max(0, Number(timestamp || 0) - Date.now());
+    }
+
+    function formatDurationShort(ms) {
+      const totalSeconds = Math.ceil(ms / 1000);
+      if (totalSeconds <= 0) return "Ready";
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      if (hours > 0) return `${hours}h ${minutes}m`;
+      if (minutes > 0) return `${minutes}m ${seconds}s`;
+      return `${seconds}s`;
+    }
+
+    function isEmberSkillActive(skillKey) {
+      const state = emberSkillState[skillKey] || {};
+      return getRemainingMs(state.activeUntil) > 0;
+    }
+
+    function getForgeSurgeBonusPercent() {
+      if (!isEmberSkillActive("forgeSurge")) return 0;
+      return getEmberUpgradeLevel("forgeSurge");
+    }
+
+    function applyForgeSurgeBonus(payout) {
+      const bonusPercent = getForgeSurgeBonusPercent();
+      if (!bonusPercent || payout <= 0n) return payout;
+      return payout + (payout * BigInt(bonusPercent)) / 100n;
+    }
+
+    function getFreeForgeCharges() {
+      const state = emberSkillState.freeForge || {};
+      return Math.max(0, Number(state.charges || 0));
+    }
+
+    function useFreeForgeCharge() {
+      const charges = getFreeForgeCharges();
+      if (charges <= 0) return false;
+      emberSkillState.freeForge = emberSkillState.freeForge || {};
+      emberSkillState.freeForge.charges = charges - 1;
+      saveEmberSkillState();
+      updateActiveSkillButtons();
+      return true;
+    }
+
+    function getEmberSkillButtonText(skillKey) {
+      const level = getEmberUpgradeLevel(skillKey);
+      const upgrade = EMBER_UPGRADES[skillKey];
+      const state = emberSkillState[skillKey] || {};
+
+      if (!upgrade || level <= 0) {
+        return skillKey === "forgeSurge" ? "Surge<br>Locked" : "Free<br>Locked";
+      }
+
+      if (skillKey === "forgeSurge") {
+        const activeMs = getRemainingMs(state.activeUntil);
+        const cooldownMs = getRemainingMs(state.cooldownUntil);
+
+        if (activeMs > 0) return `Surge<br>${formatDurationShort(activeMs)}`;
+        if (cooldownMs > 0) return `Surge CD<br>${formatDurationShort(cooldownMs)}`;
+        return `Surge<br>Ready`;
+      }
+
+      if (skillKey === "freeForge") {
+        const charges = getFreeForgeCharges();
+        const cooldownMs = getRemainingMs(state.cooldownUntil);
+
+        if (charges > 0) return `Free x${charges}<br>Ready`;
+        if (cooldownMs > 0) return `Free CD<br>${formatDurationShort(cooldownMs)}`;
+        return `Free<br>Ready`;
+      }
+
+      return "Skill";
+    }
+
+    function updateSkillButtonState(button, skillKey) {
+      if (!button) return;
+
+      const level = getEmberUpgradeLevel(skillKey);
+      const state = emberSkillState[skillKey] || {};
+      const cooldownMs = getRemainingMs(state.cooldownUntil);
+      const active = isEmberSkillActive(skillKey);
+      const charges = skillKey === "freeForge" ? getFreeForgeCharges() : 0;
+
+      button.innerHTML = getEmberSkillButtonText(skillKey);
+      button.disabled = controlsLocked || level <= 0 || (cooldownMs > 0 && !active && charges <= 0);
+      button.classList.toggle("ready", level > 0 && cooldownMs <= 0 && !active);
+      button.classList.toggle("activeSkill", active || charges > 0);
+    }
+
+    function updateActiveSkillButtons() {
+      updateSkillButtonState(forgeSurgeButton, "forgeSurge");
+      updateSkillButtonState(freeForgeButton, "freeForge");
+    }
+
+    function getEmberSkillStatus(skillKey) {
+      const level = getEmberUpgradeLevel(skillKey);
+      const state = emberSkillState[skillKey] || {};
+
+      if (level <= 0) return "Locked";
+
+      if (skillKey === "forgeSurge") {
+        const activeMs = getRemainingMs(state.activeUntil);
+        const cooldownMs = getRemainingMs(state.cooldownUntil);
+        if (activeMs > 0) return `Active: ${formatDurationShort(activeMs)}`;
+        if (cooldownMs > 0) return `Cooldown: ${formatDurationShort(cooldownMs)}`;
+        return "Ready";
+      }
+
+      if (skillKey === "freeForge") {
+        const charges = getFreeForgeCharges();
+        const cooldownMs = getRemainingMs(state.cooldownUntil);
+        if (charges > 0) return `${charges} free paid spin${charges === 1 ? "" : "s"} ready`;
+        if (cooldownMs > 0) return `Cooldown: ${formatDurationShort(cooldownMs)}`;
+        return "Ready";
+      }
+
+      return "Passive";
+    }
+
+    function activateEmberSkill(skillKey) {
+      playSound("click");
+
+      const upgrade = EMBER_UPGRADES[skillKey];
+      const level = getEmberUpgradeLevel(skillKey);
+      if (!upgrade || level <= 0) {
+        codeMessage.textContent = "Upgrade this skill in the Ember Store first.";
+        return;
+      }
+
+      const state = emberSkillState[skillKey] || {};
+      const now = Date.now();
+
+      if (skillKey === "forgeSurge") {
+        if (getRemainingMs(state.activeUntil) > 0) {
+          codeMessage.textContent = "Forge Surge is already active.";
+          return;
+        }
+        if (getRemainingMs(state.cooldownUntil) > 0) {
+          codeMessage.textContent = `Forge Surge cooldown: ${formatDurationShort(getRemainingMs(state.cooldownUntil))}.`;
+          return;
+        }
+
+        emberSkillState.forgeSurge = {
+          activeUntil: now + upgrade.durationMs,
+          cooldownUntil: now + upgrade.cooldownMs
+        };
+        saveEmberSkillState();
+        updateActiveSkillButtons();
+        codeMessage.textContent = `Forge Surge active: +${level}% winnings for 10 minutes.`;
+        return;
+      }
+
+      if (skillKey === "freeForge") {
+        if (getFreeForgeCharges() > 0) {
+          codeMessage.textContent = `Free Forge already has ${getFreeForgeCharges()} charge(s).`;
+          return;
+        }
+        if (getRemainingMs(state.cooldownUntil) > 0) {
+          codeMessage.textContent = `Free Forge cooldown: ${formatDurationShort(getRemainingMs(state.cooldownUntil))}.`;
+          return;
+        }
+
+        emberSkillState.freeForge = {
+          charges: Math.max(1, Math.min(level, 3)),
+          cooldownUntil: now + upgrade.cooldownMs
+        };
+        saveEmberSkillState();
+        updateActiveSkillButtons();
+        codeMessage.textContent = `Free Forge ready: next ${Math.max(1, Math.min(level, 3))} paid spin(s) cost 0.`;
+      }
+    }
+
+    function calculateIdleReward(minutesAway, highestRunTokens, idleForgeLevel) {
+      if (minutesAway < IDLE_MIN_MINUTES || idleForgeLevel <= 0 || highestRunTokens <= 0n) {
+        return 0n;
+      }
+
+      const fullRateMinutes = Math.min(minutesAway, IDLE_FULL_RATE_END_MINUTES);
+      const reducedRateMinutes = Math.min(
+        Math.max(minutesAway - IDLE_FULL_RATE_END_MINUTES, 0),
+        IDLE_REDUCED_RATE_END_MINUTES - IDLE_FULL_RATE_END_MINUTES
+      );
+      const longTermMinutes = Math.max(minutesAway - IDLE_REDUCED_RATE_END_MINUTES, 0);
+      const level = BigInt(idleForgeLevel);
+
+      // 0.5% per level per hour = 1 / 12,000 per minute.
+      const fullReward = highestRunTokens * level * BigInt(fullRateMinutes) / 12000n;
+      const reducedReward = highestRunTokens * level * BigInt(reducedRateMinutes) / 48000n;
+      const longTermReward = highestRunTokens * level * BigInt(longTermMinutes) / 240000n;
+
+      return fullReward + reducedReward + longTermReward;
+    }
+
+    function getIdleTenMinuteEstimate(level = getEmberUpgradeLevel("idleForge")) {
+      if (level <= 0 || currentGameHighestTokens <= 0n) return 0n;
+      return currentGameHighestTokens * BigInt(level) / 1200n;
+    }
+
+    function formatIdleDuration(totalMinutes) {
+      const minutes = Math.max(0, Math.floor(totalMinutes));
+      const days = Math.floor(minutes / 1440);
+      const hours = Math.floor((minutes % 1440) / 60);
+      const remainingMinutes = minutes % 60;
+      const parts = [];
+
+      if (days > 0) parts.push(`${days}d`);
+      if (hours > 0) parts.push(`${hours}h`);
+      if (remainingMinutes > 0 || parts.length === 0) parts.push(`${remainingMinutes}m`);
+
+      return parts.join(" ");
+    }
+
+    function processCompletedSpinTimestamp(completedAt, highestRunSnapshot) {
+      const previousUpdatedAt = lastUpdatedAt;
+      const elapsedMs = Math.max(0, completedAt - previousUpdatedAt);
+      const minutesAway = Math.floor(elapsedMs / 60000);
+      const idleLevel = getEmberUpgradeLevel("idleForge");
+      const reward = calculateIdleReward(minutesAway, highestRunSnapshot, idleLevel);
+
+      if (reward > 0n) {
+        pendingIdleReward += reward;
+        pendingIdleMinutes += minutesAway;
+        saveBigInt("pendingIdleReward", pendingIdleReward);
+        localStorage.setItem("pendingIdleMinutes", String(pendingIdleMinutes));
+      }
+
+      lastUpdatedAt = completedAt;
+      localStorage.setItem("lastUpdated", String(lastUpdatedAt));
+    }
+
+    function maybeShowIdleRewardOverlay(finalBet, spinType) {
+      if (pendingIdleReward <= 0n) return false;
+
+      const overlay = document.getElementById("idleRewardOverlay");
+      const details = document.getElementById("idleRewardDetails");
+      const amount = document.getElementById("idleRewardAmount");
+      const collectButton = document.getElementById("collectIdleRewardButton");
+
+      if (!overlay) return false;
+
+      idleResumeContext = { finalBet, spinType };
+
+      if (details) {
+        details.innerHTML = `
+          Away: <strong>${formatIdleDuration(pendingIdleMinutes)}</strong><br>
+          Idle Forge: <strong>Lv ${getEmberUpgradeLevel("idleForge")}</strong>
+        `;
+      }
+
+      if (amount) {
+        amount.textContent = `+${formatGameNumber(pendingIdleReward)} Forge Tokens`;
+      }
+
+      if (collectButton) collectButton.disabled = false;
+      overlay.classList.add("show");
+      return true;
+    }
+
+    function collectIdleReward() {
+      const overlay = document.getElementById("idleRewardOverlay");
+      const collectButton = document.getElementById("collectIdleRewardButton");
+      const reward = pendingIdleReward;
+
+      if (collectButton) collectButton.disabled = true;
+
+      pendingIdleReward = 0n;
+      pendingIdleMinutes = 0;
+      localStorage.removeItem("pendingIdleReward");
+      localStorage.removeItem("pendingIdleMinutes");
+
+      if (reward > 0n) {
+        tokens += reward;
+
+        if (tokens > currentGameHighestTokens) {
+          currentGameHighestTokens = tokens;
+        }
+
+        saveBigInt("forgeTokens", tokens);
+        saveStats();
+        updateDisplay();
+        showUnlockPopup(`Idle Forge Collected<br>+${formatGameNumber(reward)}`);
+
+        if (leaderboardOptedIn) {
+          submitLeaderboardScore("auto", false);
+        }
+      }
+
+      if (overlay) overlay.classList.remove("show");
+
+      const resumeContext = idleResumeContext;
+      idleResumeContext = null;
+
+      if (resumeContext) {
+        maybeTriggerWinkyIntervention(resumeContext.finalBet, resumeContext.spinType);
+      }
+
+      scheduleAutoSpin();
+    }
+
+    function isRebornAvailable() {
+      return tokens >= REBORN_UNLOCK_AT;
+    }
+
+    function maybeShowRebornIntro() {
+      if (!isRebornAvailable()) return;
+
+      rebornEverUnlocked = true;
+      localStorage.setItem("rebornEverUnlocked", "true");
+
+      if (rebornIntroSeen) return;
+
+      rebornIntroSeen = true;
+      localStorage.setItem("rebornIntroSeen", "true");
+
+      const overlay = document.getElementById("rebornIntroOverlay");
+      if (overlay) {
+        overlay.classList.add("show");
+      }
+    }
+
+    function closeRebornIntro(openConfirm = false) {
+      playSound("click");
+
+      const overlay = document.getElementById("rebornIntroOverlay");
+      if (overlay) {
+        overlay.classList.remove("show");
+      }
+
+      if (openConfirm) {
+        openRebornConfirm();
+      }
+    }
+
+    function getNextRebornTierText(balance) {
+      const nextTier = REBORN_REWARD_TIERS.find(([requiredBalance]) => balance < requiredBalance);
+
+      if (!nextTier) {
+        return "Top test tier reached.";
+      }
+
+      return `Next tier: ${formatGameNumber(nextTier[0])} = ${nextTier[1].toString()} ${REBORN_CURRENCY_NAME}`;
+    }
+
+    function openRebornConfirm() {
+      playSound("click");
+
+      const overlay = document.getElementById("rebornOverlay");
+      const popupText = document.getElementById("rebornPopupText");
+      const popupMessage = document.getElementById("rebornPopupMessage");
+      const confirmButton = document.getElementById("confirmRebornButton");
+      const reward = calculateRebornCurrency(tokens);
+
+      if (popupMessage) popupMessage.textContent = "";
+
+      if (!isRebornAvailable()) {
+        if (popupText) {
+          popupText.innerHTML = `
+            Reborn unlocks at <strong>${formatGameNumber(REBORN_UNLOCK_AT)}</strong> Forge Tokens.<br><br>
+            Current Forge Tokens: <strong>${formatGameNumber(tokens)}</strong><br>
+            Keep forging until Valhalla notices.
+          `;
+        }
+
+        if (confirmButton) confirmButton.disabled = true;
+        if (overlay) overlay.classList.add("show");
+        return;
+      }
+
+      if (popupText) {
+        popupText.innerHTML = `
+          Current Forge Tokens: <strong>${formatGameNumber(tokens)}</strong><br>
+          You will gain: <strong>${reward.toString()} ${REBORN_CURRENCY_NAME}</strong><br>
+          ${getNextRebornTierText(tokens)}<br><br>
+          Reborn will reset your current run and current Forge Tokens.
+          Themes, codes, lifetime stats, Player ID, and ${REBORN_CURRENCY_NAME} stay saved.<br><br>
+          Push higher before rebirthing for larger rewards.
+        `;
+      }
+
+      if (confirmButton) confirmButton.disabled = false;
+      if (overlay) overlay.classList.add("show");
+    }
+
+    function closeRebornConfirm() {
+      playSound("click");
+
+      const overlay = document.getElementById("rebornOverlay");
+      if (overlay) {
+        overlay.classList.remove("show");
+      }
+    }
+
+    function confirmReborn() {
+      playSound("unlock");
+
+      if (!isRebornAvailable()) {
+        const popupMessage = document.getElementById("rebornPopupMessage");
+        if (popupMessage) popupMessage.textContent = "You are not ready.";
+        return;
+      }
+
+      const reward = calculateRebornCurrency(tokens);
+
+      rebornCurrency += reward;
+      rebornCount += 1;
+
+      tokens = 0n;
+      currentGameHighestTokens = 0n;
+
+      bonusSpinQueue = 0;
+      bonusSpinLineBet = 0n;
+      bonusSpinFinalBet = 0n;
+      bonusSpinSource = "";
+      bonusSessionTotal = 0;
+      bonusSessionPlayed = 0;
+      bonusSessionWon = 0n;
+      lastWinBreakdown = [];
+
+      saveBigInt("forgeTokens", tokens);
+      saveRebornState();
+      saveStats();
+
+      const overlay = document.getElementById("rebornOverlay");
+      if (overlay) {
+        overlay.classList.remove("show");
+      }
+
+      clearWinningHighlights();
+      clearWinPopup();
+      hideLineOverlay();
+      updateDisplay();
+
+      showUnlockPopup(`Valhalla spits you back out.<br>You are not ready.<br>Use your new skills to forge faster and further than ever before.<br><br>+${reward.toString()} ${REBORN_CURRENCY_NAME}`);
+      codeMessage.textContent = `Reborn complete. +${reward.toString()} ${REBORN_CURRENCY_NAME} earned.`;
+    }
+
+    function updateRebornButton() {
+      if (!rebornButton) return;
+
+      const available = isRebornAvailable();
+
+      rebornButton.disabled = controlsLocked ? true : false;
+      rebornButton.classList.toggle("rebornButtonAvailable", available);
+
+      if (available) {
+        rebornButton.textContent = "Reborn Available";
+        return;
+      }
+
+      if (rebornEverUnlocked || rebornCount > 0) {
+        rebornButton.textContent = "Reborn";
+        return;
+      }
+
+      rebornButton.textContent = "Reborn Locked";
+    }
+
+    function updateDisplay() {
+      if (getBaseBet() === 0n) {
+        multiplierIndex = 0;
+      }
+
+      const baseBet = getBaseBet();
+      const multiplier = getMultiplier();
+      const finalBet = getFinalBet();
+
+      tokenBalance.textContent = formatGameNumber(tokens);
+
+      if (rebornCurrencyBalance) {
+        rebornCurrencyBalance.textContent = rebornCurrency.toString();
+      }
+
+      if (rebornCurrencyLabel) {
+        rebornCurrencyLabel.textContent = REBORN_CURRENCY_NAME;
+      }
+
+      spinCount.textContent = totalSpins.toLocaleString();
+
+      baseBetDisplay.textContent = baseBet === 0n ? "Free" : formatGameNumber(baseBet);
+      multiplierDisplay.textContent = formatMultiplier(multiplier);
+      lineCountDisplay.textContent = getLineCount();
+
+      if (multiplierRow) {
+        multiplierRow.classList.toggle("multiplierLocked", baseBet === 0n);
+      }
+
+      const activeGroup = themes[activeTheme]?.characterGroup || "Default";
+      const activeVariant = themes[activeTheme]?.variantLabel || "Base";
+
+      if (themeCharacterDisplay) {
+        themeCharacterDisplay.textContent = activeGroup;
+      }
+
+      if (themeVariantDisplay) {
+        themeVariantDisplay.textContent = activeVariant;
+      }
+
+      spinButton.textContent = finalBet === 0n
+        ? "FREE"
+        : formatGameNumber(finalBet);
+
+      syncThemeSelectors();
+      updateInfoButtons();
+      updateWinInfo();
+      updateDevToolsVisibility();
+      updateUnlockPanel();
+      updateSoundButton();
+      updateControlBoundaryStates();
+      updateRebornButton();
+      updateActiveSkillButtons();
+      maybeShowRebornIntro();
+    }
+
+    // =========================
+    // INFO FRAME MODE
+    // =========================
+
+    function setInfoMode(mode) {
+      playSound("click");
+
+      activePanel = activePanel === mode ? null : mode;
+
+      updateInfoButtons();
+      updateWinInfo();
+      updateDevToolsVisibility();
+    }
+
+    function updateInfoButtons() {
+      const buttonModes = {
+        statsButton: "stats",
+        breakdownButton: "breakdown",
+        gameInfoButton: "gameInfo",
+        codesButton: "codes",
+        storeButton: "store",
+        emberStoreButton: "emberStore"
+      };
+
+      Object.entries(buttonModes).forEach(([buttonId, mode]) => {
+        const button = document.getElementById(buttonId);
+        if (button) {
+          button.classList.toggle("active", activePanel === mode);
+        }
+      });
+    }
+
+    function updateAllPanels() {
+      updateWinInfo();
+      updateUnlockPanel();
+      updateSoundButton();
+      updateDevToolsVisibility();
+    }
+
+    function toggleDevUnlocks() {
+      playSound("click");
+      devUnlockInfoVisible = !devUnlockInfoVisible;
+      updateDevToolsVisibility();
+    }
+
+
+    // =========================
+    // SECTION 5: ODDS / PAYOUTS / WIN EVALUATION
+    // =========================
+
+    // =========================
+    // ODDS DISPLAY
+    // =========================
+
+    function getSymbolDistribution() {
+      const counts = {};
+      const total = symbolPool.length;
+
+      symbolPool.forEach(symbol => {
+        counts[symbol.name] = (counts[symbol.name] || 0) + 1;
+      });
+
+      return Object.keys(counts).map(name => ({
+        name,
+        probability: counts[name] / total
+      }));
+    }
+
+    function symbolsMatchByName(baseName, testName) {
+      return baseName === "Wild" || testName === "Wild" || baseName === testName;
+    }
+
+    function getDirectedMatchCountFromNames(names) {
+      const firstName = names[0];
+      let baseName = firstName === "Wild" ? null : firstName;
+      let matchCount = 1;
+
+      for (let i = 1; i < names.length; i++) {
+        const symbolName = names[i];
+
+        if (!baseName && symbolName !== "Wild") {
+          baseName = symbolName;
+        }
+
+        const compareName = baseName || firstName;
+
+        if (symbolsMatchByName(compareName, symbolName)) {
+          matchCount++;
+        } else {
+          break;
+        }
+      }
+
+      return matchCount >= 2 ? matchCount : 0;
+    }
+
+    function calculateDirectedLineOdds() {
+      const distribution = getSymbolDistribution();
+      const odds = { 2: 0, 3: 0, 4: 0, 5: 0 };
+
+      function walk(position, names, probability) {
+        if (position === COLS) {
+          const matchCount = getDirectedMatchCountFromNames(names);
+
+          if (matchCount >= 2) {
+            odds[Math.min(matchCount, 5)] += probability;
+          }
+
+          return;
+        }
+
+        distribution.forEach(symbol => {
+          names[position] = symbol.name;
+          walk(position + 1, names, probability * symbol.probability);
+        });
+      }
+
+      walk(0, new Array(COLS), 1);
+      return odds;
+    }
+
+    function calculateOdds() {
+      const activeLines = getActivePaylines().length;
+      const directed = calculateDirectedLineOdds();
+      const anyDirectedWin = directed[2] + directed[3] + directed[4] + directed[5];
+
+      // Exact per directed line. Full-spin chance is an estimate because paylines overlap on the same grid cells.
+      const approxAnySpinWin = 1 - Math.pow(1 - anyDirectedWin, activeLines * 2);
+
+      return {
+        twoInRow: directed[2],
+        threeInRow: directed[3],
+        fourInRow: directed[4],
+        fiveInRow: directed[5],
+        anyDirectedWin,
+        approxAnySpinWin
+      };
+    }
+
+    function formatOdds(probability) {
+      if (probability <= 0) return "Never";
+
+      const oneIn = Math.round(1 / probability).toLocaleString();
+      const percent = (probability * 100).toFixed(probability < 0.001 ? 4 : 2);
+
+      return `${percent}% / 1 in ${oneIn}`;
+    }
+
+    // =========================
+    // BIGINT PAYOUT TABLES
+    // Paid payout multipliers are scaled by 100.
+    // Example: 75n = 0.75x, 150n = 1.5x, 14000n = 140x.
+    // =========================
+
+    const PAYOUT_SCALE = 100n;
+
+    const payoutTables = {
+      free: {
+        Axe: { 2: 15n, 3: 75n, 4: 200n, 5: 750n },
+        Animal: { 2: 15n, 3: 75n, 4: 200n, 5: 750n },
+        Gem: { 2: 150n, 3: 600n, 4: 1750n, 5: 7500n },
+        Wild: { 2: 100n, 3: 400n, 4: 1250n, 5: 5000n },
+        default: { 2: 40n, 3: 175n, 4: 500n, 5: 1500n }
+      },
+
+      paid: {
+        Axe: { 2: 50n, 3: 300n, 4: 1400n, 5: 7000n },
+        Animal: { 2: 50n, 3: 300n, 4: 1400n, 5: 7000n },
+        Gem: { 2: 300n, 3: 1800n, 4: 10000n, 5: 50000n },
+        Wild: { 2: 200n, 3: 1200n, 4: 7000n, 5: 32500n },
+        default: { 2: 100n, 3: 600n, 4: 3200n, 5: 14000n }
+      }
+    };
+
+    function getPayoutTable(mode, symbolName) {
+      const tableSet = payoutTables[mode];
+      return tableSet[symbolName] || tableSet.default;
+    }
+
+    function freePayoutForMatch(matchCount, symbolName) {
+      const table = getPayoutTable("free", symbolName);
+
+      if (matchCount >= 5) return table[5];
+      if (matchCount === 4) return table[4];
+      if (matchCount === 3) return table[3];
+      if (matchCount === 2) return table[2];
+
+      return 0n;
+    }
+
+    function paidMultiplierForMatch(matchCount, symbolName) {
+      const table = getPayoutTable("paid", symbolName);
+
+      if (matchCount >= 5) return table[5];
+      if (matchCount === 4) return table[4];
+      if (matchCount === 3) return table[3];
+      if (matchCount === 2) return table[2];
+
+      return 0n;
+    }
+
+    function paidPayoutForMatch(matchCount, symbolName, lineBet) {
+      const scaledMultiplier = paidMultiplierForMatch(matchCount, symbolName);
+      return (lineBet * scaledMultiplier) / PAYOUT_SCALE;
+    }
+
+    function payoutForWin(win, finalBet, lineBet) {
+      let payout = 0n;
+
+      if (finalBet === 0n) {
+        payout = freePayoutForMatch(win.matchCount, win.symbol);
+      } else {
+        payout = paidPayoutForMatch(win.matchCount, win.symbol, lineBet);
+      }
+
+      return applyEmberSymbolBonus(win.symbol, payout);
+    }
+
+    // =========================
+    // GRID BUILDING
+    // =========================
+
+    function buildFinalGrid() {
+      const grid = [];
+
+      for (let row = 0; row < VISIBLE_ROWS; row++) {
+        grid[row] = [];
+
+        for (let col = 0; col < COLS; col++) {
+          grid[row][col] = randomSymbol();
+        }
+      }
+
+      return grid;
+    }
+
+    // =========================
+    // WIN HELPERS
+    // =========================
+
+    function isWild(symbol) {
+      return symbol && symbol.name === "Wild";
+    }
+
+    function symbolsMatch(baseSymbol, testSymbol) {
+      if (!baseSymbol || !testSymbol) return false;
+      if (isWild(baseSymbol) || isWild(testSymbol)) return true;
+
+      return baseSymbol.name === testSymbol.name;
+    }
+
+    function getBestBaseSymbol(symbols) {
+      const nonWild = symbols.find(symbol => !isWild(symbol));
+
+      if (nonWild) return nonWild;
+
+      // Pure Wild line pays as Wild.
+      return { name: "Wild", type: "image", value: "wild.png" };
+    }
+
+    function countLeadingWilds(symbols) {
+      let count = 0;
+
+      for (let i = 0; i < symbols.length; i++) {
+        if (isWild(symbols[i])) {
+          count++;
+        } else {
+          break;
+        }
+      }
+
+      return count;
+    }
+
+    function isPureWildChain(symbols) {
+      return symbols.length >= 2 && symbols.every(symbol => isWild(symbol));
+    }
+
+    function evaluateDirection(grid, line, direction) {
+      const columns = direction === "LTR"
+        ? [0, 1, 2, 3, 4]
+        : [4, 3, 2, 1, 0];
+
+      const firstCol = columns[0];
+      const firstRow = line.rows[firstCol] - 1;
+      const firstSymbol = grid[firstRow][firstCol];
+
+      let checkedSymbols = [firstSymbol];
+      let baseSymbol = isWild(firstSymbol) ? null : firstSymbol;
+      let matchCount = 1;
+      let cells = [{ row: firstRow, col: firstCol }];
+
+      for (let i = 1; i < columns.length; i++) {
+        const col = columns[i];
+        const row = line.rows[col] - 1;
+        const symbol = grid[row][col];
+
+        if (!baseSymbol && !isWild(symbol)) {
+          baseSymbol = symbol;
+        }
+
+        const compareBase = baseSymbol || firstSymbol;
+
+        if (symbolsMatch(compareBase, symbol)) {
+          matchCount++;
+          checkedSymbols.push(symbol);
+          cells.push({ row, col });
+        } else {
+          break;
+        }
+      }
+
+      if (matchCount < 2) return null;
+
+      const payingSymbol = baseSymbol || getBestBaseSymbol(checkedSymbols);
+      const pureWild = isPureWildChain(checkedSymbols);
+      const leadingWildCount = countLeadingWilds(checkedSymbols);
+
+      return {
+        lineName: line.name,
+        direction,
+        symbol: payingSymbol.name,
+        matchCount,
+        wildCount: leadingWildCount,
+        cells,
+        pureWild
+      };
+    }
+
+    function evaluatePaylines(grid) {
+      const wins = [];
+      const activePaylines = getActivePaylines();
+
+      activePaylines.forEach(line => {
+        const leftWin = evaluateDirection(grid, line, "LTR");
+        const rightWin = evaluateDirection(grid, line, "RTL");
+
+        // Prevent double-paying the same full 5-symbol line.
+        if (leftWin && rightWin && leftWin.matchCount === 5 && rightWin.matchCount === 5) {
+          wins.push(leftWin);
+          return;
+        }
+
+        if (leftWin) wins.push(leftWin);
+        if (rightWin) wins.push(rightWin);
+      });
+
+      return wins;
+    }
+
+    function countBonusSpinsFromWins(wins) {
+      let earned = 0;
+
+      wins.forEach(win => {
+        if (win.wildCount >= 2) {
+          earned += win.wildCount;
+        }
+      });
+
+      return earned;
+    }
+
+    function checkThemeUnlocks(wins) {
+      let unlockedSomething = false;
+
+      wins.forEach(win => {
+        if (win.matchCount < 5) return;
+
+        if (characterSymbols.includes(win.symbol)) {
+          const wasUnlocked = handleCharacterThemeUnlock(win.symbol);
+
+          if (wasUnlocked) {
+            unlockedSomething = true;
+          }
+        }
+
+        if (win.symbol === "Gem" || win.symbol === "Wild") {
+          const wasUnlocked = unlockTheme("Winky");
+
+          if (wasUnlocked) {
+            applyUnlockedTheme("Winky");
+            showUnlockPopup("Winky Unlocked");
+            playSound("unlock");
+            unlockedSomething = true;
+          }
+        }
+      });
+
+      if (unlockedSomething) {
+        localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+        updateUnlockPanel();
+      }
+
+      syncThemeIndex();
+    }
+
+    function clearWinningHighlights() {
+      document.querySelectorAll(".cell").forEach(cell => {
+        cell.classList.remove("winningCell");
+        cell.classList.remove("wildCell");
+      });
+    }
+
+    function highlightWins(wins) {
+      wins.forEach(win => {
+        win.cells.forEach(cellPosition => {
+          const cell = getCell(cellPosition.row, cellPosition.col);
+          cell.classList.add("winningCell");
+
+          const img = cell.querySelector("img");
+
+          if (img && img.alt === "Wild") {
+            cell.classList.add("wildCell");
+          }
+        });
+      });
+    }
+
+    function buildWinBreakdown(wins, finalBet, lineBet) {
+      if (!wins.length) return [];
+
+      return wins.map(win => {
+        const payout = payoutForWin(win, finalBet, lineBet);
+
+        const wildText = win.wildCount >= 2
+          ? ` — Wild x${win.wildCount}`
+          : "";
+
+        const bonusText = finalBet > 0n && win.wildCount >= 2
+          ? ` + ${win.wildCount} Bonus Spins`
+          : "";
+
+        return {
+          text: `${win.lineName} ${win.direction}: ${win.matchCount}x ${win.symbol}${wildText}${bonusText}`,
+          payout
+        };
+      });
+    }
+
+    function clearWinPopup() {
+      if (winPopupTimer) {
+        clearTimeout(winPopupTimer);
+        winPopupTimer = null;
+      }
+
+      winPopup.classList.remove("show");
+      winPopup.textContent = "";
+    }
+
+    function showWinPopup(amount) {
+      amount = BigInt(amount);
+
+      if (amount <= 0n) {
+        clearWinPopup();
+        return;
+      }
+
+      winPopup.textContent = `+${formatGameNumber(amount)}`;
+      winPopup.classList.add("show");
+
+      winPopupTimer = setTimeout(() => {
+        winPopup.classList.remove("show");
+      }, 2500);
+    }
+
+
+    // =========================
+    // SECTION 6: SPIN / DEV TOOLS / CODES / STATS / CLOSE
+    // =========================
+
+    let themePeekTimer = null;
+    let winkyOverlayActive = false;
+
+    // =========================
+    // THEME PEEK
+    // =========================
+
+    function startThemePeek() {
+      const gamePanel = document.getElementById("gamePanel");
+      if (!gamePanel) return;
+
+      if (spinButton.disabled) {
+        codeMessage.textContent = "Theme Peek is unavailable while spinning.";
+        return;
+      }
+
+      playSound("click");
+      hideLineOverlay();
+      clearWinPopup();
+
+      gamePanel.classList.add("themePeekActive");
+
+      if (themePeekTimer) {
+        clearTimeout(themePeekTimer);
+      }
+
+      themePeekTimer = setTimeout(() => {
+        gamePanel.classList.remove("themePeekActive");
+        themePeekTimer = null;
+        startLinePreview();
+      }, 4000);
+    }
+
+    // =========================
+    // WINKY INTERVENTION SHELL
+    // =========================
+
+    function maybeTriggerWinkyIntervention(finalBet, spinType) {
+      if (winkyOverlayActive) return;
+      if (spinType !== "normal") return;
+      if (finalBet <= 0n) return;
+
+      const roll = Math.random();
+
+      if (roll < 0.01) {
+        triggerWinkyIntervention();
+      }
+    }
+
+    function triggerWinkyIntervention() {
+      const overlay = document.getElementById("winkyOverlay");
+      const message = document.getElementById("winkyPopupMessage");
+
+      if (!overlay) return;
+
+      winkyOverlayActive = true;
+
+      if (message) {
+        message.textContent = "";
+      }
+
+      overlay.classList.add("show");
+      playSound("winky");
+    }
+
+    function answerWinky(fedWinky) {
+      const overlay = document.getElementById("winkyOverlay");
+      const message = document.getElementById("winkyPopupMessage");
+
+      if (fedWinky) {
+        winkyCansFed += 4;
+      } else {
+        winkyHungryNights += 2;
+      }
+
+      saveStats();
+      updateWinInfo();
+
+      if (message) {
+        message.textContent = fedWinky
+          ? "Winky accepts your offering."
+          : "Winky is staring.";
+      }
+
+      setTimeout(() => {
+        if (overlay) {
+          overlay.classList.remove("show");
+        }
+
+        winkyOverlayActive = false;
+      }, fedWinky ? 1400 : 2200);
+    }
+
+    // =========================
+    // SPIN CONTROL
+    // =========================
+
+    function setControlsDisabled(disabled) {
+      controlsLocked = disabled;
+      spinButton.disabled = disabled;
+      updateActiveSkillButtons();
+
+      document.querySelectorAll(".arrowButton").forEach(button => {
+        button.disabled = disabled;
+      });
+
+      document.querySelectorAll(".infoButton").forEach(button => {
+        button.disabled = disabled;
+      });
+
+      if (!disabled) {
+        updateControlBoundaryStates();
+      }
+    }
+
+    function updateControlBoundaryStates() {
+      if (controlsLocked) return;
+
+      if (baseBetDownButton) baseBetDownButton.disabled = baseBetIndex <= 0;
+      if (baseBetUpButton) baseBetUpButton.disabled = baseBetIndex >= baseBetOptions.length - 1;
+
+      const multiplierLocked = getBaseBet() === 0n;
+      const availableMultipliers = getUnlockedMultiplierOptions();
+
+      if (multiplierDownButton) multiplierDownButton.disabled = multiplierLocked || multiplierIndex <= 0;
+      if (multiplierUpButton) multiplierUpButton.disabled = multiplierLocked || multiplierIndex >= availableMultipliers.length - 1;
+    }
+
+    function calculateSpinPayout(wins, finalBet, lineBet) {
+      let payout = 0n;
+
+      wins.forEach(win => {
+        payout += payoutForWin(win, finalBet, lineBet);
+      });
+
+      return applyForgeSurgeBonus(payout);
+    }
+
+    function spin() {
+      const finalBet = getFinalBet();
+      const lineBet = getLineBet();
+      const tokensBeforeSpin = tokens;
+      let actualCost = finalBet;
+
+      // Free Forge only removes the cost after the player can afford the selected paid spin.
+      // This prevents using a free charge to spin far above the current token balance.
+      if (finalBet > tokens) {
+        codeMessage.textContent = "Not enough Forge Tokens.";
+        playSound("click");
+        return;
+      }
+
+      if (finalBet > 0n && getFreeForgeCharges() > 0) {
+        actualCost = 0n;
+        useFreeForgeCharge();
+        codeMessage.textContent = "Free Forge used. This paid spin costs 0.";
+      }
+
+      if (actualCost > 0n) {
+        tokens -= actualCost;
+        saveBigInt("forgeTokens", tokens);
+        updateDisplay();
+      }
+
+      animateSpin(finalBet, lineBet, "normal", tokensBeforeSpin, actualCost);
+    }
+
+    function animateSpin(finalBet, lineBet, spinType = "normal", tokensBeforeSpin = null, actualCost = finalBet) {
+      stopResultSounds();
+      playSound("spin");
+      hideLineOverlay();
+      clearWinPopup();
+      clearWinningHighlights();
+      setControlsDisabled(true);
+
+      if (spinType === "bonus") {
+        const currentBonusNumber = bonusSessionPlayed + 1;
+        showUnlockPopup(`Bonus Spin ${currentBonusNumber} / ${bonusSessionTotal}`);
+      }
+
+      const finalGrid = buildFinalGrid();
+      const intervals = [];
+
+      for (let col = 0; col < COLS; col++) {
+        intervals[col] = setInterval(() => {
+          for (let row = 0; row < VISIBLE_ROWS; row++) {
+            const cell = getCell(row, col);
+            showSymbol(cell, randomSymbol());
+            cell.classList.add("spinning");
+          }
+        }, 70);
+
+        setTimeout(() => {
+          clearInterval(intervals[col]);
+          playSingleSound("stop");
+
+          for (let row = 0; row < VISIBLE_ROWS; row++) {
+            const cell = getCell(row, col);
+            cell.classList.remove("spinning");
+            showSymbol(cell, finalGrid[row][col]);
+          }
+
+          if (col === COLS - 1) {
+            finishSpin(finalGrid, finalBet, lineBet, spinType, tokensBeforeSpin, actualCost);
+          }
+        }, FIRST_REEL_STOP_DELAY + col * REEL_STOP_SPACING);
+      }
+    }
+
+    function finishSpin(finalGrid, finalBet, lineBet, spinType = "normal", tokensBeforeSpin = null, actualCost = finalBet) {
+      const spinCompletedAt = Date.now();
+      const idleHighestSnapshot = currentGameHighestTokens;
+      const wins = evaluatePaylines(finalGrid);
+      const payout = calculateSpinPayout(wins, finalBet, lineBet);
+
+      const earnedBonusSpins = spinType === "normal" && finalBet > 0n
+        ? countBonusSpinsFromWins(wins)
+        : 0;
+
+      highlightWins(wins);
+      drawWinningLines(wins);
+      checkThemeUnlocks(wins);
+
+      lastWinBreakdown = buildWinBreakdown(wins, finalBet, lineBet);
+      processCompletedSpinTimestamp(spinCompletedAt, idleHighestSnapshot);
+
+      tokens += payout;
+
+      if (tokens > currentGameHighestTokens) {
+        currentGameHighestTokens = tokens;
+      }
+
+      totalSpins += 1;
+      updateThemeRotationIfNeeded();
+      lifetimeTokensEarned += payout;
+
+
+      if (spinType === "normal") {
+        lifetimeTokensWagered += actualCost;
+
+        if (finalBet === 0n) {
+          lifetimeFreeGames += 1;
+          lifetimeFreeWinnings += payout;
+        } else {
+          lifetimePaidGames += 1;
+          lifetimePaidWagered += actualCost;
+          lifetimePaidWinnings += payout;
+
+          if (actualCost > 0n) {
+            recordPaidSpinAdvancedStats(actualCost, payout, tokensBeforeSpin);
+          }
+        }
+      }
+
+      if (spinType === "bonus") {
+        lifetimeBonusSpinsPlayed += 1;
+        lifetimeBonusSpinWinnings += payout;
+        bonusSessionPlayed += 1;
+        bonusSessionWon += payout;
+      }
+
+      if (earnedBonusSpins > 0) {
+        bonusSpinQueue += earnedBonusSpins;
+        bonusSpinLineBet = lineBet;
+        bonusSpinFinalBet = finalBet;
+        bonusSpinSource = `${earnedBonusSpins} Bonus Spins`;
+
+        bonusSessionTotal = earnedBonusSpins;
+        bonusSessionPlayed = 0;
+        bonusSessionWon = 0n;
+
+        lifetimeBonusSpinsEarned += earnedBonusSpins;
+        showUnlockPopup(`${earnedBonusSpins} Bonus Earned`);
+        playSound("bonus");
+      }
+
+      if (payout > biggestSingleWin) {
+        biggestSingleWin = payout;
+      }
+
+      saveBigInt("forgeTokens", tokens);
+      localStorage.setItem("forgeTotalSpins", totalSpins);
+      localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+
+      saveStats();
+      updateDisplay();
+      maybeAutoSubmitLeaderboard();
+      showWinPopup(payout);
+
+      if (payout > 0n) {
+        if (finalBet > 0n && payout >= finalBet * 20n) {
+          playSound("bigWin");
+        } else {
+          playSound("smallWin");
+        }
+      }
+
+      if (bonusSpinQueue > 0) {
+        setTimeout(runBonusSpin, BONUS_SPIN_DELAY);
+      } else {
+        if (spinType === "bonus" && bonusSessionTotal > 0) {
+          showUnlockPopup(`Bonus Tokens Won<br>${formatGameNumber(bonusSessionWon)}`);
+          bonusSessionTotal = 0;
+          bonusSessionPlayed = 0;
+          bonusSessionWon = 0n;
+        }
+
+        setControlsDisabled(false);
+
+        if (maybeShowIdleRewardOverlay(finalBet, spinType)) {
+          return;
+        }
+
+        maybeTriggerWinkyIntervention(finalBet, spinType);
+        scheduleAutoSpin();
+      }
+    }
+
+    function runBonusSpin() {
+      if (bonusSpinQueue <= 0) {
+        setControlsDisabled(false);
+        scheduleAutoSpin();
+        return;
+      }
+
+      bonusSpinQueue -= 1;
+      animateSpin(bonusSpinFinalBet, bonusSpinLineBet, "bonus");
+    }
+
+
+    // =========================
+    // AUTO SPIN DEV/DEMO TOOL
+    // Plays normally using current bet settings and updates normal stats.
+    // =========================
+
+    function toggleAutoSpin() {
+      markDevToolsUsed();
+      playSound("click");
+
+      autoSpinEnabled = !autoSpinEnabled;
+
+      if (!autoSpinEnabled && autoSpinTimer) {
+        clearTimeout(autoSpinTimer);
+        autoSpinTimer = null;
+      }
+
+      updateDevToolsVisibility();
+      scheduleAutoSpin();
+    }
+
+    function scheduleAutoSpin() {
+      if (!autoSpinEnabled) return;
+
+      if (autoSpinTimer) {
+        clearTimeout(autoSpinTimer);
+        autoSpinTimer = null;
+      }
+
+      autoSpinTimer = setTimeout(() => {
+        autoSpinTimer = null;
+
+        if (!autoSpinEnabled) return;
+
+        if (spinButton.disabled || controlsLocked || bonusSpinQueue > 0) {
+          scheduleAutoSpin();
+          return;
+        }
+
+        if (getFinalBet() > tokens) {
+          autoSpinEnabled = false;
+          codeMessage.textContent = "Auto Spin stopped: not enough Forge Tokens.";
+          updateDevToolsVisibility();
+          return;
+        }
+
+        spin();
+      }, AUTO_SPIN_DELAY);
+    }
+
+    // =========================
+    // QUICK SPIN DEV TOOL
+    // =========================
+
+    function quickSpin(amount) {
+      markDevToolsUsed();
+      playSound("click");
+
+      const finalBet = getFinalBet();
+      const lineBet = getLineBet();
+
+      let totalPayout = 0n;
+      let totalWagered = 0n;
+      let completedSpins = 0;
+      let earnedBonusTotal = 0;
+      let playedBonusTotal = 0;
+
+      for (let i = 0; i < amount; i++) {
+        if (finalBet > tokens) break;
+
+        if (finalBet > 0n) {
+          tokens -= finalBet;
+          totalWagered += finalBet;
+        }
+
+        const grid = buildFinalGrid();
+        const wins = evaluatePaylines(grid);
+        const spinPayout = calculateSpinPayout(wins, finalBet, lineBet);
+        const earnedBonusSpins = finalBet > 0n ? countBonusSpinsFromWins(wins) : 0;
+
+        checkThemeUnlocks(wins);
+
+        tokens += spinPayout;
+        totalPayout += spinPayout;
+        totalSpins += 1;
+        updateThemeRotationIfNeeded();
+        completedSpins += 1;
+
+        lifetimeTokensEarned += spinPayout;
+        lifetimeTokensWagered += finalBet;
+
+        if (finalBet === 0n) {
+          lifetimeFreeGames += 1;
+          lifetimeFreeWinnings += spinPayout;
+        } else {
+          lifetimePaidGames += 1;
+          lifetimePaidWagered += finalBet;
+          lifetimePaidWinnings += spinPayout;
+          recordPaidSpinAdvancedStats(finalBet, spinPayout, tokens + finalBet);
+        }
+
+        if (earnedBonusSpins > 0) {
+          lifetimeBonusSpinsEarned += earnedBonusSpins;
+          earnedBonusTotal += earnedBonusSpins;
+
+          for (let b = 0; b < earnedBonusSpins; b++) {
+            const bonusGrid = buildFinalGrid();
+            const bonusWins = evaluatePaylines(bonusGrid);
+            const bonusPayout = calculateSpinPayout(bonusWins, finalBet, lineBet);
+
+            checkThemeUnlocks(bonusWins);
+
+            tokens += bonusPayout;
+
+            totalPayout += bonusPayout;
+            totalSpins += 1;
+            updateThemeRotationIfNeeded();
+
+            lifetimeTokensEarned += bonusPayout;
+            lifetimeBonusSpinsPlayed += 1;
+            lifetimeBonusSpinWinnings += bonusPayout;
+            playedBonusTotal += 1;
+
+            if (bonusPayout > biggestSingleWin) {
+              biggestSingleWin = bonusPayout;
+            }
+          }
+        }
+
+        if (spinPayout > biggestSingleWin) {
+          biggestSingleWin = spinPayout;
+        }
+      }
+
+      saveBigInt("forgeTokens", tokens);
+      localStorage.setItem("forgeTotalSpins", totalSpins);
+      localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+
+      saveStats();
+      clearWinningHighlights();
+      clearWinPopup();
+      hideLineOverlay();
+      updateDisplay();
+      maybeAutoSubmitLeaderboard();
+
+      const net = totalPayout - totalWagered;
+      const sign = net >= 0n ? "+" : "-";
+      const absNet = net >= 0n ? net : -net;
+
+      codeMessage.textContent =
+        `Quick Spin: ${completedSpins} spins | Bonus ${playedBonusTotal}/${earnedBonusTotal} | Net ${sign}${formatGameNumber(absNet)}`;
+    }
+
+    // =========================
+    // STATS / INFO AREA
+    // =========================
+
+    function saveStats() {
+      if (tokens > highestBalance) {
+        highestBalance = tokens;
+      }
+
+      if (tokens > currentGameHighestTokens) {
+        currentGameHighestTokens = tokens;
+      }
+
+      saveRebornState();
+
+      saveBigInt("lifetimeTokensEarned", lifetimeTokensEarned);
+      saveBigInt("lifetimeTokensWagered", lifetimeTokensWagered);
+      saveBigInt("biggestSingleWin", biggestSingleWin);
+      saveBigInt("highestBalance", highestBalance);
+      localStorage.setItem("devToolsUsed", devToolsUsed ? "true" : "false");
+      saveBigInt("promoTokensRedeemed", promoTokensRedeemed);
+
+      localStorage.setItem("lifetimeFreeGames", lifetimeFreeGames);
+      saveBigInt("lifetimeFreeWinnings", lifetimeFreeWinnings);
+
+      localStorage.setItem("lifetimePaidGames", lifetimePaidGames);
+      saveBigInt("lifetimePaidWagered", lifetimePaidWagered);
+      saveBigInt("lifetimePaidWinnings", lifetimePaidWinnings);
+
+      localStorage.setItem("lifetimeBonusSpinsEarned", lifetimeBonusSpinsEarned);
+      localStorage.setItem("lifetimeBonusSpinsPlayed", lifetimeBonusSpinsPlayed);
+      saveBigInt("lifetimeBonusSpinWinnings", lifetimeBonusSpinWinnings);
+
+      localStorage.setItem("winkyCansFed", winkyCansFed);
+      localStorage.setItem("winkyHungryNights", winkyHungryNights);
+
+      saveBigInt("lifetimePaidRoiTotal", lifetimePaidRoiTotal);
+      saveBigInt("lifetimeBetRiskTotal", lifetimeBetRiskTotal);
+      saveBigInt("highestBetRisk", highestBetRisk);
+      localStorage.setItem("gemPresses", gemPresses);
+    }
+
+    function markDevToolsUsed() {
+      devToolsUsed = true;
+      saveStats();
+      updateDisplay();
+    }
+
+    function getPaidReturnRateText() {
+      return formatPercent(lifetimePaidWinnings, lifetimePaidWagered);
+    }
+
+    function getOverallReturnRateText() {
+      return formatPercent(lifetimeTokensEarned, lifetimeTokensWagered);
+    }
+
+    function getNetGain() {
+      return lifetimeTokensEarned - lifetimeTokensWagered;
+    }
+
+    function getAveragePaidSpinRoi() {
+      if (lifetimePaidGames <= 0) return 0n;
+      return lifetimePaidRoiTotal / BigInt(lifetimePaidGames);
+    }
+
+    function getAverageBetRisk() {
+      if (lifetimePaidGames <= 0) return 0n;
+      return lifetimeBetRiskTotal / BigInt(lifetimePaidGames);
+    }
+
+    function getPlayStyleLabel() {
+      const averageRisk = getAverageBetRisk();
+
+      if (averageRisk <= 100n) return "Conservative";
+      if (averageRisk <= 500n) return "Balanced";
+      if (averageRisk <= 1500n) return "Aggressive";
+      if (averageRisk <= 3000n) return "Reckless";
+      return "Winky Mode";
+    }
+
+    function recordPaidSpinAdvancedStats(finalBet, payout, tokensBeforeSpin) {
+      if (finalBet <= 0n) return;
+
+      const spinRoi = ((payout - finalBet) * 10000n) / finalBet;
+      lifetimePaidRoiTotal += spinRoi;
+
+      if (tokensBeforeSpin && tokensBeforeSpin > 0n) {
+        const betRisk = (finalBet * 10000n) / tokensBeforeSpin;
+        lifetimeBetRiskTotal += betRisk;
+
+        if (betRisk > highestBetRisk) {
+          highestBetRisk = betRisk;
+        }
+      }
+    }
+
+
+    function getUnlockCount() {
+      return Object.keys(themes).filter(themeKey => unlockedThemes[themeKey]).length;
+    }
+
+    function getTotalUnlockCount() {
+      return Object.keys(themes).length;
+    }
+
+    function paidReturnGreaterThan(percent) {
+      if (lifetimePaidWagered <= 0n) return false;
+      return lifetimePaidWinnings * 100n > lifetimePaidWagered * BigInt(percent);
+    }
+
+    function getWinkyJudgement() {
+      if (devToolsUsed) {
+        return {
+          text: "Void — Timeline Corrupted",
+          className: "judgementVoid"
+        };
+      }
+
+      if (tokens >= 8000000000n && totalSpins < 100) {
+        return {
+          text: "Void — Impossible Snack Behavior",
+          className: "judgementVoid"
+        };
+      }
+
+      if (lifetimePaidGames >= 1000 && paidReturnGreaterThan(250)) {
+        return {
+          text: "Suspicious Snack",
+          className: "judgementSuspicious"
+        };
+      }
+
+      if (lifetimePaidGames >= 5000 && paidReturnGreaterThan(180)) {
+        return {
+          text: "Unusually Blessed",
+          className: "judgementSuspicious"
+        };
+      }
+
+      return {
+        text: "Acceptable Mortal",
+        className: "judgementGood"
+      };
+    }
+
+    function renderOddsInfo() {
+      const activeLines = getActivePaylines().length;
+      const odds = calculateOdds();
+
+      return `
+        <div class="winCard">
+          <strong>Possibilities & Odds</strong>
+
+          <div class="winRow">
+            <span>Active Lines</span>
+            <span>${activeLines}</span>
+          </div>
+
+          <div class="winRow">
+            <span>2 in row / direction</span>
+            <span>${formatOdds(odds.twoInRow)}</span>
+          </div>
+
+          <div class="winRow">
+            <span>3 in row / direction</span>
+            <span>${formatOdds(odds.threeInRow)}</span>
+          </div>
+
+          <div class="winRow">
+            <span>4 in row / direction</span>
+            <span>${formatOdds(odds.fourInRow)}</span>
+          </div>
+
+          <div class="winRow">
+            <span>5 in row / direction</span>
+            <span>${formatOdds(odds.fiveInRow)}</span>
+          </div>
+
+          <div class="winRow winGap">
+            <span>Any payout / direction</span>
+            <span>${formatOdds(odds.anyDirectedWin)}</span>
+          </div>
+
+          <div class="winRow">
+            <span>Estimated spin hit</span>
+            <span>${formatOdds(odds.approxAnySpinWin)}</span>
+          </div>
+
+          <div class="codeMessage">Per-direction odds include Wild behavior. Spin hit is an estimate because paylines overlap.</div>
+        </div>
+      `;
+    }
+
+
+
+    function statCard(label, value) {
+      return `<div class="statRow"><span>${label}</span><span>${value}</span></div>`;
+    }
+
+    function statGroup(title, cards, extraClass = "") {
+      return `
+        <div class="statGroup ${extraClass}">
+          <div class="statGroupTitle">${title}</div>
+          <div class="statGroupInner">${cards}</div>
+        </div>
+      `;
+    }
+
+    function getLifetimeNetGain() {
+      return lifetimeTokensEarned - lifetimeTokensWagered;
+    }
+
+    function renderStatsInfo() {
+      const lifetimeCards = `
+        ${statCard("Tokens", formatGameNumber(tokens))}
+        ${statCard("Themes", `${getUnlockCount()} / ${getTotalUnlockCount()}`)}
+        ${statCard("Lifetime Spins", totalSpins.toLocaleString())}
+        ${statCard("Highest Balance", formatGameNumber(highestBalance))}
+        ${statCard("Largest Win", formatGameNumber(biggestSingleWin))}
+        ${statCard("Free Won", formatGameNumber(lifetimeFreeWinnings))}
+        ${statCard("Paid Won", formatGameNumber(lifetimePaidWinnings))}
+        ${statCard("Paid Wagered", formatGameNumber(lifetimePaidWagered))}
+        ${statCard("Bonus Won", formatGameNumber(lifetimeBonusSpinWinnings))}
+        ${statCard("Cans Fed", winkyCansFed.toLocaleString())}
+      `;
+
+      const leaderboardCards = `
+        ${statCard("Player ID", `${playerId.slice(0, 8)}...`)}
+        ${statCard("Username", leaderboardUsername || "Not set")}
+        ${statCard("Device", leaderboardDeviceInfo || "Not set")}
+        ${statCard("Status", leaderboardOptedIn ? "Opted In" : "Not Submitted")}
+        ${statCard("Edit", `<button class="infoButton smallStatButton" onclick="openLeaderboardPrompt(true)">Create/Edit</button>`)}
+        ${statCard("Submit", `<button class="infoButton smallStatButton" onclick="manualSubmitLeaderboardScore()">Submit</button>`)}
+      `;
+
+      return `
+        <div class="winCard">
+          <strong>Lifetime Stats</strong>
+
+          <div class="statsGrid">
+            ${statGroup("Lifetime", lifetimeCards)}
+            ${statGroup("Leaderboard", leaderboardCards)}
+          </div>
+        </div>
+      `;
+    }
+
+    function getRedeemedCodes() {
+      return JSON.parse(localStorage.getItem("redeemedCodes")) || [];
+    }
+
+    function renderCodesUnlockedInfo() {
+      const redeemedCodes = getRedeemedCodes();
+      const knownCodes = unlockedCodes.filter(code => getCodeRewards()[code]);
+
+      const rows = knownCodes.length
+        ? knownCodes.map(code => {
+            const used = redeemedCodes.includes(code);
+            return `
+              <div class="codeItem ${used ? "used" : ""}">
+                <div class="codeItemName">${code}</div>
+                <div class="codeItemStatus">${used ? "Used This Reset" : "Ready"}</div>
+                <button class="infoButton codeApplyButton" onclick="applyKnownCode('${code}')" ${used ? "disabled" : ""}>Apply</button>
+              </div>
+            `;
+          }).join("")
+        : `<div class="codeItem"><div class="codeItemName">No codes discovered yet.</div><div class="codeItemStatus">Enter a valid code first.</div></div>`;
+
+      return `
+        <div class="winCard">
+          <strong>Codes Unlocked</strong>
+          <div class="codesGrid">${rows}</div>
+        </div>
+      `;
+    }
+
+    function getThemeStoreCost(themeKey) {
+      const config = themeStoreConfig[themeKey];
+      if (!config) return THEME_STORE_BASE_COST;
+      return THEME_STORE_BASE_COST * BigInt(config.multiplier || 1n);
+    }
+
+    function getThemeStoreLabel(themeKey, config, owned) {
+      if (config.comingSoon) return "Coming Soon";
+      if (owned && themes[themeKey]) return themes[themeKey].label || themeKey;
+      if (owned) return config.label || themeKey;
+      return "????";
+    }
+
+    function renderThemeStoreInfo() {
+      const rows = Object.keys(themeStoreConfig).map(themeKey => {
+        const config = themeStoreConfig[themeKey];
+        const owned = Boolean(unlockedThemes[themeKey]);
+        const canBuy = config.active && !config.comingSoon && themes[themeKey] && !owned;
+        const label = getThemeStoreLabel(themeKey, config, owned);
+        const cost = config.comingSoon || !themes[themeKey]
+          ? "?"
+          : formatGameNumber(getThemeStoreCost(themeKey));
+        const buttonText = owned ? "Owned" : config.comingSoon || !themes[themeKey] || !config.active ? "?" : cost;
+
+        return `
+          <div class="storeItem ${canBuy ? "" : "locked"}">
+            <div class="storeItemName">${label}</div>
+            <button class="infoButton storeButton" onclick="buyTheme('${themeKey}')" ${canBuy ? "" : "disabled"}>${buttonText}</button>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <div class="winCard">
+          <strong>Theme Store</strong>
+          <div class="storeGrid">${rows}</div>
+        </div>
+      `;
+    }
+
+    function buyTheme(themeKey) {
+      playSound("click");
+
+      const config = themeStoreConfig[themeKey];
+
+      if (!config || !config.active || config.comingSoon || !themes[themeKey]) {
+        codeMessage.textContent = "Theme not available yet.";
+        return;
+      }
+
+      if (unlockedThemes[themeKey]) {
+        codeMessage.textContent = "Theme already owned.";
+        return;
+      }
+
+      const cost = getThemeStoreCost(themeKey);
+
+      if (tokens < cost) {
+        codeMessage.textContent = "Not enough Forge Tokens.";
+        return;
+      }
+
+      tokens -= cost;
+      unlockTheme(themeKey);
+
+      saveBigInt("forgeTokens", tokens);
+      localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+      saveStats();
+
+      syncThemeIndex();
+      syncThemeSelectors();
+      updateDisplay();
+      updateWinInfo();
+
+      codeMessage.textContent = "Theme purchased.";
+    }
+
+    function renderGameInfo() {
+      return `
+        <div class="winCard">
+          <strong>Game Info</strong>
+
+          <div class="statGroup">
+            <div class="statGroupTitle">Paylines / Odds</div>
+            ${renderOddsInfo().replace('<div class="winCard">', '<div>').replace('</div>', '</div>')}
+          </div>
+
+          <div class="statGroup">
+            <div class="statGroupTitle">Notation</div>
+            ${renderNotationInfo().replace('<div class="winCard">', '<div>').replace('</div>', '</div>')}
+          </div>
+
+          <div class="codeMessage">All spins use 15 paylines. Changing Bet or Multiplier temporarily previews the active lines.</div>
+          <button class="infoButton smallStatButton" onclick="startLinePreview()">Preview Lines</button>
+        </div>
+      `;
+    }
+
+    function getEmberUpgradeCurrentBonusText(upgradeKey, level) {
+      if (upgradeKey === "axeMastery") return `Current Bonus: +${level}% Axe value`;
+      if (upgradeKey === "gemAffinity") return `Current Bonus: +${level}% Gem value`;
+      if (upgradeKey === "wildSpark") return `Current Bonus: +${level}% Wild value`;
+
+      if (upgradeKey === "idleForge") {
+        return `Current Bonus: ${formatGameNumber(getIdleTenMinuteEstimate(level))} every 10 minutes idle`;
+      }
+
+      if (upgradeKey === "forgeSurge") {
+        return `Current Bonus: +${level}% winnings while active`;
+      }
+
+      if (upgradeKey === "freeForge") {
+        const charges = Math.max(0, Math.min(level, 3));
+        return `Current Bonus: ${charges} paid spin${charges === 1 ? "" : "s"} cost 0 per activation`;
+      }
+
+      return "Current Bonus: None";
+    }
+
+    function getEmberUpgradeNote(upgradeKey) {
+      if (upgradeKey === "idleForge") {
+        return "Diminishing returns apply after 8 hours; the rate decreases again after 24 hours.";
+      }
+
+      return "";
+    }
+
+    function renderEmberStoreInfo() {
+      const rows = Object.entries(EMBER_UPGRADES).map(([upgradeKey, upgrade]) => {
+        const level = getEmberUpgradeLevel(upgradeKey);
+        const maxed = level >= upgrade.maxLevel;
+        const cost = getEmberUpgradeCost(upgradeKey);
+        const buttonText = maxed ? "Max" : `${cost.toString()} ${REBORN_CURRENCY_NAME}`;
+        const disabled = maxed || rebornCurrency < cost;
+        const canActivate = upgrade.type === "Active" || upgrade.type === "Rare";
+        const activationButton = canActivate
+          ? `<div class="emberStoreActionRow"><span class="emberStatusText">${getEmberSkillStatus(upgradeKey)}</span><button class="infoButton storeButton" onclick="activateEmberSkill('${upgradeKey}')" ${level <= 0 ? "disabled" : ""}>Activate</button></div>`
+          : "";
+        const note = getEmberUpgradeNote(upgradeKey);
+
+        return `
+          <div class="emberStoreItem ${disabled ? "locked" : ""}">
+            <div class="emberStoreTopRow">
+              <div class="emberStoreName">${upgrade.name}</div>
+              <div class="emberStoreDetails">Lv ${level}/${upgrade.maxLevel} — ${upgrade.type}</div>
+              <button class="infoButton storeButton" onclick="buyEmberUpgrade('${upgradeKey}')" ${disabled ? "disabled" : ""}>${buttonText}</button>
+            </div>
+            <div class="emberStoreDescription">${upgrade.description}</div>
+            <div class="emberStoreCurrentBonus">${getEmberUpgradeCurrentBonusText(upgradeKey, level)}</div>
+            ${note ? `<div class="emberStoreNote">${note}</div>` : ""}
+            ${activationButton}
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <div class="winCard">
+          <strong>Ember Store</strong>
+          <div class="codeMessage">Spend ${REBORN_CURRENCY_NAME} earned from Reborn. Passives apply immediately. Active and rare skills can also be used from the gem buttons.</div>
+          <div class="emberStoreGrid">${rows}</div>
+        </div>
+      `;
+    }
+
+    function renderBreakdownInfo() {
+      if (!lastWinBreakdown.length) {
+        return `
+          <div class="winCard">
+            <strong>Last Win Breakdown</strong>
+            <div class="breakdownRow">
+              <span>No wins recorded yet.</span>
+              <span></span>
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="winCard">
+          <strong>Last Win Breakdown</strong>
+          ${lastWinBreakdown.map(item => `
+            <div class="breakdownRow">
+              <span>${item.text}</span>
+              <span>${item.payout > 0n ? "+" + formatGameNumber(item.payout) : ""}</span>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderNotationInfo() {
+      return `
+        <div class="winCard">
+          <strong>Number Legend</strong>
+
+          <div class="winRow"><span>B</span><span>Billion</span></div>
+          <div class="winRow"><span>T</span><span>Trillion</span></div>
+          <div class="winRow"><span>Q</span><span>Quadrillion</span></div>
+          <div class="winRow"><span>Qi</span><span>Quintillion</span></div>
+          <div class="winRow"><span>S</span><span>Sextillion</span></div>
+          <div class="winRow"><span>Sp</span><span>Septillion</span></div>
+          <div class="winRow"><span>Oc</span><span>Octillion</span></div>
+          <div class="winRow"><span>No</span><span>Nonillion</span></div>
+          <div class="winRow"><span>Dc</span><span>Decillion</span></div>
+          <div class="winRow"><span>Ud</span><span>Undecillion</span></div>
+          <div class="winRow"><span>Dd</span><span>Duodecillion</span></div>
+        </div>
+      `;
+    }
+
+    function renderUnlockRows() {
+      const baseThemes = Object.keys(themes).filter(key => themes[key].unlockType === "base");
+      const variantThemes = Object.keys(themes).filter(key => themes[key].unlockType === "variant");
+      const specialThemes = Object.keys(themes).filter(key => themes[key].unlockType === "special");
+
+      const baseFound = baseThemes.filter(key => unlockedThemes[key]).length;
+      const variantFound = variantThemes.filter(key => unlockedThemes[key]).length;
+      const specialFound = specialThemes.filter(key => unlockedThemes[key]).length;
+
+      let rows = `
+        <div class="unlockRow">
+          <span>Total Unlocks</span>
+          <span>${getUnlockCount()} / ${getTotalUnlockCount()}</span>
+        </div>
+        <div class="unlockRow">
+          <span>Base Themes</span>
+          <span>${baseFound} / ${baseThemes.length}</span>
+        </div>
+        <div class="unlockRow">
+          <span>Gem Variants</span>
+          <span>${variantFound} / ${variantThemes.length}</span>
+        </div>
+        <div class="unlockRow">
+          <span>Special Themes</span>
+          <span>${specialFound} / ${specialThemes.length}</span>
+        </div>
+      `;
+
+      Object.keys(themes).forEach(themeKey => {
+        if (themeKey === "Default") return;
+
+        const label = themes[themeKey].label || themeKey;
+        const found = unlockedThemes[themeKey];
+
+        rows += `
+          <div class="unlockRow">
+            <span>${label}</span>
+            <span>${found ? "Found" : "Locked"}</span>
+          </div>
+        `;
+      });
+
+      return rows;
+    }
+
+    function renderDevToolsInfo() {
+      if (!devToolsUnlocked) {
+        return "";
+      }
+
+      return `
+        <div class="winCard">
+          <strong>Dev Tools</strong>
+
+          <div class="statGroup">
+            <div class="statGroupTitle">Theme Tools</div>
+            <div class="devButtonGrid">
+              <button class="devButton" onclick="devResetThemes()">Reset Themes</button>
+            </div>
+          </div>
+
+          <div class="statGroup">
+            <div class="statGroupTitle">Token Tools</div>
+            <div class="devButtonGrid">
+              <button class="devButton" onclick="addDevTokens()">+100M</button>
+              <button class="devButton" onclick="quickSpin(500)">Quick Spin x500</button>
+              <button class="devButton" onclick="triggerWinkyIntervention()">Test Winky</button>
+              <button class="devButton" onclick="toggleAutoSpin()">Auto Spin: ${autoSpinEnabled ? "On" : "Off"}</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateWinInfo() {
+      const winInfo = document.getElementById("winInfo");
+      if (!winInfo) return;
+
+      const infoPanel = winInfo.closest(".infoPanel");
+
+      if (!activePanel) {
+        winInfo.innerHTML = "";
+        if (infoPanel) infoPanel.style.display = "none";
+        return;
+      }
+
+      if (infoPanel) infoPanel.style.display = "block";
+
+      if (activePanel === "stats") {
+        winInfo.innerHTML = renderStatsInfo();
+        return;
+      }
+
+      if (activePanel === "breakdown") {
+        winInfo.innerHTML = renderBreakdownInfo();
+        return;
+      }
+
+      if (activePanel === "gameInfo") {
+        winInfo.innerHTML = renderGameInfo();
+        return;
+      }
+
+      if (activePanel === "codes") {
+        winInfo.innerHTML = renderCodesUnlockedInfo();
+        return;
+      }
+
+      if (activePanel === "store") {
+        winInfo.innerHTML = renderThemeStoreInfo();
+        return;
+      }
+
+      if (activePanel === "emberStore") {
+        winInfo.innerHTML = renderEmberStoreInfo();
+        return;
+      }
+
+      winInfo.innerHTML = "";
+    }
+
+    function updateUnlockPanel() {
+      if (unlockContent) {
+        unlockContent.innerHTML = renderUnlockRows();
+      }
+
+      updateDevToolsVisibility();
+    }
+
+    // =========================
+    // DEV TOOLS
+    // =========================
+
+    function updateDevToolsVisibility() {
+      if (!devPanel || !devPanelContent) return;
+
+      if (devToolsUnlocked) {
+        devPanel.classList.add("visible");
+        devPanelContent.innerHTML = renderDevToolsInfo();
+      } else {
+        devPanel.classList.remove("visible");
+        devPanelContent.innerHTML = "";
+      }
+
+      if (devTools) {
+        devTools.classList.remove("visible");
+      }
+    }
+
+    function activateThemeDev(themeName) {
+      markDevToolsUsed();
+      playSound("click");
+
+      unlockTheme(themeName);
+      applyUnlockedTheme(themeName);
+
+      localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+      updateDisplay();
+
+      codeMessage.textContent = `${themes[themeName]?.label || themeName} activated.`;
+    }
+
+    function devResetThemes() {
+      markDevToolsUsed();
+      playSound("click");
+
+      Object.keys(unlockedThemes).forEach(themeKey => {
+        unlockedThemes[themeKey] = themeKey === "Default";
+      });
+
+      activeTheme = "Default";
+      localStorage.setItem("activeTheme", activeTheme);
+      localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+
+      syncThemeIndex();
+      syncThemeSelectors();
+      applyTheme(activeTheme);
+      createGrid();
+      updateDisplay();
+      updateWinInfo();
+
+      codeMessage.textContent = "Themes reset. Default only.";
+    }
+
+    function addDevTokens() {
+      markDevToolsUsed();
+      playSound("click");
+
+      tokens += 100000000n;
+
+      saveBigInt("forgeTokens", tokens);
+
+      saveStats();
+      updateDisplay();
+
+      codeMessage.textContent = "+100M Forge Tokens added.";
+    }
+
+
+    // =========================
+    // LEADERBOARD
+    // =========================
+
+    function getLeaderboardPayload() {
+      const judgement = getWinkyJudgement();
+
+      return {
+        playerId: playerId,
+        username: leaderboardUsername || "Anonymous",
+        deviceInfo: leaderboardDeviceInfo || "Not set",
+
+        highestBalance: highestBalance.toString(),
+        highestBalanceRaw: highestBalance.toString(),
+        highestBalanceDisplay: formatGameNumber(highestBalance),
+        highestBalancePrecise: formatPreciseGameNumber(highestBalance),
+
+        currentTokens: tokens.toString(),
+        currentTokensRaw: tokens.toString(),
+        currentTokensDisplay: formatGameNumber(tokens),
+        currentTokensPrecise: formatPreciseGameNumber(tokens),
+
+        totalSpins: totalSpins,
+        themesUnlocked: getUnlockCount(),
+        totalThemes: getTotalUnlockCount(),
+        averagePaidSpinROI: formatBasisPoints(getAveragePaidSpinRoi()),
+        averageBetRisk: formatBasisPoints(getAverageBetRisk()),
+        highestBetRisk: formatBasisPoints(highestBetRisk),
+        playStyle: getPlayStyleLabel(),
+        gemPresses: gemPresses,
+        paidReturn: getPaidReturnRateText(),
+        totalReturn: getOverallReturnRateText(),
+        winkyCansFed: winkyCansFed,
+        winkyHungryNights: winkyHungryNights,
+        devToolsUsed: devToolsUsed,
+        judgement: judgement.text,
+        lastUpdated: new Date(lastUpdatedAt).toISOString()
+      };
+    }
+
+    function updateLeaderboardPromptFields() {
+      const idDisplay = document.getElementById("leaderboardPlayerIdDisplay");
+      const usernameInput = document.getElementById("leaderboardUsernameInput");
+      const deviceInput = document.getElementById("leaderboardDeviceInput");
+      const message = document.getElementById("leaderboardMessage");
+
+      if (idDisplay) {
+        idDisplay.textContent = "Player ID: " + playerId;
+      }
+
+      if (usernameInput) {
+        usernameInput.value = leaderboardUsername;
+      }
+
+      if (deviceInput) {
+        deviceInput.value = leaderboardDeviceInfo;
+      }
+
+      if (message) {
+        message.textContent = "";
+      }
+    }
+
+    function openLeaderboardPrompt(manual = false) {
+      const overlay = document.getElementById("leaderboardOverlay");
+      if (!overlay) return;
+
+      updateLeaderboardPromptFields();
+      overlay.classList.add("show");
+    }
+
+    function closeLeaderboardPrompt() {
+      const overlay = document.getElementById("leaderboardOverlay");
+      if (overlay) {
+        overlay.classList.remove("show");
+      }
+    }
+
+    function maybeShowLeaderboardPrompt() {
+      if (leaderboardPromptAnswered) return;
+
+      setTimeout(() => {
+        if (!leaderboardPromptAnswered) {
+          openLeaderboardPrompt(false);
+        }
+      }, 900);
+    }
+
+    function saveLeaderboardFields() {
+      const usernameInput = document.getElementById("leaderboardUsernameInput");
+      const deviceInput = document.getElementById("leaderboardDeviceInput");
+
+      leaderboardUsername = usernameInput ? usernameInput.value.trim().slice(0, 30) : leaderboardUsername;
+      leaderboardDeviceInfo = deviceInput ? deviceInput.value.trim().slice(0, 60) : leaderboardDeviceInfo;
+
+      localStorage.setItem("leaderboardUsername", leaderboardUsername);
+      localStorage.setItem("leaderboardDeviceInfo", leaderboardDeviceInfo);
+    }
+
+    function declineLeaderboardPrompt() {
+      playSound("click");
+
+      leaderboardPromptAnswered = true;
+      leaderboardOptedIn = false;
+
+      localStorage.setItem("leaderboardPromptAnswered", "true");
+      localStorage.setItem("leaderboardOptedIn", "false");
+
+      closeLeaderboardPrompt();
+      updateDisplay();
+    }
+
+    function submitLeaderboardFromPrompt() {
+      playSound("click");
+
+      saveLeaderboardFields();
+
+      if (!leaderboardUsername) {
+        const message = document.getElementById("leaderboardMessage");
+        if (message) message.textContent = "Enter a username first.";
+        return;
+      }
+
+      leaderboardPromptAnswered = true;
+      leaderboardOptedIn = true;
+
+      localStorage.setItem("leaderboardPromptAnswered", "true");
+      localStorage.setItem("leaderboardOptedIn", "true");
+
+      submitLeaderboardScore("manual", true);
+      closeLeaderboardPrompt();
+      updateDisplay();
+    }
+
+    function manualSubmitLeaderboardScore() {
+      playSound("click");
+
+      if (!leaderboardUsername) {
+        openLeaderboardPrompt(true);
+        return;
+      }
+
+      leaderboardPromptAnswered = true;
+      leaderboardOptedIn = true;
+
+      localStorage.setItem("leaderboardPromptAnswered", "true");
+      localStorage.setItem("leaderboardOptedIn", "true");
+
+      submitLeaderboardScore("manual", true);
+      updateDisplay();
+    }
+
+    function submitLeaderboardScore(source = "manual", showMessage = false) {
+      if (!LEADERBOARD_URL) return;
+      if (!leaderboardOptedIn && source === "auto") return;
+
+      const payload = getLeaderboardPayload();
+
+      fetch(LEADERBOARD_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify(payload)
+      }).then(() => {
+        if (showMessage && codeMessage) {
+          codeMessage.textContent = "Leaderboard score submitted.";
+        }
+      }).catch(() => {
+        if (showMessage && codeMessage) {
+          codeMessage.textContent = "Leaderboard submit failed. Try again later.";
+        }
+      });
+    }
+
+    function maybeAutoSubmitLeaderboard() {
+      if (!leaderboardOptedIn) return;
+      if (totalSpins <= 0) return;
+      if (lastLeaderboardAutoSpin === totalSpins) return;
+
+      lastLeaderboardAutoSpin = totalSpins;
+      localStorage.setItem("lastLeaderboardAutoSpin", String(lastLeaderboardAutoSpin));
+
+      submitLeaderboardScore("auto", false);
+    }
+
+    // =========================
+    // CODES
+    // =========================
+
+    function getCodeRewards() {
+      return {
+        MFEMAIL: () => {
+          tokens += 2000000n;
+          promoTokensRedeemed += 2000000n;
+          saveBigInt("forgeTokens", tokens);
+          saveStats();
+          codeMessage.textContent = "MFEMAIL redeemed: +2,000,000 Forge Tokens.";
+        },
+
+        PHONECHK: () => {
+          tokens += 1000000n;
+          promoTokensRedeemed += 1000000n;
+          saveBigInt("forgeTokens", tokens);
+          saveStats();
+          codeMessage.textContent = "PHONECHK redeemed: +1,000,000 Forge Tokens.";
+        },
+
+        MAYAFOX: () => {
+          unlockTheme("Maya");
+          localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+          codeMessage.textContent = "Maya theme unlocked.";
+        },
+
+        REIGNBEAR: () => {
+          unlockTheme("Reign");
+          localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+          codeMessage.textContent = "Reign theme unlocked.";
+        },
+
+        LETMESEETHEKITTIES: () => {
+          unlockTheme("WarriorPets1");
+          localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+          codeMessage.textContent = "Warrior Pets 1 unlocked.";
+        },
+           
+        SILLYDAWG: () => {
+          unlockTheme("WarriorPets2");
+          localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+          codeMessage.textContent = "Warrior Pets 2 unlocked.";
+        },
+
+        KYRASCYTHE: () => {
+          unlockTheme("Kyra");
+          localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+          codeMessage.textContent = "Kyra theme unlocked.";
+        },
+
+        NADIASPELL: () => {
+          unlockTheme("Nadia");
+          localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+          codeMessage.textContent = "Nadia theme unlocked.";
+        },
+
+        WINKYCHAOS: () => {
+          unlockTheme("Winky");
+          localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+          codeMessage.textContent = "Winky theme unlocked.";
+        },
+
+        FORGEDEV: () => {
+          devToolsUnlocked = true;
+          localStorage.setItem("devToolsUnlocked", "true");
+
+          markDevToolsUsed();
+          updateDevToolsVisibility();
+
+          codeMessage.textContent = "Dev tools unlocked.";
+        }
+      };
+    }
+
+    function redeemCode(code) {
+      const codeRewards = getCodeRewards();
+      const redeemedCodes = getRedeemedCodes();
+
+      if (!codeRewards[code]) {
+        codeMessage.textContent = "Invalid code.";
+        return false;
+      }
+
+      rememberUnlockedCode(code);
+
+      if (redeemedCodes.includes(code)) {
+        codeMessage.textContent = "Code already redeemed this reset.";
+        return false;
+      }
+
+      codeRewards[code]();
+      redeemedCodes.push(code);
+      localStorage.setItem("redeemedCodes", JSON.stringify(redeemedCodes));
+
+      syncThemeIndex();
+      syncThemeSelectors();
+      updateDisplay();
+      updateDevToolsVisibility();
+      updateWinInfo();
+
+      return true;
+    }
+
+    function applyCode() {
+      playSound("click");
+
+      const code = codeInput.value.trim().toUpperCase();
+
+      if (!code) {
+        codeMessage.textContent = "Enter a code.";
+        return;
+      }
+
+      if (redeemCode(code)) {
+        codeInput.value = "";
+      }
+    }
+
+    function applyKnownCode(code) {
+      playSound("click");
+      redeemCode(code);
+    }
+
+    codeInput.addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        applyCode();
+      }
+    });
+
+    // =========================
+    // RESET
+    // =========================
+
+    function resetGame() {
+      playSound("click");
+
+      const resetOverlay = document.getElementById("resetOverlay");
+      if (resetOverlay) {
+        resetOverlay.classList.add("show");
+      }
+    }
+
+    function closeResetConfirm() {
+      const resetOverlay = document.getElementById("resetOverlay");
+      if (resetOverlay) {
+        resetOverlay.classList.remove("show");
+      }
+    }
+
+    function confirmResetGame() {
+      playSound("click");
+      closeResetConfirm();
+      resetGameConfirmed();
+    }
+
+    function resetGameConfirmed() {
+      tokens = 0n;
+      currentGameHighestTokens = 0n;
+
+      bonusSpinQueue = 0;
+      bonusSpinLineBet = 0n;
+      bonusSpinFinalBet = 0n;
+      bonusSpinSource = "";
+
+      bonusSessionTotal = 0;
+      bonusSessionPlayed = 0;
+      bonusSessionWon = 0n;
+      devUnlockInfoVisible = false;
+      winkyOverlayActive = false;
+
+      lineCountIndex = lineCountOptions.length - 1;
+      baseBetIndex = getStoredIndex("baseBetIndex", 0, baseBetOptions.length);
+      multiplierIndex = getStoredIndex("multiplierIndex", 0, allMultiplierOptions.length);
+      themeGroupMap = buildThemeGroupMap();
+      symbolPool = buildSymbolPool();
+
+      activePanel = null;
+      lastWinBreakdown = [];
+
+      const winkyOverlay = document.getElementById("winkyOverlay");
+      if (winkyOverlay) {
+        winkyOverlay.classList.remove("show");
+      }
+
+      const gamePanel = document.getElementById("gamePanel");
+      if (gamePanel) {
+        gamePanel.classList.remove("themePeekActive");
+      }
+
+      saveBigInt("forgeTokens", tokens);
+      localStorage.setItem("unlockedThemes", JSON.stringify(unlockedThemes));
+      localStorage.setItem("activeTheme", activeTheme);
+      localStorage.removeItem("redeemedCodes");
+
+      saveStats();
+
+      clearWinningHighlights();
+      clearWinPopup();
+      hideLineOverlay();
+
+      syncThemeIndex();
+      syncThemeSelectors();
+      applyTheme(activeTheme);
+      createGrid();
+      updateDisplay();
+      updateDevToolsVisibility();
+      startLinePreview();
+
+      codeMessage.textContent = "Current game reset. Themes, lifetime stats, and Player ID were kept.";
+    }
+
+    // =========================
+    // RESIZE HANDLER
+    // =========================
+
+    window.addEventListener("resize", () => {
+      if (lineOverlayVisible) {
+        drawSingleLinePreview();
+      }
+    });
+  </script>
+</body>
+</html>

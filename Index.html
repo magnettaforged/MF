@@ -5915,10 +5915,7 @@
     function manualSubmitLeaderboardScore() {
       playSound("click");
 
-      if (!leaderboardUsername) {
-        openLeaderboardPrompt(true);
-        return;
-      }
+      saveLeaderboardFields();
 
       leaderboardPromptAnswered = true;
       leaderboardOptedIn = true;

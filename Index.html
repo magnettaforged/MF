@@ -2474,6 +2474,7 @@
     // =========================
 
     const LEADERBOARD_URL = "https://script.google.com/macros/s/AKfycby0gs4pBMKVwDEXpD3RgnhILqZTfvUwIiAO5Q8JCprWY7AcAovO7T13uVDDKTKbVqFZag/exec";
+    const LEADERBOARD_SYNC_EVERY_SPINS = 3;
 
     function createPlayerId() {
       if (window.crypto && typeof window.crypto.randomUUID === "function") {
@@ -5882,13 +5883,15 @@
     function declineLeaderboardPrompt() {
       playSound("click");
 
+      saveLeaderboardFields();
+
       leaderboardPromptAnswered = true;
       leaderboardOptedIn = true;
 
       localStorage.setItem("leaderboardPromptAnswered", "true");
       localStorage.setItem("leaderboardOptedIn", "true");
 
-      submitLeaderboardScore("auto", false);
+      submitLeaderboardScore("prompt", true);
       closeLeaderboardPrompt();
       updateDisplay();
     }
@@ -5904,7 +5907,7 @@
       localStorage.setItem("leaderboardPromptAnswered", "true");
       localStorage.setItem("leaderboardOptedIn", "true");
 
-      submitLeaderboardScore("manual", true);
+      submitLeaderboardScore("prompt", true);
       closeLeaderboardPrompt();
       updateDisplay();
     }
@@ -5929,28 +5932,53 @@
 
     function submitLeaderboardScore(source = "manual", showMessage = false) {
       if (!LEADERBOARD_URL) return;
-      const payload = getLeaderboardPayload();
 
-      fetch(LEADERBOARD_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8"
-        },
-        body: JSON.stringify(payload)
-      }).then(() => {
-        if (showMessage && codeMessage) {
-          codeMessage.textContent = "Leaderboard score submitted.";
+      const payload = getLeaderboardPayload();
+      payload.submitSource = source;
+
+      const body = JSON.stringify(payload);
+      let beaconQueued = false;
+
+      // sendBeacon is useful on mobile and cannot be cancelled by UI changes.
+      if (navigator.sendBeacon) {
+        try {
+          const blob = new Blob([body], { type: "text/plain;charset=utf-8" });
+          beaconQueued = navigator.sendBeacon(LEADERBOARD_URL, blob);
+        } catch {
+          beaconQueued = false;
         }
-      }).catch(() => {
-        if (showMessage && codeMessage) {
-          codeMessage.textContent = "Leaderboard submit failed. Try again later.";
-        }
-      });
+      }
+
+      if (!beaconQueued) {
+        fetch(LEADERBOARD_URL, {
+          method: "POST",
+          mode: "no-cors",
+          keepalive: true,
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body
+        }).then(() => {
+          if (showMessage && codeMessage) {
+            codeMessage.textContent = leaderboardUsername
+              ? "Leaderboard score submitted."
+              : "Tracking active by Player ID.";
+          }
+        }).catch(() => {
+          if (showMessage && codeMessage) {
+            codeMessage.textContent = "Leaderboard submit failed. Try again later.";
+          }
+        });
+      } else if (showMessage && codeMessage) {
+        codeMessage.textContent = leaderboardUsername
+          ? "Leaderboard score submitted."
+          : "Tracking active by Player ID.";
+      }
     }
 
     function maybeAutoSubmitLeaderboard() {
       if (totalSpins <= 0) return;
+      if (totalSpins % LEADERBOARD_SYNC_EVERY_SPINS !== 0) return;
       if (lastLeaderboardAutoSpin === totalSpins) return;
 
       lastLeaderboardAutoSpin = totalSpins;

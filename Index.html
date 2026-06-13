@@ -1685,8 +1685,8 @@
 
   <div class="winkyOverlay" id="leaderboardOverlay">
     <div class="winkyPopup">
-      <div class="winkyPopupTitle">Optional Leaderboard</div>
-      <div class="winkyPopupText">Submit your score to the leaderboard?</div>
+      <div class="winkyPopupTitle">Optional Username</div>
+      <div class="winkyPopupText">Your gameplay stats are tracked by Player ID. Add a username only if you want to be visible or eligible for events.</div>
 
       <div class="leaderboardPlayerId" id="leaderboardPlayerIdDisplay"></div>
 
@@ -1701,8 +1701,8 @@
       </div>
 
       <div class="winkyButtonRow">
-        <button class="infoButton" onclick="submitLeaderboardFromPrompt()">Submit</button>
-        <button class="infoButton" onclick="declineLeaderboardPrompt()">No Thanks</button>
+        <button class="infoButton" onclick="submitLeaderboardFromPrompt()">Save</button>
+        <button class="infoButton" onclick="declineLeaderboardPrompt()">Continue</button>
       </div>
 
       <div class="winkyPopupMessage" id="leaderboardMessage"></div>
@@ -5883,11 +5883,12 @@
       playSound("click");
 
       leaderboardPromptAnswered = true;
-      leaderboardOptedIn = false;
+      leaderboardOptedIn = true;
 
       localStorage.setItem("leaderboardPromptAnswered", "true");
-      localStorage.setItem("leaderboardOptedIn", "false");
+      localStorage.setItem("leaderboardOptedIn", "true");
 
+      submitLeaderboardScore("auto", false);
       closeLeaderboardPrompt();
       updateDisplay();
     }
@@ -5896,12 +5897,6 @@
       playSound("click");
 
       saveLeaderboardFields();
-
-      if (!leaderboardUsername) {
-        const message = document.getElementById("leaderboardMessage");
-        if (message) message.textContent = "Enter a username first.";
-        return;
-      }
 
       leaderboardPromptAnswered = true;
       leaderboardOptedIn = true;

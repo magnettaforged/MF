@@ -912,6 +912,22 @@
       font-weight: bold;
     }
 
+    .leaderboardPopup {
+      width: min(330px, 92vw);
+      padding: 18px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at top, rgba(214,168,79,0.14), rgba(0,0,0,0.96) 48%),
+        rgba(0,0,0,0.96);
+    }
+
+    .leaderboardPopup .winkyPopupText {
+      color: var(--text-muted);
+      font-size: 13px;
+      line-height: 1.35;
+      margin-bottom: 10px;
+    }
+
     .leaderboardField {
       margin-top: 10px;
       text-align: left;
@@ -919,37 +935,46 @@
 
     .leaderboardField label {
       display: block;
-      color: var(--text-muted);
+      color: var(--text-accent);
       font-size: 12px;
+      font-weight: bold;
       margin-bottom: 4px;
     }
 
     .leaderboardField input {
       width: 100%;
-      background: var(--button-bg);
+      background: rgba(0,0,0,0.48);
       color: var(--text-main);
-      border: var(--ui-border);
-      border-radius: 8px;
-      padding: 8px;
-      font-size: 13px;
+      border: 1px solid rgba(214,168,79,0.42);
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 14px;
       outline: none;
       box-sizing: border-box;
+      box-shadow: inset 0 0 8px rgba(0,0,0,0.58);
     }
 
     .leaderboardField input:focus {
       border-color: var(--accent);
+      box-shadow:
+        inset 0 0 8px rgba(0,0,0,0.58),
+        0 0 10px var(--accent-soft);
     }
 
-    .leaderboardPlayerId {
-      margin-top: 8px;
-      padding: 7px;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.35);
-      border: var(--ui-border);
+    .leaderboardNote {
+      margin-top: 9px;
       color: var(--text-muted);
       font-size: 11px;
-      overflow-wrap: anywhere;
-      text-align: left;
+      line-height: 1.3;
+      text-align: center;
+    }
+
+    .leaderboardButtonRow {
+      margin-top: 12px;
+    }
+
+    .leaderboardButtonRow .infoButton {
+      min-height: 36px;
     }
 
     .smallStatButton {
@@ -1684,11 +1709,9 @@
   </div>
 
   <div class="winkyOverlay" id="leaderboardOverlay">
-    <div class="winkyPopup">
-      <div class="winkyPopupTitle">Player Tracking</div>
-      <div class="winkyPopupText">Gameplay stats are automatically tracked by Player ID. Add a username only if you want to be visible or eligible for events.</div>
-
-      <div class="leaderboardPlayerId" id="leaderboardPlayerIdDisplay"></div>
+    <div class="winkyPopup leaderboardPopup">
+      <div class="winkyPopupTitle">Leaderboard</div>
+      <div class="winkyPopupText">Create a username for the leaderboard. Phone is optional and only helps verify event winners.</div>
 
       <div class="leaderboardField">
         <label for="leaderboardUsernameInput">Username</label>
@@ -1696,11 +1719,13 @@
       </div>
 
       <div class="leaderboardField">
-        <label for="leaderboardDeviceInput">Device Info</label>
-        <input id="leaderboardDeviceInput" placeholder="Example: Galaxy S22 / Chrome" maxlength="60" autocomplete="off">
+        <label for="leaderboardPhoneInput">Phone</label>
+        <input id="leaderboardPhoneInput" placeholder="Optional" maxlength="30" inputmode="tel" autocomplete="tel">
       </div>
 
-      <div class="winkyButtonRow">
+      <div class="leaderboardNote">Closing does not opt out. Scores still submit by Player ID.</div>
+
+      <div class="winkyButtonRow leaderboardButtonRow">
         <button class="infoButton" onclick="submitLeaderboardFromPrompt()">Save</button>
         <button class="infoButton" onclick="closeLeaderboardPrompt()">Close</button>
       </div>
@@ -2492,9 +2517,9 @@
     }
 
     let leaderboardUsername = localStorage.getItem("leaderboardUsername") || "";
-    let leaderboardDeviceInfo = localStorage.getItem("leaderboardDeviceInfo") || "";
-    let leaderboardPromptAnswered = true;
-    let leaderboardOptedIn = true;
+    let leaderboardPhone = localStorage.getItem("leaderboardPhone") || localStorage.getItem("leaderboardDeviceInfo") || "";
+    let leaderboardDeviceInfo = leaderboardPhone;
+    let leaderboardPromptSeen = localStorage.getItem("leaderboardPromptSeenV2") === "true";
     let lastLeaderboardAutoSpin = Number(localStorage.getItem("lastLeaderboardAutoSpin")) || 0;
 
 
@@ -2750,7 +2775,7 @@
     updateActiveSkillButtons();
     setInterval(updateActiveSkillButtons, 1000);
     startLinePreview();
-    // Username prompt is no longer automatic; tracking starts by Player ID.
+    setTimeout(maybeShowLeaderboardPrompt, 700);
 
     // =========================
     // AUDIO
@@ -5325,9 +5350,9 @@
       const leaderboardCards = `
         ${statCard("Player ID", `${playerId.slice(0, 8)}...`)}
         ${statCard("Username", leaderboardUsername || "Not set")}
-        ${statCard("Device", leaderboardDeviceInfo || "Not set")}
-        ${statCard("Status", leaderboardUsername ? "Username Set" : "Tracked by ID")}
-        ${statCard("Edit", `<button class="infoButton smallStatButton" onclick="openLeaderboardPrompt(true)">Create/Edit</button>`)}
+        ${statCard("Phone", leaderboardPhone || "Not set")}
+        ${statCard("Status", leaderboardUsername ? "Username Set" : "Tracked by Player ID")}
+        ${statCard("Edit", `<button class="infoButton smallStatButton" onclick="openLeaderboardPrompt(true)">Edit</button>`)}
         ${statCard("Submit", `<button class="infoButton smallStatButton" onclick="manualSubmitLeaderboardScore()">Submit</button>`)}
       `;
 
@@ -5785,13 +5810,38 @@
     // LEADERBOARD
     // =========================
 
+    function cleanLeaderboardUsername(value) {
+      return String(value || "")
+        .trim()
+        .replace(/[^a-zA-Z0-9 _-]/g, "")
+        .slice(0, 30);
+    }
+
+    function cleanLeaderboardPhone(value) {
+      return String(value || "")
+        .trim()
+        .replace(/[^0-9()+\-.\s]/g, "")
+        .slice(0, 30);
+    }
+
+    function markLeaderboardPromptSeen() {
+      leaderboardPromptSeen = true;
+      localStorage.setItem("leaderboardPromptSeenV2", "true");
+      localStorage.setItem("leaderboardPromptAnswered", "true");
+      localStorage.setItem("leaderboardOptedIn", "true");
+    }
+
     function getLeaderboardPayload() {
       const judgement = getWinkyJudgement();
+      leaderboardUsername = cleanLeaderboardUsername(leaderboardUsername);
+      leaderboardPhone = cleanLeaderboardPhone(leaderboardPhone);
+      leaderboardDeviceInfo = leaderboardPhone;
 
       return {
         playerId: playerId,
         username: leaderboardUsername || "",
-        deviceInfo: leaderboardDeviceInfo || "Not set",
+        phone: leaderboardPhone || "",
+        deviceInfo: leaderboardPhone || "Not set",
 
         highestBalance: highestBalance.toString(),
         highestBalanceRaw: highestBalance.toString(),
@@ -5822,21 +5872,16 @@
     }
 
     function updateLeaderboardPromptFields() {
-      const idDisplay = document.getElementById("leaderboardPlayerIdDisplay");
       const usernameInput = document.getElementById("leaderboardUsernameInput");
-      const deviceInput = document.getElementById("leaderboardDeviceInput");
+      const phoneInput = document.getElementById("leaderboardPhoneInput");
       const message = document.getElementById("leaderboardMessage");
-
-      if (idDisplay) {
-        idDisplay.textContent = "Player ID: " + playerId;
-      }
 
       if (usernameInput) {
         usernameInput.value = leaderboardUsername;
       }
 
-      if (deviceInput) {
-        deviceInput.value = leaderboardDeviceInfo;
+      if (phoneInput) {
+        phoneInput.value = leaderboardPhone;
       }
 
       if (message) {
@@ -5852,72 +5897,65 @@
       overlay.classList.add("show");
     }
 
-    function closeLeaderboardPrompt() {
+    function closeLeaderboardPrompt(submitOnClose = true) {
       const overlay = document.getElementById("leaderboardOverlay");
+
+      markLeaderboardPromptSeen();
+
+      if (submitOnClose) {
+        submitLeaderboardScore("prompt-close", false);
+      }
+
       if (overlay) {
         overlay.classList.remove("show");
       }
+
+      updateDisplay();
     }
 
     function maybeShowLeaderboardPrompt() {
-      // Tracking is automatic by Player ID. Username prompt only opens manually from Stats.
-      return;
+      if (leaderboardPromptSeen || leaderboardUsername) return;
+      openLeaderboardPrompt(false);
     }
 
     function saveLeaderboardFields() {
       const usernameInput = document.getElementById("leaderboardUsernameInput");
-      const deviceInput = document.getElementById("leaderboardDeviceInput");
+      const phoneInput = document.getElementById("leaderboardPhoneInput");
 
-      leaderboardUsername = usernameInput ? usernameInput.value.trim().slice(0, 30) : leaderboardUsername;
-      leaderboardDeviceInfo = deviceInput ? deviceInput.value.trim().slice(0, 60) : leaderboardDeviceInfo;
+      if (usernameInput) {
+        leaderboardUsername = cleanLeaderboardUsername(usernameInput.value);
+      }
+
+      if (phoneInput) {
+        leaderboardPhone = cleanLeaderboardPhone(phoneInput.value);
+      }
+
+      leaderboardDeviceInfo = leaderboardPhone;
 
       localStorage.setItem("leaderboardUsername", leaderboardUsername);
-      localStorage.setItem("leaderboardDeviceInfo", leaderboardDeviceInfo);
+      localStorage.setItem("leaderboardPhone", leaderboardPhone);
+      localStorage.setItem("leaderboardDeviceInfo", leaderboardPhone);
     }
 
     function declineLeaderboardPrompt() {
       playSound("click");
-
-      saveLeaderboardFields();
-
-      leaderboardPromptAnswered = true;
-      leaderboardOptedIn = true;
-
-      localStorage.setItem("leaderboardPromptAnswered", "true");
-      localStorage.setItem("leaderboardOptedIn", "true");
-
-      submitLeaderboardScore("prompt", true);
-      closeLeaderboardPrompt();
-      updateDisplay();
+      closeLeaderboardPrompt(true);
     }
 
     function submitLeaderboardFromPrompt() {
       playSound("click");
 
       saveLeaderboardFields();
+      markLeaderboardPromptSeen();
 
-      leaderboardPromptAnswered = true;
-      leaderboardOptedIn = true;
-
-      localStorage.setItem("leaderboardPromptAnswered", "true");
-      localStorage.setItem("leaderboardOptedIn", "true");
-
-      submitLeaderboardScore("prompt", true);
-      closeLeaderboardPrompt();
+      submitLeaderboardScore("prompt-save", true);
+      closeLeaderboardPrompt(false);
       updateDisplay();
     }
 
     function manualSubmitLeaderboardScore() {
       playSound("click");
-
-      saveLeaderboardFields();
-
-      leaderboardPromptAnswered = true;
-      leaderboardOptedIn = true;
-
-      localStorage.setItem("leaderboardPromptAnswered", "true");
-      localStorage.setItem("leaderboardOptedIn", "true");
-
+      markLeaderboardPromptSeen();
       submitLeaderboardScore("manual", true);
       updateDisplay();
     }
@@ -5954,7 +5992,7 @@
           if (showMessage && codeMessage) {
             codeMessage.textContent = leaderboardUsername
               ? "Leaderboard score submitted."
-              : "Tracking active by Player ID.";
+              : "Leaderboard tracking active by Player ID.";
           }
         }).catch(() => {
           if (showMessage && codeMessage) {
@@ -5964,7 +6002,7 @@
       } else if (showMessage && codeMessage) {
         codeMessage.textContent = leaderboardUsername
           ? "Leaderboard score submitted."
-          : "Tracking active by Player ID.";
+          : "Leaderboard tracking active by Player ID.";
       }
     }
 

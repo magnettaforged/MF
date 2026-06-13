@@ -1685,8 +1685,8 @@
 
   <div class="winkyOverlay" id="leaderboardOverlay">
     <div class="winkyPopup">
-      <div class="winkyPopupTitle">Optional Username</div>
-      <div class="winkyPopupText">Your gameplay stats are tracked by Player ID. Add a username only if you want to be visible or eligible for events.</div>
+      <div class="winkyPopupTitle">Player Tracking</div>
+      <div class="winkyPopupText">Gameplay stats are automatically tracked by Player ID. Add a username only if you want to be visible or eligible for events.</div>
 
       <div class="leaderboardPlayerId" id="leaderboardPlayerIdDisplay"></div>
 
@@ -1702,7 +1702,7 @@
 
       <div class="winkyButtonRow">
         <button class="infoButton" onclick="submitLeaderboardFromPrompt()">Save</button>
-        <button class="infoButton" onclick="declineLeaderboardPrompt()">Continue</button>
+        <button class="infoButton" onclick="closeLeaderboardPrompt()">Close</button>
       </div>
 
       <div class="winkyPopupMessage" id="leaderboardMessage"></div>
@@ -2493,7 +2493,7 @@
 
     let leaderboardUsername = localStorage.getItem("leaderboardUsername") || "";
     let leaderboardDeviceInfo = localStorage.getItem("leaderboardDeviceInfo") || "";
-    let leaderboardPromptAnswered = localStorage.getItem("leaderboardPromptAnswered") === "true";
+    let leaderboardPromptAnswered = true;
     let leaderboardOptedIn = true;
     let lastLeaderboardAutoSpin = Number(localStorage.getItem("lastLeaderboardAutoSpin")) || 0;
 
@@ -2750,7 +2750,7 @@
     updateActiveSkillButtons();
     setInterval(updateActiveSkillButtons, 1000);
     startLinePreview();
-    maybeShowLeaderboardPrompt();
+    // Username prompt is no longer automatic; tracking starts by Player ID.
 
     // =========================
     // AUDIO
@@ -5860,13 +5860,8 @@
     }
 
     function maybeShowLeaderboardPrompt() {
-      if (leaderboardPromptAnswered) return;
-
-      setTimeout(() => {
-        if (!leaderboardPromptAnswered) {
-          openLeaderboardPrompt(false);
-        }
-      }, 900);
+      // Tracking is automatic by Player ID. Username prompt only opens manually from Stats.
+      return;
     }
 
     function saveLeaderboardFields() {
@@ -5975,7 +5970,9 @@
 
     function maybeAutoSubmitLeaderboard() {
       if (totalSpins <= 0) return;
-      if (totalSpins % LEADERBOARD_SYNC_EVERY_SPINS !== 0) return;
+
+      const shouldSyncNow = totalSpins === 1 || totalSpins % LEADERBOARD_SYNC_EVERY_SPINS === 0;
+      if (!shouldSyncNow) return;
       if (lastLeaderboardAutoSpin === totalSpins) return;
 
       lastLeaderboardAutoSpin = totalSpins;
